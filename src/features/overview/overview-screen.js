@@ -15,8 +15,9 @@ import { useSettings, updateSettings, settingsStore, bankrollUnits } from '../..
 import {
   SOURCES, PERIODS, VERDICT_MIN_N, periodFromQuery, periodFilter, picksInPeriod, lastGradedSlate, closeVerdict, shadowTagRows,
   shadowMarketRows, bestWorst, rangeAxis, axisPct, sourceSummary, cumulativeUnits, realBetsExtras, slateReport, upcomingPending,
-  overduePending, visitSnapshot, sinceLastVisit,
+  overduePending, visitSnapshot, sinceLastVisit, shadowTagLineRows,
 } from '../../data/overview.js';
+import { lineLabel } from '../../data/lines.js';
 import {
   describeSource, describeResultsVsClose, describeBestWorst, describeLastSlate, describePending, describeSinceVisit, describeRealBets,
   verdictLabel,
@@ -138,9 +139,38 @@ function SourceCard({ source, picks, periodPart }) {
 // ---------------------------------------------------------------- group table (tags, markets)
 
 /**
- * @param {{ rows: GroupRow[], labelOf: (k: string) => string, linkOf: (k: string) => string, testId: string, compact?: boolean }} props
+ * Under a tag row: its lines (n, record, yield, EV vs close with n, verdict), collapsed by default.
+ * @param {{ label: string, rows: GroupRow[], linkOf: (lineKey: string) => string, tag: string }} props
  */
-function GroupTable({ rows, labelOf, linkOf, testId, compact = false }) {
+function LineRows({ label, rows, linkOf, tag }) {
+  const scoped = new Set(rows.map((r) => r.key.split(':')[0])).size > 1;
+  return html`<details class="ov-lines" data-testid=${`tag-lines-${tag}`}>
+    <summary class="ov-lines-sum"><${Icon} name="chevron-down" size=${14} /><span>${t('overview.lines.summary', { count: rows.length, n: rows.length })}</span></summary>
+    <ul class="ov-llist" aria-label=${t('overview.lines.title', { label })}>
+      ${rows.map((r) => {
+        const s = r.summary;
+        const e = s.fairCloseEv;
+        const line = lineLabel(r.key, { scope: scoped });
+        const ev = e.n ? t('overview.lines.evN', { ev: formatPct(e.mean), n: e.n }) : t('overview.lines.noClose');
+        return html`<li key=${r.key}>
+          <a class="ov-lrow" href=${linkOf(r.key)} data-key=${r.key}
+            aria-label=${t('overview.lines.rowLabel', { line, n: s.n, record: formatRecord(s), yield: formatPct(s.yield), ev, verdict: verdictLabel(r.verdict) })}>
+            <span class="ov-lname">${line}</span>
+            <span class="ov-lmeta num">${t('overview.tags.meta', { n: s.n, record: formatRecord(s), yield: formatPct(s.yield) })}</span>
+            <span class="ov-lev num">${ev}</span>
+            <span class="ov-lverdict"><${VerdictChip} v=${r.verdict} /></span>
+          </a>
+        </li>`;
+      })}
+    </ul>
+  </details>`;
+}
+
+/**
+ * @param {{ rows: GroupRow[], labelOf: (k: string) => string, linkOf: (k: string) => string, testId: string, compact?: boolean,
+ *   linesOf?: Record<string, GroupRow[]>, lineLinkOf?: (k: string, lineKey: string) => string }} props
+ */
+function GroupTable({ rows, labelOf, linkOf, testId, compact = false, linesOf, lineLinkOf }) {
   const axis = rangeAxis(rows);
   const zero = axisPct(0, axis);
   if (!rows.length) return html`<p class="ov-muted">${t('overview.tags.empty')}</p>`;
@@ -178,6 +208,9 @@ function GroupTable({ rows, labelOf, linkOf, testId, compact = false }) {
             <span class="ov-gverdict"><${VerdictChip} v=${r.verdict} /></span>
             <${Icon} name="chevron-right" size=${16} />
           </a>
+          ${linesOf && lineLinkOf && linesOf[r.key]
+            ? html`<${LineRows} label=${label} tag=${r.key} rows=${linesOf[r.key]} linkOf=${(/** @type {string} */ lk) => lineLinkOf(r.key, lk)} />`
+            : null}
         </li>`;
       })}
     </ol>
@@ -302,6 +335,7 @@ function Overview({ data, query }) {
   const periodPart = useMemo(() => periodFilter(period, all), [period, all]);
   const picks = useMemo(() => picksInPeriod(all, period, { today }), [all, period, today]);
   const tagRows = useMemo(() => shadowTagRows(picks), [picks]);
+  const tagLines = useMemo(() => shadowTagLineRows(picks), [picks]);
   const marketRows = useMemo(() => shadowMarketRows(picks), [picks]);
   const summaries = useMemo(() => SOURCES.map((source) => ({ source, summary: sourceSummary(picks, source) })), [picks]);
   const lastSlate = useMemo(() => slateReport(all, lastGradedSlate(all)), [all]);
@@ -363,6 +397,8 @@ function Overview({ data, query }) {
         labelOf=${(/** @type {string} */ k) => tagLabel(/** @type {any} */ (k))}
         linkOf=${(/** @type {string} */ k) => href(`/explorer?${qs({ ...periodPart, sources: ['shadow'], tags: [k] })}`)}
         testId="tag-table"
+        linesOf=${tagLines}
+        lineLinkOf=${(/** @type {string} */ k, /** @type {string} */ lk) => href(`/explorer?${qs({ ...periodPart, sources: ['shadow'], tags: [k], lines: [lk] })}`)}
       />
     </${Card}>
 

@@ -105,6 +105,10 @@ export interface Pick extends Measures {
   reviewClass: ReviewClass;
   selection: string;
   side: 'over' | 'under' | '';
+  /** The line of the selection (4.5, 9.5; signed for Asian handicaps: 0.25, -1), null when it has none (src/data/lines.js). */
+  line: number | null;
+  /** `<scope>:<over|under>:<value>` ('cards:under:4.5') or `ah:<signed>` ('ah:+0.25'); null without a line. */
+  lineKey: string | null;
   price: number | null;
   closePrice: number | null;
   status: Status;

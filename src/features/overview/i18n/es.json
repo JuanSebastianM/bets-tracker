@@ -73,5 +73,15 @@
     "picks": "Ver todos los picks",
     "simulate": "Simular",
     "tests": "Tests"
+  },
+  "lines": {
+    "summary": {
+      "one": "Por línea · {n} línea",
+      "other": "Por línea · {n} líneas"
+    },
+    "title": "Por línea en {label}",
+    "evN": "EV {ev} (n {n})",
+    "noClose": "sin cierre",
+    "rowLabel": "{line}: n {n}, {record}, yield {yield}, {ev}, {verdict}"
   }
 }

@@ -168,7 +168,8 @@
     "170_200": "1.70–2.00",
     "200_250": "2.00–2.50",
     "250_400": "2.50–4.00",
-    "gt400": "> 4.00"
+    "gt400": "> 4.00",
+    "lt170": "< 1.70"
   },
   "breakdown": {
     "title": "Breakdown",
@@ -177,6 +178,7 @@
     "tag": "Tag",
     "market": "Market",
     "price": "Price",
+    "line": "Line",
     "avg": "price {price}",
     "note": "With this plan's stakes. Tap a row to see those picks in the Explorer."
   },

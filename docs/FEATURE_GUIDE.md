@@ -120,9 +120,18 @@ s.fairCloseEv; // { n, mean, median, se (clustered by match), lo, hi (±2 SE), z
 s.clv;         // same shape
 groupBy(picks, (p) => p.league);                 // [{ key, picks, summary }], largest first
 groupBy(picks, (p) => p.books);                  // a key array puts a pick in several groups
-groupBy(picks, (p) => priceBand(p.price));       // 'le170' | '170_200' | '200_250' | '250_400' | 'gt400'
+groupBy(picks, (p) => priceBand(p.price));       // 'lt170' | '170_200' | '200_250' | '250_400' | 'gt400'
+groupByLine(picks);                              // lines.js: [{ key: lineKey, picks, summary }], in line order
 calibration(picks, (p) => p.probModel);          // [{ lo, hi, n, wins, meanProb, hitRate }]
 ```
+
+Price bands are disjoint and each one is exactly the price preset of the same id: `lt170` (< 1.70),
+`170_200` (1.70–2.00, 1.70 included), `200_250`, `250_400`, `gt400`. To link a breakdown row to exactly
+its picks use `exactSlice(picks, filters, patch, ctx)` (filters.js): it adds the graded statuses and,
+only when they change the selection, leaves out PUBLICADA Y APOSTADA and unpriced rows (summarize and
+simulate skip those); `priceBandPatch(band)` is the patch of a band. Lines: `lineLabel(key, { scope })`,
+`lineAddsInfo(pick)` (show the label beside the selection only when it adds something),
+`compareLineKeys`, `parseLineKey`, `LINE_SCOPES`.
 
 Never show a rate over fewer than `MIN_N_FOR_RATE` (5) graded picks without its `n` beside it.
 `summarize` leaves out `PUBLICADA Y APOSTADA` rows and unknown statuses.
@@ -166,7 +175,11 @@ const opts = filterOptions(data.picks);                      // { tags: [{ value
 State fields: `sources, tags, markets, marketsRaw, leagues, books, statuses` (lists), `pricePreset`
 (`le170, 170_200, lt200, le200, 200_250, le250, 250_400, le400, gt400`) or `price {min,max}`,
 `datePreset` (`last_slate, 7d, 30d, this_month, since`) with `dateFrom/dateTo`, `slate`, `hasClose`,
-`twoSidedClose`, `refs`, `samples`, `fuerza`, `reasons`, `ev {min,max}`, `prob {min,max}`, `q`. The same
+`twoSidedClose`, `refs`, `samples`, `fuerza`, `reasons`, `ev {min,max}`, `prob {min,max}`, `q`. Added with the line filter:
+`sides` (`over`, `under`: `Pick.side`; URL `side`), `lines` (lineKeys, `cards:under:4.5`; URL `line`) and
+`passedAll` (`true`/`false`/`null`: `parsed.passedAll`; URL `pass`). Old URLs and saved presets parse as
+before (the new fields stay at their defaults). `PRICE_PRESETS` has one hidden preset, `lt170` (< 1.70),
+not offered as a chip: it exists so the `lt170` price band can be linked. The same
 query string works on `#/explorer` and `#/simulator`, and saved presets (`savePreset(name, query)` in
 `settings.js`) store it.
 
@@ -259,6 +272,12 @@ html`<${FilterButton} count=${countActive(f)} onClick=${() => setOpen(true)} />
 - `FilterButton`: the "Filtros" button with the active count (`filter-button`).
 - `SavedFilters`: the user's saved filters (`savePreset` / `deletePreset`; Settings lists them too),
   "save this filter", and the built-in starting points (`BUILTIN_PRESETS`), which only fill the panel.
+- The "Línea" section (`line`, open by default, right after Market) shows Over / Under chips and the
+  line chips that exist under the other filters ("Under 4.5 · 11"), grouped by kind of market (Tarjetas,
+  Córners de equipo…) when they span several, sorted by line. It hides itself when no pick has a line.
+  Chip test ids: `fchip-sides-under`, `fchip-lines-cards:under:4.5`; the section is `fp-lines`. "Pasó
+  todos los filtros" (yes / no / any) sits in the Reason section. Built-in presets `cards_under_45`,
+  `cards_under_55`, `corners_under_95` (a preset may carry `labelKey`).
 - Data helpers added with it: `facetCounts`, `activeEntries`, `removeEntry`, `fromQueryString`,
   `BUILTIN_PRESETS`, `builtinPreset` (`filters.js`); `TAG_GROUPS`, `tagSlug` (`tags.js`); `sortPicks`,
   `SORT_KEYS`, `pinnacleFor`, `neighbours` (`explore.js`).

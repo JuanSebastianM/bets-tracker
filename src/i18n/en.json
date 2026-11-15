@@ -232,5 +232,46 @@
     "reload": "Update",
     "updateAfterWork": "It will update when this finishes.",
     "updated": "App updated."
+  },
+  "lines": {
+    "over": "Over {line}",
+    "under": "Under {line}",
+    "ah": "Handicap {line}",
+    "withScope": "{scope}: {line}",
+    "side": {
+      "over": "Over",
+      "under": "Under"
+    },
+    "scope": {
+      "cards": "Cards",
+      "cards_team": "Team cards",
+      "corners": "Corners",
+      "corners_team": "Team corners",
+      "goals": "Goals",
+      "goals_team": "Team goals",
+      "goals_1h": "First-half goals",
+      "shots": "Shots",
+      "shots_team": "Team shots",
+      "sot": "Shots on target",
+      "sot_team": "Team shots on target",
+      "ah": "Asian handicap"
+    },
+    "filter": {
+      "title": "Line",
+      "side": "Side",
+      "lines": "Lines",
+      "none": "With these filters no pick has a line.",
+      "hint": "The line comes from the selection text (Under 4.5, Over 9.5, handicap +0.25). Doubles and result markets have no single line.",
+      "passedAll": "Passed every filter",
+      "entrySide": "Side: {v}",
+      "entryPassedAll": "Passed every filter: {v}"
+    },
+    "builtin": {
+      "cards_under_45": "Cards Under 4.5",
+      "cards_under_55": "Cards Under 5.5",
+      "corners_under_95": "Total corners Under 9.5"
+    },
+    "byLine": "By line",
+    "pickLine": "Line"
   }
 }

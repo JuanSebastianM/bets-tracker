@@ -2,6 +2,7 @@
 // and serialised to the hash query so a filtered view can be bookmarked.
 
 import { MARKET_FAMILIES, TAGS } from './tags.js';
+import { compareLineKeys, isLineKey, LINE_SIDES } from './lines.js';
 
 /** @typedef {import('./types').Pick} Pick */
 
@@ -35,6 +36,9 @@ import { MARKET_FAMILIES, TAGS } from './tags.js';
  * @property {Range} ev               logged EV (fraction)
  * @property {Range} prob             model probability (fraction)
  * @property {string} q               free text (match, league, selection, notes, reason)
+ * @property {string[]} sides         'over' | 'under' (review.py's side of the selection, Pick.side)
+ * @property {string[]} lines         lineKey ('cards:under:4.5', 'ah:+0.25'; src/data/lines.js)
+ * @property {boolean | null} passedAll  model picks that passed every filter (parsed.passedAll)
  */
 
 /** @returns {FilterState} */
@@ -62,12 +66,17 @@ export function defaultFilters() {
     ev: { min: null, max: null },
     prob: { min: null, max: null },
     q: '',
+    sides: [],
+    lines: [],
+    passedAll: null,
   };
 }
 
 /**
- * Price presets. Bounds: min exclusive unless minInc, max inclusive unless maxExc.
- * @type {Array<{ id: string, label: string, min: number | null, max: number | null, minInc?: boolean, maxExc?: boolean }>}
+ * Price presets. Bounds: min exclusive unless minInc, max inclusive unless maxExc. `hidden` presets are
+ * not offered as panel chips: they exist so a breakdown row (stats.js PRICE_BANDS) can link to exactly
+ * its picks, and still show as an active chip and round-trip through the URL.
+ * @type {Array<{ id: string, label: string, min: number | null, max: number | null, minInc?: boolean, maxExc?: boolean, hidden?: boolean }>}
  */
 export const PRICE_PRESETS = [
   { id: 'le170', label: '≤ 1.70', min: null, max: 1.7 },
@@ -79,6 +88,7 @@ export const PRICE_PRESETS = [
   { id: '250_400', label: '2.50–4.00', min: 2.5, max: 4.0 },
   { id: 'le400', label: '≤ 4.00', min: null, max: 4.0 },
   { id: 'gt400', label: '> 4.00', min: 4.0, max: null },
+  { id: 'lt170', label: '< 1.70', min: null, max: 1.7, maxExc: true, hidden: true },
 ];
 
 /** Date presets; resolved against `today` and the data's last slate. */
@@ -170,6 +180,9 @@ export function applyFilters(picks, f, ctx) {
     if (f.reasons.length && !p.parsed.filters.some((r) => f.reasons.includes(r))) return false;
     if (!inRange(p.ev, f.ev)) return false;
     if (!inRange(p.probModel, f.prob)) return false;
+    if (f.sides && f.sides.length && !f.sides.includes(p.side)) return false;
+    if (f.lines && f.lines.length && !f.lines.includes(/** @type {string} */ (p.lineKey))) return false;
+    if (f.passedAll != null && Boolean(p.parsed.passedAll) !== f.passedAll) return false;
     if (words.length) {
       const hay = fold(`${p.match} ${p.league} ${p.selection} ${p.marketRaw} ${p.tagRaw} ${p.notes}`);
       if (!words.every((w) => hay.includes(w))) return false;
@@ -200,6 +213,7 @@ export function countActive(f) {
 const LIST_KEYS = /** @type {const} */ ({
   sources: 'src', tags: 'tag', markets: 'mkt', marketsRaw: 'mraw', leagues: 'lg', books: 'book', statuses: 'st',
   refs: 'ref', samples: 'sample', fuerza: 'fz', reasons: 'why',
+  sides: 'side', lines: 'line',
 });
 const RANGE_KEYS = /** @type {const} */ ({ price: ['pmin', 'pmax'], ev: ['evmin', 'evmax'], prob: ['prmin', 'prmax'] });
 
@@ -228,6 +242,7 @@ export function toQuery(f) {
   if (f.hasClose != null) q.close = f.hasClose ? '1' : '0';
   if (f.twoSidedClose != null) q.close2 = f.twoSidedClose ? '1' : '0';
   if (f.q) q.q = f.q;
+  if (f.passedAll != null) q.pass = f.passedAll ? '1' : '0';
   return q;
 }
 
@@ -252,6 +267,9 @@ export function fromQuery(q = {}) {
   if (q.close === '1' || q.close === '0') f.hasClose = q.close === '1';
   if (q.close2 === '1' || q.close2 === '0') f.twoSidedClose = q.close2 === '1';
   if (q.q) f.q = q.q;
+  f.sides = f.sides.filter((v) => /** @type {readonly string[]} */ (LINE_SIDES).includes(v));
+  f.lines = f.lines.filter(isLineKey);
+  if (q.pass === '1' || q.pass === '0') f.passedAll = q.pass === '1';
   return f;
 }
 
@@ -299,6 +317,8 @@ export function filterOptions(picks) {
     add('fuerza', p.parsed.fuerza);
     for (const r of p.parsed.filters) add('reasons', r);
     add('slates', p.date);
+    add('sides', p.side);
+    add('lines', p.lineKey);
   }
   const tagOrder = TAGS.map((t) => t.id);
   const order = /** @type {Record<string, string[]>} */ ({
@@ -309,15 +329,17 @@ export function filterOptions(picks) {
     refs: ['feed', 'consensus', 'books', 'one_book', 'none'],
     samples: ['10+', '6-9'],
     fuerza: ['keeps', 'rejects', 'na'],
+    sides: [...LINE_SIDES],
   });
   /** @type {Record<string, Array<{ value: string, count: number }>>} */
   const out = {};
-  for (const field of ['sources', 'tags', 'markets', 'marketsRaw', 'leagues', 'books', 'statuses', 'refs', 'samples', 'fuerza', 'reasons', 'slates']) {
+  for (const field of ['sources', 'tags', 'markets', 'marketsRaw', 'leagues', 'books', 'statuses', 'refs', 'samples', 'fuerza', 'reasons', 'slates', 'sides', 'lines']) {
     const m = maps[field] || new Map();
     const list = [...m.entries()].map(([value, count]) => ({ value, count }));
     const ord = order[field];
     if (ord) list.sort((a, b) => ord.indexOf(a.value) - ord.indexOf(b.value));
     else if (field === 'slates') list.sort((a, b) => (a.value < b.value ? 1 : -1));
+    else if (field === 'lines') list.sort((a, b) => compareLineKeys(a.value, b.value));
     else list.sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
     out[field] = list;
   }
@@ -339,6 +361,8 @@ const FACET_VALUES = /** @type {Record<string, (p: Pick) => Array<string | null>
   samples: (p) => [p.parsed.sample],
   fuerza: (p) => [p.parsed.fuerza],
   reasons: (p) => p.parsed.filters,
+  sides: (p) => [p.side],
+  lines: (p) => [p.lineKey],
 });
 
 /** The list fields that facetCounts counts. */
@@ -383,6 +407,11 @@ export function facetCounts(picks, f, ctx) {
     const yes = list.filter((p) => (field === 'hasClose' ? p.closePrice != null : p.hasTwoSidedClose)).length;
     out[field] = { yes, no: list.length - yes };
   }
+  {
+    const list = applyFilters(base, { ...rest, passedAll: null }, c);
+    const yes = list.filter((p) => p.parsed.passedAll).length;
+    out.passedAll = { yes, no: list.length - yes };
+  }
   return out;
 }
 
@@ -414,6 +443,8 @@ export function activeEntries(f) {
   if (f.datePreset || f.dateFrom || f.dateTo) out.push({ field: 'date' });
   list('markets');
   list('marketsRaw');
+  list('sides');
+  list('lines');
   list('statuses');
   list('leagues');
   list('books');
@@ -423,6 +454,7 @@ export function activeEntries(f) {
   list('samples');
   list('fuerza');
   list('reasons');
+  if (f.passedAll != null) out.push({ field: 'passedAll', value: f.passedAll ? 'yes' : 'no' });
   if (f.ev.min != null || f.ev.max != null) out.push({ field: 'ev' });
   if (f.prob.min != null || f.prob.max != null) out.push({ field: 'prob' });
   if (f.q) out.push({ field: 'q', value: f.q });
@@ -458,8 +490,8 @@ export function fromQueryString(qs) {
 
 /**
  * Built-in starting points for the panel ("only fill the panel"): a label key under `filters.builtin`
- * and the state patch.
- * @type {Array<{ id: string, patch: Partial<FilterState> }>}
+ * and the state patch. `labelKey` (optional) overrides the label key.
+ * @type {Array<{ id: string, labelKey?: string, patch: Partial<FilterState> }>}
  */
 export const BUILTIN_PRESETS = [
   { id: 'value_le200', patch: { tags: ['value'], pricePreset: 'le200' } },
@@ -469,10 +501,51 @@ export const BUILTIN_PRESETS = [
   { id: 'prop_value', patch: { tags: ['prop_value', 'prop_near_value'] } },
   { id: 'real_bets', patch: { sources: ['bets'] } },
   { id: 'two_sided_close', patch: { sources: ['shadow'], twoSidedClose: true } },
+  { id: 'cards_under_45', labelKey: 'lines.builtin.cards_under_45', patch: { tags: ['cards_under'], lines: ['cards:under:4.5'] } },
+  { id: 'cards_under_55', labelKey: 'lines.builtin.cards_under_55', patch: { tags: ['cards_under'], lines: ['cards:under:5.5'] } },
+  { id: 'corners_under_95', labelKey: 'lines.builtin.corners_under_95', patch: { sources: ['shadow'], lines: ['corners:under:9.5'] } },
 ];
 
 /** Full state of a built-in preset. @param {string} id @returns {FilterState | null} */
 export function builtinPreset(id) {
   const b = BUILTIN_PRESETS.find((x) => x.id === id);
   return b ? { ...defaultFilters(), ...b.patch } : null;
+}
+
+// ---------------------------------------------------------------- exact links for breakdown rows
+
+/** The graded statuses (the ones stats.js counts). */
+export const GRADED_STATUSES = ['won', 'lost', 'void', 'half_won', 'half_lost'];
+
+/**
+ * The filter patch that selects exactly one price band of stats.js priceBand (every band id is a
+ * PRICE_PRESETS id). @param {string} band
+ * @returns {Partial<FilterState>}
+ */
+export const priceBandPatch = (band) => ({ pricePreset: band, price: { min: null, max: null } });
+
+/**
+ * A filter state that selects in the Explorer exactly the picks a breakdown row counts: the current
+ * filters plus the row's patch, graded only, without PUBLICADA Y APOSTADA rows and without unpriced
+ * rows (summarize and simulate leave those out). The extra conditions are added only when they change
+ * the selection, so most links stay as short as the row's own filter.
+ * @param {Pick[]} picks all picks
+ * @param {FilterState} f the current filters
+ * @param {Partial<FilterState>} patch the row (e.g. { lines: ['cards:under:4.5'] })
+ * @param {{ today: string, lastSlate?: string | null }} ctx
+ * @returns {FilterState}
+ */
+export function exactSlice(picks, f, patch, ctx) {
+  /** @type {FilterState} */
+  const next = { ...f, ...patch };
+  const graded = f.statuses.filter((s) => GRADED_STATUSES.includes(s));
+  next.statuses = graded.length ? graded : [...GRADED_STATUSES];
+  const list = applyFilters(picks, next, ctx);
+  if (list.some((p) => p.tag === 'published_bet')) {
+    const present = new Set(applyFilters(picks, { ...next, tags: [] }, ctx).map((p) => p.tag));
+    const base = next.tags.length ? next.tags : TAGS.map((x) => x.id).filter((id) => present.has(id));
+    next.tags = base.filter((id) => id !== 'published_bet');
+  }
+  if (list.some((p) => p.price == null) && !next.pricePreset && next.price.min == null) next.price = { min: 1, max: next.price.max };
+  return next;
 }

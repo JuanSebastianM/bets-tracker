@@ -3,6 +3,7 @@
 
 import { classifyGrok, classifyShadow, marketFamily, reviewClass, sideOf, booksInReason, BOOKS } from './tags.js';
 import { measure, parseNotes } from './notes.js';
+import { parseLine } from './lines.js';
 
 /** @typedef {import('./types').Pick} Pick */
 /** @typedef {import('./types').Status} Status */
@@ -123,7 +124,7 @@ function fromBet(r) {
       freeBet: /apuesta gratis|freebet/i.test(notes) ? 1 : 0,
     },
   });
-  if (/^(doble|crear apuesta)/i.test(type)) pick.market = 'combo';
+  if (/^(doble|crear apuesta)/i.test(type)) Object.assign(pick, { market: 'combo', line: null, lineKey: null });
   return pick;
 }
 
@@ -165,6 +166,7 @@ function fromGrok(r) {
 function common(source, r) {
   const marketRaw = str(r.market);
   const statusRaw = str(r.status);
+  const market = marketFamily(marketRaw);
   return {
     uid: `${source}:${r.row}`,
     source,
@@ -174,10 +176,11 @@ function common(source, r) {
     league: str(r.league),
     match: str(r.match),
     marketRaw,
-    market: marketFamily(marketRaw),
+    market,
     reviewClass: reviewClass(marketRaw),
     selection: str(r.selection),
     side: sideOf(str(r.selection)),
+    ...parseLine(marketRaw, str(r.selection), market),
     price: num(r.price),
     status: statusOf(statusRaw),
     statusRaw,

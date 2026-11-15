@@ -187,7 +187,7 @@ function Simulator({ data, query }) {
             ? html`<${RiskBlock} sim=${simA} staking=${a.staking} />
                 <${PriceBlock} sim=${simA} />
                 <${MonthsBlock} sim=${simA} />
-                <${BreakdownBlock} sim=${simA} filters=${a.filters} />`
+                <${BreakdownBlock} sim=${simA} filters=${a.filters} picks=${data.picks} today=${today} />`
             : null}
           <${PendingBlock} sim=${simA} filters=${a.filters} />
           <${CompareBlock} data=${data} today=${today} a=${a} b=${b} simA=${simA} onChange=${go} />

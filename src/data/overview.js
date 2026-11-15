@@ -5,6 +5,7 @@
 import { summarize, groupBy, isCountable, isGraded, sheetProfit, flatProfit, drawdown, mean } from './stats.js';
 import { applyFilters, defaultFilters } from './filters.js';
 import { byDate } from './normalize.js';
+import { groupByLine } from './lines.js';
 
 /** @typedef {import('./types').Pick} Pick */
 /** @typedef {import('./types').Source} Source */
@@ -391,4 +392,24 @@ export function dateIn(iso, tz) {
   const t = Date.parse(iso);
   if (!Number.isFinite(t)) return null;
   return new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(t));
+}
+
+/**
+ * Sombra by tag and line: for every tag whose graded picks span at least two lines, one GroupRow per
+ * line (lineKey; picks without a line left out), in line order (lines.js compareLineKeys). Tags with
+ * fewer than two lines are absent. Same picks as shadowTagRows.
+ * @param {Pick[]} picks
+ * @returns {Record<string, GroupRow[]>}
+ */
+export function shadowTagLineRows(picks) {
+  const shadow = picks.filter((p) => p.source === 'shadow' && p.tag !== 'published_bet' && p.lineKey);
+  /** @type {Record<string, GroupRow[]>} */
+  const out = {};
+  for (const g of groupBy(shadow, (p) => p.tag)) {
+    const rows = groupByLine(g.picks)
+      .filter((l) => l.summary.n > 0)
+      .map((l) => ({ key: l.key, summary: l.summary, verdict: closeVerdict(l.summary.fairCloseEv), count: l.picks.length }));
+    if (rows.length >= 2) out[g.key] = rows;
+  }
+  return out;
 }

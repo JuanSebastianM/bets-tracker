@@ -67,3 +67,7 @@
 .sf-apply:hover { background: var(--c-surface-2); }
 .sf-save { display: grid; gap: var(--sp-2); }
 .sf-save .btn { justify-self: start; }
+
+/* The "Línea" section (src/lib/ui/filter-panel.js LineSection) */
+.filter-panel .fp-lines { display: grid; gap: var(--sp-2); }
+.filter-panel .fp-lines > .fp-group-title { margin-top: var(--sp-1); }

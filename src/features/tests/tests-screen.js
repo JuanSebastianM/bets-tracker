@@ -168,6 +168,7 @@ function FrozenDetail({ p, today }) {
       <a class="btn btn-secondary tests-link" href=${explorerHref(test.explorer || {})} data-testid=${`explorer-${test.id}`}>${t('tests.frozen.explorer')}</a>
       ${test.decisionRow ? html`<a class="link-btn tests-link-sm" href=${decisionHref(test.decisionRow)}>${t('tests.frozen.decision', { row: test.decisionRow })}</a>` : null}
     </div>
+    ${test.explorer && test.explorerExact === false ? html`<p class="tests-muted tests-small" data-testid=${`explorer-approx-${test.id}`}>${t('tests.frozen.explorerApprox')}</p>` : null}
   </div>`;
 }
 
@@ -273,6 +274,7 @@ function StoppedSection({ data }) {
               ${rows.length ? html`<p class="tests-muted tests-small">${t('tests.stopped.span', { first: formatDate(first), last: formatDate(last) })}</p>` : null}
               <div class="tests-links">
                 ${rows.length ? html`<a class="link-btn tests-link-sm" href=${explorerHref(c.explorer)}>${t('tests.frozen.explorer')}</a>` : null}
+                ${rows.length && c.explorerExact === false ? html`<span class="tests-muted tests-small">${t('tests.frozen.explorerApprox')}</span>` : null}
                 <a class="link-btn tests-link-sm" href=${decisionHref(c.decisionRow)}>${t('tests.frozen.decision', { row: c.decisionRow })}</a>
               </div>
             </div>
