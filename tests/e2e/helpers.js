@@ -12,6 +12,7 @@ export const ROUTES = [
   { path: '/decisions', title: 'Decisiones', ready: 'decisions-count' },
   { path: '/glossary', title: 'Glosario', ready: 'glossary-tags' },
   { path: '/settings', title: 'Ajustes', ready: 'settings-feed' },
+  { path: '/explorer/shadow%3A169', title: 'Pick', ready: 'pick-sheet' },
 ];
 
 /**

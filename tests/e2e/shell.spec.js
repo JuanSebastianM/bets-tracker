@@ -137,8 +137,10 @@ test('explorer: source chips filter through the URL and the detail sheet opens a
   await openApp(page, '/explorer');
   const count = page.getByTestId('explorer-count');
   const all = await count.textContent();
-  await page.getByTestId('chip-source-grok').click();
+  await page.getByTestId('filter-button').click();
+  await page.getByTestId('fchip-sources-grok').click();
   await expect(page).toHaveURL(/src=grok/);
+  await page.getByTestId('filter-show').click();
   await expect(count).not.toHaveText(all || '');
   await page.locator('.pick-card').first().click();
   const sheet = page.getByRole('dialog');
