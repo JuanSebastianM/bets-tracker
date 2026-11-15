@@ -1,6 +1,237 @@
 {
-  "stubTitle": "1u en cada pick de Sombra",
-  "stubBody": "Vista provisional: todos los picks calificados de Sombra a 1u, en orden de fecha.",
-  "curveSummary": "Ganancia acumulada de {n} picks a 1u: {profit} en total; la peor caída fue de {dd}.",
-  "month": "Mes"
+  "kellyFull": "completo",
+  "label": {
+    "flat": "{stake} fija",
+    "percent": "{pct}% de la banca",
+    "staked": "Stake registrado",
+    "kelly": "Kelly {frac}, máx. {cap}"
+  },
+  "modeLabel": "Cómo apostar",
+  "mode": {
+    "flat": "Fija",
+    "percent": "% banca",
+    "staked": "Registrado",
+    "kelly": "Kelly"
+  },
+  "modeHelp": {
+    "flat": "Las mismas unidades en cada pick, gane o pierda.",
+    "percent": "Un porcentaje de la banca, que sube y baja con los resultados. Los picks del mismo día se apuestan sobre la banca con que empezó ese día, porque se ponen antes de que se resuelva alguno.",
+    "staked": "El stake con que se registró cada pick: en Apuestas, el stake y la ganancia de la hoja; en Grok, su stake sugerido. Los picks sin stake (Sombra) quedan fuera.",
+    "kelly": "Kelly fraccional con la probabilidad justa registrada y la cuota, sobre la banca al empezar el día y con un tope por pick. Si el pick no tiene ventaja, el stake es 0 y no se apuesta."
+  },
+  "quickStakes": "Stakes rápidos",
+  "stakeField": "Unidades por pick",
+  "percentField": "Porcentaje de la banca por pick",
+  "kellyFraction": "Fracción de Kelly",
+  "kellyCap": "Tope por pick",
+  "bankField": "Banca inicial",
+  "bankHintFlat": "Solo sirve para medir la peor caída como % de la banca.",
+  "bankHint": "Por defecto, tu banca de Ajustes en unidades (o 100u si no la has puesto).",
+  "lead": {
+    "flat": "Si hubieras apostado {stake} en cada uno",
+    "percent": "Si hubieras apostado el {pct}% de la banca en cada uno",
+    "staked": "Con el stake con que se registró cada uno",
+    "kelly": "Con {label}"
+  },
+  "close": {
+    "no_close": "Ninguno de estos picks tiene cierre con los dos lados, así que todavía no se puede juzgar el precio contra el cierre.",
+    "lucky": {
+      "one": "En el único pick con cierre de dos lados ganaste {actual}, pero contra el cierre el precio valía {expected}: el resultado todavía puede ser suerte.",
+      "other": "En los {n} picks con cierre de dos lados ganaste {actual}, pero contra el cierre el precio valía {expected}: el resultado todavía puede ser suerte."
+    },
+    "backed": {
+      "one": "En el único pick con cierre de dos lados ganaste {actual} y el precio lo respalda: contra el cierre valía {expected} (de {lo} a {hi}).",
+      "other": "En los {n} picks con cierre de dos lados ganaste {actual} y el precio lo respalda: contra el cierre valía {expected} (de {lo} a {hi})."
+    },
+    "backed_weak": {
+      "one": "En el único pick con cierre de dos lados ganaste {actual} y contra el cierre el precio valía {expected}, pero el rango todavía incluye el cero: falta muestra.",
+      "other": "En los {n} picks con cierre de dos lados ganaste {actual} y contra el cierre el precio valía {expected}, pero el rango ({lo} a {hi}) todavía incluye el cero: falta muestra."
+    },
+    "unlucky": {
+      "one": "En el único pick con cierre de dos lados perdiste {actualAbs}, pero contra el cierre el precio valía {expected}: puede ser mala suerte más que malos precios.",
+      "other": "En los {n} picks con cierre de dos lados perdiste {actualAbs}, pero contra el cierre el precio valía {expected}: puede ser mala suerte más que malos precios."
+    },
+    "deserved": {
+      "one": "En el único pick con cierre de dos lados perdiste {actualAbs} y contra el cierre el precio tampoco valía ({expected}): no es solo mala suerte.",
+      "other": "En los {n} picks con cierre de dos lados perdiste {actualAbs} y contra el cierre el precio tampoco valía ({expected}): no es solo mala suerte."
+    }
+  },
+  "leftOut": {
+    "noStake": {
+      "one": "{n} pick sin stake quedó fuera.",
+      "other": "{n} picks sin stake quedaron fuera."
+    },
+    "noProb": {
+      "one": "{n} pick sin probabilidad registrada quedó fuera de Kelly.",
+      "other": "{n} picks sin probabilidad registrada quedaron fuera de Kelly."
+    },
+    "zeroStake": {
+      "one": "{n} pick sin ventaja tuvo stake 0 y no se apostó.",
+      "other": "{n} picks sin ventaja tuvieron stake 0 y no se apostaron."
+    },
+    "unpriced": {
+      "one": "{n} pick calificado sin cuota no cuenta.",
+      "other": "{n} picks calificados sin cuota no cuentan."
+    }
+  },
+  "lineActual": "Resultado",
+  "lineExpected": "Lo que valía el precio contra el cierre (n {n})",
+  "curveSummary": "Ganancia acumulada de {n} picks en orden de fecha: {profit} en total; la peor caída fue de {dd}.",
+  "curveExpected": "Contra el cierre, el precio valía {expected}.",
+  "day": "Día",
+  "picksCol": "Picks",
+  "stakedCol": "Apostado",
+  "profitCol": "Ganancia",
+  "cumCol": "Acumulado",
+  "emptyTitle": "No hay picks calificados con estos filtros",
+  "emptyPending": {
+    "one": "Hay {n} pick pendiente: el resultado aparece cuando se califique.",
+    "other": "Hay {n} picks pendientes: el resultado aparece cuando se califiquen."
+  },
+  "emptyBody": "Cambia o quita filtros para tener algo que simular.",
+  "money": "≈ {money} con tu valor de unidad",
+  "chance": "Rango por azar (±2 EE): de {lo} a {hi}",
+  "chanceNone": "Con tan pocos picks no hay rango por azar.",
+  "picks": "Picks",
+  "stakedSub": "{staked} apostadas",
+  "avgPrice": "Cuota media",
+  "finalBank": "Banca final",
+  "fromBank": "empezó en {bank}",
+  "ofBank": "{pct} de la banca inicial",
+  "savedFilters": "Filtros guardados y para empezar",
+  "picksTitle": "Los picks",
+  "count": {
+    "one": "{n} pick calificado",
+    "other": "{n} picks calificados"
+  },
+  "countPending": {
+    "one": "{n} pendiente",
+    "other": "{n} pendientes"
+  },
+  "stakingTitle": "Cómo apostar",
+  "risk": {
+    "title": "Caídas y rachas",
+    "summary": "peor caída {dd} · {loss} perdidas seguidas",
+    "dayValue": {
+      "one": "{profit} el {date} ({n} pick)",
+      "other": "{profit} el {date} ({n} picks)"
+    },
+    "maxDd": "Peor caída",
+    "lossStreak": "Racha perdedora más larga",
+    "winStreak": "Racha ganadora más larga",
+    "picksN": {
+      "one": "{n} pick",
+      "other": "{n} picks"
+    },
+    "bestDay": "Mejor día",
+    "worstDay": "Peor día",
+    "underwater": "Más tiempo bajo el máximo",
+    "underwaterValue": {
+      "one": "{days} día ({picks} picks) desde el {from}",
+      "other": "{days} días ({picks} picks) desde el {from}"
+    },
+    "underwaterOngoing": {
+      "one": "{days} día ({picks} picks) desde el {from}, y sigue",
+      "other": "{days} días ({picks} picks) desde el {from}, y sigue"
+    },
+    "neverUnder": "Nunca bajó de su máximo",
+    "underShare": "Picks por debajo del máximo",
+    "underShareValue": "{pct} (n {n})",
+    "avgStake": "Stake medio",
+    "note": "La peor caída va del punto más alto de la curva al más bajo que vino después. Las nulas y las medias no cortan una racha."
+  },
+  "price": {
+    "title": "Lo que dice el precio",
+    "summary": "contra el cierre {expected} (n {n})",
+    "summaryNone": "sin cierres de dos lados",
+    "intro": "Un resultado puede ser suerte; el cierre sin margen dice cuánto valía cada precio. Aquí se suma, con los mismos stakes, lo que cada pick valía contra el cierre.",
+    "coverage": "Picks con cierre de dos lados",
+    "coverageValue": "{n} de {total} ({pct})",
+    "actual": "Ganancia en esos picks",
+    "expected": "Lo que valía el precio",
+    "range": "de {lo} a {hi}",
+    "meanEv": "EV vs cierre medio",
+    "chance": "Total ± rango por azar",
+    "chanceNote": "Rango por azar: el total ± 2 errores estándar. Si incluye el cero, la muestra todavía no separa la habilidad de la suerte."
+  },
+  "months": {
+    "title": "Mes a mes",
+    "summary": {
+      "one": "{n} mes",
+      "other": "{n} meses"
+    },
+    "month": "Mes",
+    "record": "Récord"
+  },
+  "bands": {
+    "le170": "≤ 1.70",
+    "170_200": "1.70–2.00",
+    "200_250": "2.00–2.50",
+    "250_400": "2.50–4.00",
+    "gt400": "> 4.00"
+  },
+  "breakdown": {
+    "title": "Desglose",
+    "summary": "por etiqueta, mercado y cuota",
+    "by": "Ver por",
+    "tag": "Etiqueta",
+    "market": "Mercado",
+    "price": "Cuota",
+    "avg": "cuota {price}",
+    "note": "Con los stakes de este plan. Toca una fila para ver esos picks en el Explorador."
+  },
+  "pending": {
+    "title": "Pendientes",
+    "summary": {
+      "one": "{n} pick · {units} en juego",
+      "other": "{n} picks · {units} en juego"
+    },
+    "body": {
+      "one": "Hay {n} pick pendiente; con este plan tendría {units} en juego.",
+      "other": "Hay {n} picks pendientes; con este plan tendrían {units} en juego."
+    },
+    "notCounted": {
+      "one": "{n} no cuenta porque este plan no lo apostaría.",
+      "other": "{n} no cuentan porque este plan no los apostaría."
+    },
+    "see": "Ver los pendientes en el Explorador"
+  },
+  "compare": {
+    "allPicks": "Todos los picks",
+    "title": "Comparar con otro escenario",
+    "summary": "A {a} · B {b}",
+    "summaryNone": "A contra B",
+    "intro": "Prueba otra versión al lado de esta: otros filtros, otro stake o las dos cosas. B queda en el enlace, así que la comparación se puede guardar en favoritos.",
+    "withKelly": "B: lo mismo con Kelly",
+    "withLe200": "B: lo mismo con cuota ≤ 2.00",
+    "copy": "B: una copia para cambiar",
+    "bPicks": {
+      "one": "Picks de B: {n}",
+      "other": "Picks de B: {n}"
+    },
+    "lineA": "A",
+    "lineB": "B",
+    "chartSummary": "Ganancia acumulada por día: A {a}, B {b}, en {days} días.",
+    "tableCaption": "Diferencias entre A y B",
+    "diff": "B − A",
+    "swap": "Cambiar A por B",
+    "remove": "Quitar B",
+    "bFilters": "Filtros de B"
+  },
+  "scenarios": {
+    "savedToast": "Escenario «{name}» guardado.",
+    "title": "Escenarios guardados",
+    "summary": {
+      "one": "{n} guardado",
+      "other": "{n} guardados"
+    },
+    "hint": "Un escenario guarda los filtros y el plan de apuestas. Los filtros guardados en el Explorador también aparecen aquí.",
+    "apply": "Aplicar «{name}»",
+    "filterOnly": "solo filtros",
+    "asB": "Usar «{name}» como B",
+    "asBShort": "Como B",
+    "empty": "Todavía no guardas ninguno.",
+    "name": "Nombre del escenario",
+    "save": "Guardar escenario"
+  }
 }

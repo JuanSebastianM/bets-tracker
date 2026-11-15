@@ -1,6 +1,237 @@
 {
-  "stubTitle": "1u on every Shadow pick",
-  "stubBody": "Placeholder view: every graded Shadow pick at 1u, in date order.",
-  "curveSummary": "Cumulative profit of {n} picks at 1u: {profit} in total; the worst drop was {dd}.",
-  "month": "Month"
+  "kellyFull": "full",
+  "label": {
+    "flat": "{stake} flat",
+    "percent": "{pct}% of the bankroll",
+    "staked": "Logged stake",
+    "kelly": "Kelly {frac}, max {cap}"
+  },
+  "modeLabel": "How to stake",
+  "mode": {
+    "flat": "Flat",
+    "percent": "% bank",
+    "staked": "Logged",
+    "kelly": "Kelly"
+  },
+  "modeHelp": {
+    "flat": "The same units on every pick, win or lose.",
+    "percent": "A percentage of the bankroll, which grows and shrinks with the results. Same-day picks are staked on the bankroll at the start of that day, because they are placed before any of them settles.",
+    "staked": "The stake each pick was logged with: real bets use the sheet's stake and profit; Grok his suggested stake. Picks without a stake (Shadow) are left out.",
+    "kelly": "Fractional Kelly from the logged fair probability and the price, on the bankroll at the start of the day and capped per pick. A pick with no edge gets stake 0 and is not placed."
+  },
+  "quickStakes": "Quick stakes",
+  "stakeField": "Units per pick",
+  "percentField": "Percentage of the bankroll per pick",
+  "kellyFraction": "Kelly fraction",
+  "kellyCap": "Cap per pick",
+  "bankField": "Starting bankroll",
+  "bankHintFlat": "Only used to measure the worst drop as a % of the bankroll.",
+  "bankHint": "By default, your Settings bankroll in units (or 100u if you have not set it).",
+  "lead": {
+    "flat": "Had you bet {stake} on each",
+    "percent": "Had you bet {pct}% of the bankroll on each",
+    "staked": "With the stake each was logged with",
+    "kelly": "With {label}"
+  },
+  "close": {
+    "no_close": "None of these picks has a close with both sides, so the price cannot be judged against the close yet.",
+    "lucky": {
+      "one": "On the one pick with a two-sided close you won {actual}, but against the close the price was worth {expected}: the result may still be luck.",
+      "other": "On the {n} picks with a two-sided close you won {actual}, but against the close the price was worth {expected}: the result may still be luck."
+    },
+    "backed": {
+      "one": "On the one pick with a two-sided close you won {actual} and the price backs it: against the close it was worth {expected} ({lo} to {hi}).",
+      "other": "On the {n} picks with a two-sided close you won {actual} and the price backs it: against the close it was worth {expected} ({lo} to {hi})."
+    },
+    "backed_weak": {
+      "one": "On the one pick with a two-sided close you won {actual} and against the close the price was worth {expected}, but the range still includes zero: the sample is short.",
+      "other": "On the {n} picks with a two-sided close you won {actual} and against the close the price was worth {expected}, but the range ({lo} to {hi}) still includes zero: the sample is short."
+    },
+    "unlucky": {
+      "one": "On the one pick with a two-sided close you lost {actualAbs}, but against the close the price was worth {expected}: it may be bad luck rather than bad prices.",
+      "other": "On the {n} picks with a two-sided close you lost {actualAbs}, but against the close the price was worth {expected}: it may be bad luck rather than bad prices."
+    },
+    "deserved": {
+      "one": "On the one pick with a two-sided close you lost {actualAbs} and against the close the price was not worth it either ({expected}): it is not just bad luck.",
+      "other": "On the {n} picks with a two-sided close you lost {actualAbs} and against the close the price was not worth it either ({expected}): it is not just bad luck."
+    }
+  },
+  "leftOut": {
+    "noStake": {
+      "one": "{n} pick without a stake was left out.",
+      "other": "{n} picks without a stake were left out."
+    },
+    "noProb": {
+      "one": "{n} pick without a logged probability was left out of Kelly.",
+      "other": "{n} picks without a logged probability were left out of Kelly."
+    },
+    "zeroStake": {
+      "one": "{n} pick with no edge got stake 0 and was not placed.",
+      "other": "{n} picks with no edge got stake 0 and were not placed."
+    },
+    "unpriced": {
+      "one": "{n} graded pick without a price does not count.",
+      "other": "{n} graded picks without a price do not count."
+    }
+  },
+  "lineActual": "Result",
+  "lineExpected": "What the price was worth against the close (n {n})",
+  "curveSummary": "Cumulative profit of {n} picks in date order: {profit} in total; the worst drop was {dd}.",
+  "curveExpected": "Against the close, the price was worth {expected}.",
+  "day": "Day",
+  "picksCol": "Picks",
+  "stakedCol": "Staked",
+  "profitCol": "Profit",
+  "cumCol": "Cumulative",
+  "emptyTitle": "No graded picks with these filters",
+  "emptyPending": {
+    "one": "{n} pick is pending: the result shows up once it is graded.",
+    "other": "{n} picks are pending: the result shows up once they are graded."
+  },
+  "emptyBody": "Change or remove filters to have something to simulate.",
+  "money": "≈ {money} at your unit value",
+  "chance": "Chance range (±2 SE): {lo} to {hi}",
+  "chanceNone": "Too few picks for a chance range.",
+  "picks": "Picks",
+  "stakedSub": "{staked} staked",
+  "avgPrice": "Average price",
+  "finalBank": "Final bankroll",
+  "fromBank": "started at {bank}",
+  "ofBank": "{pct} of the starting bankroll",
+  "savedFilters": "Saved filters and starting points",
+  "picksTitle": "The picks",
+  "count": {
+    "one": "{n} graded pick",
+    "other": "{n} graded picks"
+  },
+  "countPending": {
+    "one": "{n} pending",
+    "other": "{n} pending"
+  },
+  "stakingTitle": "How to stake",
+  "risk": {
+    "title": "Drops and streaks",
+    "summary": "worst drop {dd} · {loss} losses in a row",
+    "dayValue": {
+      "one": "{profit} on {date} ({n} pick)",
+      "other": "{profit} on {date} ({n} picks)"
+    },
+    "maxDd": "Worst drop",
+    "lossStreak": "Longest losing streak",
+    "winStreak": "Longest winning streak",
+    "picksN": {
+      "one": "{n} pick",
+      "other": "{n} picks"
+    },
+    "bestDay": "Best day",
+    "worstDay": "Worst day",
+    "underwater": "Longest time below the peak",
+    "underwaterValue": {
+      "one": "{days} day ({picks} picks) from {from}",
+      "other": "{days} days ({picks} picks) from {from}"
+    },
+    "underwaterOngoing": {
+      "one": "{days} day ({picks} picks) from {from}, still going",
+      "other": "{days} days ({picks} picks) from {from}, still going"
+    },
+    "neverUnder": "Never fell below its peak",
+    "underShare": "Picks below the peak",
+    "underShareValue": "{pct} (n {n})",
+    "avgStake": "Average stake",
+    "note": "The worst drop runs from the highest point of the curve to the lowest one after it. Voids and halves do not break a streak."
+  },
+  "price": {
+    "title": "What the price says",
+    "summary": "against the close {expected} (n {n})",
+    "summaryNone": "no two-sided closes",
+    "intro": "A result can be luck; the close without the margin says what each price was worth. This adds up, with the same stakes, what each pick was worth against the close.",
+    "coverage": "Picks with a two-sided close",
+    "coverageValue": "{n} of {total} ({pct})",
+    "actual": "Profit on those picks",
+    "expected": "What the price was worth",
+    "range": "{lo} to {hi}",
+    "meanEv": "Mean fair-close EV",
+    "chance": "Total ± chance range",
+    "chanceNote": "Chance range: the total ± 2 standard errors. If it includes zero, the sample cannot yet tell skill from luck."
+  },
+  "months": {
+    "title": "Month by month",
+    "summary": {
+      "one": "{n} month",
+      "other": "{n} months"
+    },
+    "month": "Month",
+    "record": "Record"
+  },
+  "bands": {
+    "le170": "≤ 1.70",
+    "170_200": "1.70–2.00",
+    "200_250": "2.00–2.50",
+    "250_400": "2.50–4.00",
+    "gt400": "> 4.00"
+  },
+  "breakdown": {
+    "title": "Breakdown",
+    "summary": "by tag, market and price",
+    "by": "Show by",
+    "tag": "Tag",
+    "market": "Market",
+    "price": "Price",
+    "avg": "price {price}",
+    "note": "With this plan's stakes. Tap a row to see those picks in the Explorer."
+  },
+  "pending": {
+    "title": "Pending",
+    "summary": {
+      "one": "{n} pick · {units} at stake",
+      "other": "{n} picks · {units} at stake"
+    },
+    "body": {
+      "one": "{n} pick is pending; with this plan it would have {units} at stake.",
+      "other": "{n} picks are pending; with this plan they would have {units} at stake."
+    },
+    "notCounted": {
+      "one": "{n} is not counted because this plan would not place it.",
+      "other": "{n} are not counted because this plan would not place them."
+    },
+    "see": "See the pending picks in the Explorer"
+  },
+  "compare": {
+    "allPicks": "All picks",
+    "title": "Compare with another scenario",
+    "summary": "A {a} · B {b}",
+    "summaryNone": "A against B",
+    "intro": "Try another version next to this one: other filters, another stake or both. B stays in the link, so the comparison can be bookmarked.",
+    "withKelly": "B: the same with Kelly",
+    "withLe200": "B: the same at price ≤ 2.00",
+    "copy": "B: a copy to change",
+    "bPicks": {
+      "one": "B's picks: {n}",
+      "other": "B's picks: {n}"
+    },
+    "lineA": "A",
+    "lineB": "B",
+    "chartSummary": "Cumulative profit by day: A {a}, B {b}, over {days} days.",
+    "tableCaption": "Differences between A and B",
+    "diff": "B − A",
+    "swap": "Swap A and B",
+    "remove": "Remove B",
+    "bFilters": "B's filters"
+  },
+  "scenarios": {
+    "savedToast": "Scenario “{name}” saved.",
+    "title": "Saved scenarios",
+    "summary": {
+      "one": "{n} saved",
+      "other": "{n} saved"
+    },
+    "hint": "A scenario keeps the filters and the staking plan. Filters saved in the Explorer show up here too.",
+    "apply": "Apply “{name}”",
+    "filterOnly": "filters only",
+    "asB": "Use “{name}” as B",
+    "asBShort": "As B",
+    "empty": "You have not saved any yet.",
+    "name": "Scenario name",
+    "save": "Save scenario"
+  }
 }
