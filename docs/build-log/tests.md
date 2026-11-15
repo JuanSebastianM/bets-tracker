@@ -74,3 +74,23 @@
 - The first interval strip used `preserveAspectRatio="none"`, which squashed the mean dot into an ellipse;
   it now positions everything in % of the width.
 - The e2e fixes the browser clock (`page.clock.setFixedTime`) so the review countdown is stable.
+
+## Revision after review: compact list (15 Nov 2026)
+
+The first version was about 25,500 px tall on a phone (one 1.5-screen card per test). Now:
+
+- Under the strip and the review card, **one list of all twelve tests** (frozen first, then price-first):
+  label, state chip, graded "16/100" with a thin bar, two-sided closes "11/50" (price-first: rows with the
+  measure out of the rule's count, 30 for VALOR, 60/120 for VALOR PROP; context tests show plain counts),
+  EV against the close with n and a small interval mark. On a phone each row is two lines; from 720 px it
+  is one line under a column header.
+- **Accordion**: a row is a button (`aria-expanded`, `aria-controls`, Enter/Space) that expands the full
+  content in place; one open at a time. The open test lives in the query (`#/tests?open=<id>`), so the
+  strip's "la más cerca de decidir", other sections and reloads open the right one; other query
+  parameters (Overview's `date=`) are kept and unknown ids are ignored. A query is used rather than a
+  path because the shell remounts and scrolls to the top on a path change.
+- Review card: meters, due chip and the due line stay visible; the rule sentence and past reviews are
+  behind a disclosure. Stopped categories sit behind one disclosure, each a summary row with when and
+  the final numbers, details on tap. "How to read" moved below the list and now carries the frozen and
+  price-first intros.
+- Height at 390 px, fixture, collapsed: about 2,400 px (was about 25,500).

@@ -76,3 +76,26 @@ export function TermSentence({ k, termKey, slug }) {
   const [before, after = ''] = t(k).split('{term}');
   return html`<p>${before}<a href=${glossaryHref(slug)}>${t(termKey)}</a>${after}</p>`;
 }
+
+/**
+ * A tiny mark of the mean and its interval against zero, for a list row. Decorative: the row says the
+ * figures in words.
+ * @param {{ mean: number | null, lo: number | null, hi: number | null }} props
+ */
+export function MiniEv({ mean, lo, hi }) {
+  if (mean == null) return null;
+  const ext = Math.max(0.05, Math.abs(mean), Math.abs(lo ?? 0), Math.abs(hi ?? 0)) * 1.1;
+  const x = (/** @type {number} */ v) => `${(6 + ((v + ext) / (2 * ext)) * 88).toFixed(2)}%`;
+  const w = (/** @type {number} */ a, /** @type {number} */ b) => `${Math.max(1, ((b - a) / (2 * ext)) * 88).toFixed(2)}%`;
+  return html`<svg class="tests-mini-ev" width="100%" height="12" aria-hidden="true" focusable="false">
+    <line class="tests-ev-zero" x1=${x(0)} x2=${x(0)} y1="0" y2="12" />
+    ${lo != null && hi != null ? html`<rect class="tests-ev-ci" x=${x(lo)} y="3" width=${w(lo, hi)} height="6" rx="2" />` : null}
+    <circle class="tests-ev-mean" cx=${x(mean)} cy="6" r="3.5" />
+  </svg>`;
+}
+
+/** A thin bar for a list row (decorative; the count is written beside it). @param {{ value: number, total: number }} props */
+export function MiniBar({ value, total }) {
+  const share = total > 0 ? Math.max(0, Math.min(1, value / total)) : 0;
+  return html`<span class="tests-mini-bar" aria-hidden="true"><i style=${{ width: `${share * 100}%` }}></i></span>`;
+}

@@ -61,7 +61,8 @@
     "history": "Past reviews",
     "historyEmpty": "No \"Revisión Sombra\" rows yet.",
     "historyItem": "{topic}",
-    "decisionRow": "Decisions row {row}"
+    "decisionRow": "Decisions row {row}",
+    "more": "Rule and past reviews"
   },
   "frozen": {
     "intro": "Model tests that keep being logged exactly as they are. Rule of row 111: each is decided once, at {graded} rows, by price against the close and not by results; if it passes you are offered real money at {stake}u, never applied on its own.",
@@ -179,7 +180,15 @@
       "corner_card_fillers": "Corner and card rejects used as fillers lost to the close whatever the rejection reason.",
       "shots_fillers": "Shots rejects stopped being fillers: only a shots pick with the verdict SHADOW is logged.",
       "model_only_shots_low": "MODELO SOLO rows under 1.70: they could never be a bet (rule 5), so they don't count toward the test."
-    }
+    },
+    "summary": "Stopped categories ({n})"
   },
-  "withCloseTwo": "With a two-sided close"
+  "withCloseTwo": "With a two-sided close",
+  "list": {
+    "graded": "Graded",
+    "closes": "With a close",
+    "ev": "EV vs close",
+    "evValue": "{mean} n {n}",
+    "glossary": "{label} in the glossary"
+  }
 }

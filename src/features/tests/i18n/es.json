@@ -61,7 +61,8 @@
     "history": "Revisiones anteriores",
     "historyEmpty": "Todavía no hay filas \"Revisión Sombra\".",
     "historyItem": "{topic}",
-    "decisionRow": "Decisiones fila {row}"
+    "decisionRow": "Decisiones fila {row}",
+    "more": "Regla y revisiones anteriores"
   },
   "frozen": {
     "intro": "Pruebas del modelo que siguen registrándose tal cual. Regla de la fila 111: se decide una sola vez, a las {graded} filas, por precio contra el cierre y no por resultados; si pasa se te propone dinero real a {stake}u, nunca se aplica solo.",
@@ -179,7 +180,15 @@
       "corner_card_fillers": "Los rechazos de córners y tarjetas usados como relleno perdían contra el cierre con cualquier motivo de rechazo.",
       "shots_fillers": "Los rechazos de tiros dejaron de usarse como relleno: solo se registra un tiro con veredicto SHADOW.",
       "model_only_shots_low": "Filas de MODELO SOLO bajo 1.70: nunca podrían ser apuesta (regla 5), así que no cuentan para la prueba."
-    }
+    },
+    "summary": "Categorías detenidas ({n})"
   },
-  "withCloseTwo": "Con cierre de dos lados"
+  "withCloseTwo": "Con cierre de dos lados",
+  "list": {
+    "graded": "Calificadas",
+    "closes": "Con cierre",
+    "ev": "EV vs cierre",
+    "evValue": "{mean} n {n}",
+    "glossary": "{label} en el glosario"
+  }
 }
