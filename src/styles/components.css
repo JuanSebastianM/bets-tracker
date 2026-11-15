@@ -247,3 +247,22 @@ button.pick-card:hover { border-color: var(--c-line-strong); }
 .toast-msg { flex: 1; }
 .toast-action, .toast-close { background: none; border: 0; color: inherit; font-weight: 700; min-height: var(--tap); min-width: var(--tap); cursor: pointer; }
 @media (min-width: 960px) { .toaster { bottom: var(--sp-6); left: var(--rail-w); } }
+
+/* ---------------------------------------------------------------- range chart, histogram (added by Analysis) */
+.ranges { display: grid; gap: 8px; }
+.range-axis { display: grid; grid-template-columns: minmax(84px, 38%) 1fr minmax(56px, auto); gap: var(--sp-2); font-size: var(--fs-xs); color: var(--c-muted); }
+.range-axis span { grid-column: 2; grid-row: 1; }
+.range-axis span:nth-child(2) { text-align: center; }
+.range-axis span:last-child { text-align: right; }
+.range-row { display: grid; grid-template-columns: minmax(84px, 38%) 1fr minmax(56px, auto); align-items: center; gap: var(--sp-2); font-size: var(--fs-sm); }
+.range-track { position: relative; height: 14px; background: var(--c-surface-2); border-radius: 3px; }
+.range-band { position: absolute; top: 3px; bottom: 3px; border-radius: 3px; background: var(--c-accent-soft); border: 1px solid var(--c-accent); }
+.range-dot { position: absolute; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--c-accent); border: 2px solid var(--c-surface); }
+.range-up .range-band { background: var(--c-won-soft); border-color: var(--c-won); }
+.range-up .range-dot { background: var(--c-won); }
+.range-down .range-band { background: var(--c-lost-soft); border-color: var(--c-lost); }
+.range-down .range-dot { background: var(--c-lost); }
+.range-muted { opacity: 0.5; }
+.chart-svg .hist-bar { fill: var(--c-accent); fill-opacity: 0.8; }
+.chart-svg .hist-below { fill: var(--c-void); fill-opacity: 0.55; }
+.chart-svg .hist-zero { stroke: var(--c-ink-2); stroke-width: 1.5; stroke-dasharray: 3 3; }

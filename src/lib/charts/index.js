@@ -161,9 +161,10 @@ export function BarChart({ bars, summary, yFormat = (v) => String(v), table, tes
 /**
  * Predicted probability (x) against hit rate (y), one dot per bucket sized by n, with the diagonal.
  * @param {{ buckets: Array<{ meanProb: number | null, hitRate: number | null, n: number, lo: number, hi: number }>, summary: string,
- *   table?: { columns: any[], rows: any[] }, testId?: string }} props
+ *   table?: { columns: any[], rows: any[] }, testId?: string, showN?: boolean }} props
+ *   showN: write "n 12" beside each dot (added by Analysis; off by default)
  */
-export function CalibrationChart({ buckets, summary, table, testId }) {
+export function CalibrationChart({ buckets, summary, table, testId, showN = false }) {
   const S = 280;
   const pad = 32;
   const id = useId();
@@ -184,8 +185,36 @@ export function CalibrationChart({ buckets, summary, table, testId }) {
       ${buckets
         .filter((b) => b.n && b.meanProb != null && b.hitRate != null)
         .map((b) => html`<circle cx=${p(b.meanProb)} cy=${q(b.hitRate)} r=${4 + 8 * Math.sqrt(b.n / maxN)} class="dot" />`)}
+      ${showN ? nLabels(buckets, p, q, maxN, S) : null}
     </svg>
   </${ChartFrame}>`;
+}
+
+/**
+ * "n 12" labels beside calibration dots, skipping a label that would overlap a dot or a label already
+ * placed (the table toggle always has every n).
+ * @param {Array<{ meanProb: number | null, hitRate: number | null, n: number }>} buckets
+ * @param {(v: number) => number} p @param {(v: number) => number} q @param {number} maxN @param {number} S
+ */
+function nLabels(buckets, p, q, maxN, S) {
+  const dots = buckets
+    .filter((b) => b.n && b.meanProb != null && b.hitRate != null)
+    .map((b) => ({ b, x: p(/** @type {number} */ (b.meanProb)), y: q(/** @type {number} */ (b.hitRate)), r: 4 + 8 * Math.sqrt(b.n / maxN) }));
+  /** @type {Array<{ x0: number, x1: number, y0: number, y1: number }>} */
+  const boxes = dots.map((d) => ({ x0: d.x - d.r, x1: d.x + d.r, y0: d.y - d.r, y1: d.y + d.r }));
+  const out = [];
+  for (const d of [...dots].sort((a, b) => b.b.n - a.b.n)) {
+    const text = `n ${d.b.n}`;
+    const w = text.length * 6.2;
+    const right = d.x + d.r + 3 + w < S - 2;
+    const x0 = right ? d.x + d.r + 3 : d.x - d.r - 3 - w;
+    const box = { x0, x1: x0 + w, y0: d.y - 7, y1: d.y + 6 };
+    const hits = boxes.some((o) => o !== boxes[dots.indexOf(d)] && box.x0 < o.x1 && box.x1 > o.x0 && box.y0 < o.y1 && box.y1 > o.y0);
+    if (hits) continue;
+    boxes.push(box);
+    out.push(html`<text x=${right ? x0 : x0 + w} y=${d.y + 4} class="axis dot-n" text-anchor=${right ? 'start' : 'end'}>${text}</text>`);
+  }
+  return out;
 }
 
 /**
@@ -212,4 +241,108 @@ export function Sparkline({ values, summary, width = 96, height = 28 }) {
     <line x1="0" x2=${width} y1=${y(0)} y2=${y(0)} class="spark-zero" />
     <path d=${d} />
   </svg>`;
+}
+
+/**
+ * Means with their ±2 SE range on one shared horizontal axis, one row per group (labels on the left,
+ * the value on the right). The axis holds every mean and, clipped to `clip`, every range; it always
+ * includes zero. `muted` rows (small samples) are drawn faint and say so in their `sub`.
+ * Added for the Analysis section (breakdowns); usable anywhere a mean comes with an interval.
+ * @param {{ rows: Array<{ key?: string, label: string, sub?: string, value: number | null, lo?: number | null, hi?: number | null,
+ *   muted?: boolean }>, summary: string, format?: (v: number) => string, clip?: number, table?: { columns: any[], rows: any[] },
+ *   testId?: string, axisLabel?: string }} props
+ */
+export function RangeChart({ rows, summary, format = (v) => String(v), clip = 0.6, table, testId, axisLabel }) {
+  let min = 0;
+  let max = 0;
+  for (const r of rows) {
+    for (const v of [r.value, r.lo, r.hi]) {
+      if (v == null || !Number.isFinite(v)) continue;
+      const c = Math.max(-clip, Math.min(clip, v));
+      min = Math.min(min, c);
+      max = Math.max(max, c);
+    }
+  }
+  if (max - min < 1e-9) {
+    min -= 0.05;
+    max += 0.05;
+  }
+  const pad = (max - min) * 0.04;
+  min -= pad;
+  max += pad;
+  const pos = (/** @type {number} */ v) => Math.max(0, Math.min(100, ((v - min) / (max - min)) * 100));
+  const zero = pos(0);
+  return html`<${ChartFrame} summary=${summary} table=${table} testId=${testId}>
+    <div class="ranges" role="img" aria-label=${summary}>
+      ${axisLabel ? html`<div class="range-axis" aria-hidden="true"><span>${format(min + pad)}</span><span>${axisLabel}</span><span>${format(max - pad)}</span></div>` : null}
+      ${rows.map((r) => {
+        const has = r.value != null && Number.isFinite(r.value);
+        const band = r.lo != null && r.hi != null && Number.isFinite(r.lo) && Number.isFinite(r.hi);
+        const tone = !has ? '' : r.lo != null && r.lo > 0 ? ' range-up' : r.hi != null && r.hi < 0 ? ' range-down' : '';
+        return html`<div class=${`range-row${r.muted ? ' range-muted' : ''}${tone}`} key=${r.key || r.label} data-key=${r.key}>
+          <div class="bar-label"><span class="bar-name">${r.label}</span>${r.sub ? html`<span class="bar-sub">${r.sub}</span>` : null}</div>
+          <div class="range-track" aria-hidden="true">
+            <i class="bar-zero" style=${{ left: `${zero}%` }}></i>
+            ${band ? html`<i class="range-band" style=${{ left: `${pos(/** @type {number} */ (r.lo))}%`, width: `${Math.max(0.8, pos(/** @type {number} */ (r.hi)) - pos(/** @type {number} */ (r.lo)))}%` }}></i>` : null}
+            ${has ? html`<i class="range-dot" style=${{ left: `${pos(/** @type {number} */ (r.value))}%` }}></i>` : null}
+          </div>
+          <div class="bar-value num">${has ? format(/** @type {number} */ (r.value)) : '–'}</div>
+        </div>`;
+      })}
+    </div>
+  </${ChartFrame}>`;
+}
+
+/**
+ * Vertical histogram of binned counts (from src/data/analysis.js `histogram`). Bins whose upper edge
+ * is at or below zero are drawn in the muted tone and the others in the accent, and the zero edge is
+ * marked, so the side of zero reads from position and the axis as well as colour.
+ * Added for the Analysis section (price against the close).
+ * @param {{ bins: Array<{ lo: number, hi: number, n: number, openLo?: boolean, openHi?: boolean }>, summary: string,
+ *   format?: (v: number) => string, height?: number, table?: { columns: any[], rows: any[] }, testId?: string }} props
+ */
+export function Histogram({ bins, summary, format = (v) => String(v), height = 168, table, testId }) {
+  const [box, W] = useWidth();
+  const id = useId();
+  const total = bins.reduce((a, b) => a + b.n, 0);
+  if (!total) return html`<${ChartFrame} summary=${summary} table=${table} testId=${testId}><div class="chart-empty">${t('chart.noData')}</div></${ChartFrame}>`;
+  const H = height;
+  const pad = { l: 28, r: 8, t: 10, b: 22 };
+  const n = bins.length;
+  const maxN = Math.max(1, ...bins.map((b) => b.n));
+  const bw = (W - pad.l - pad.r) / n;
+  const y = scale([0, maxN], [H - pad.b, pad.t]);
+  const ticks = niceTicks(0, maxN, 3).filter((v) => Number.isInteger(v));
+  const zeroIdx = bins.findIndex((b) => b.lo === 0 || (b.lo < 0 && b.hi > 0));
+  const zeroX = zeroIdx < 0 ? null : pad.l + zeroIdx * bw + (bins[zeroIdx].lo === 0 ? 0 : bw / 2);
+  // Edge labels: the first inner edge, zero and the last inner edge.
+  const inner = bins.filter((b) => !b.openLo && !b.openHi);
+  const labels = inner.length
+    ? [
+        { x: pad.l + bw, v: inner[0].lo },
+        ...(zeroX != null ? [{ x: zeroX, v: 0 }] : []),
+        { x: pad.l + (n - 1) * bw, v: inner[inner.length - 1].hi },
+      ]
+    : [];
+  return html`<${ChartFrame} summary=${summary} table=${table} testId=${testId}>
+    <div ref=${box} class="chart-box"><svg class="chart-svg" width=${W} height=${H} viewBox=${`0 0 ${W} ${H}`} role="img" aria-labelledby=${id}>
+      <title id=${id}>${summary}</title>
+      ${ticks.map(
+        (v) => html`<g>
+          <line x1=${pad.l} x2=${W - pad.r} y1=${y(v)} y2=${y(v)} class=${v === 0 ? 'grid-zero' : 'grid'} />
+          <text x=${pad.l - 6} y=${y(v) + 4} class="axis" text-anchor="end">${v}</text>
+        </g>`,
+      )}
+      ${bins.map((b, i) =>
+        b.n
+          ? html`<rect x=${pad.l + i * bw + 1} y=${y(b.n)} width=${Math.max(1, bw - 2)} height=${Math.max(1, H - pad.b - y(b.n))} rx="2"
+              class=${b.hi <= 0 ? 'hist-bar hist-below' : 'hist-bar'} />`
+          : null,
+      )}
+      ${zeroX != null ? html`<line x1=${zeroX} x2=${zeroX} y1=${pad.t - 4} y2=${H - pad.b + 4} class="hist-zero" />` : null}
+      ${labels.map(
+        (l, k) => html`<text x=${l.x} y=${H - 6} class="axis" text-anchor=${k === 0 ? 'start' : k === labels.length - 1 ? 'end' : 'middle'}>${format(l.v)}</text>`,
+      )}
+    </svg></div>
+  </${ChartFrame}>`;
 }
