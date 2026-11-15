@@ -247,3 +247,14 @@ button.pick-card:hover { border-color: var(--c-line-strong); }
 .toast-msg { flex: 1; }
 .toast-action, .toast-close { background: none; border: 0; color: inherit; font-weight: 700; min-height: var(--tap); min-width: var(--tap); cursor: pointer; }
 @media (min-width: 960px) { .toaster { bottom: var(--sp-6); left: var(--rail-w); } }
+
+/* MultiLineChart (src/lib/charts): several lines, told apart by colour and line style. */
+.mlc-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-4); font-size: var(--fs-xs); color: var(--c-ink-2); }
+.mlc-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.mlc-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.mlc-accent { stroke: var(--c-chart-line); }
+.mlc-c2 { stroke: var(--c-chart-2); }
+.mlc-c3 { stroke: var(--c-chart-3); }
+.mlc-muted { stroke: var(--c-muted); }
+.mlc-dashed { stroke-dasharray: 6 4; }
+.mlc-dotted { stroke-dasharray: 1.5 4; stroke-width: 2.5; }
