@@ -161,7 +161,8 @@
     "valueCollecting": "Todavía no hay {total} filas con EV justo en la línea ≤4.0: no se decide nada.",
     "linesAndBooks": "Por tramo de cuota y por casa",
     "gateLabel": "Filas ≤4.0 con EV justo",
-    "propLabel": "Con cierre de bet365 de ambos lados"
+    "propLabel": "Con cierre de bet365 de ambos lados",
+    "gateLineShort": "línea ≤4.0"
   },
   "stopped": {
     "title": "Categorías paradas o que no cuentan",

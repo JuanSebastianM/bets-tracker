@@ -161,7 +161,8 @@
     "valueCollecting": "Not yet {total} rows with fair-close EV on the ≤4.0 line: nothing is decided.",
     "linesAndBooks": "By price band and by book",
     "gateLabel": "Rows ≤4.0 with fair-close EV",
-    "propLabel": "With a two-sided bet365 close"
+    "propLabel": "With a two-sided bet365 close",
+    "gateLineShort": "≤4.0 line"
   },
   "stopped": {
     "title": "Stopped categories and rows that don't count",

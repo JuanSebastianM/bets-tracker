@@ -248,7 +248,7 @@ function PriceFirstCard({ p }) {
       : null}
     <div class="tests-measure">
       <div class="tests-measure-head">
-        <span class="tests-measure-label">${isValue ? t('tests.priceFirst.measureValue') : t('tests.priceFirst.measureProp')}${isValue && test.rule !== 'context' ? html` <span class="tests-muted">(${t('tests.priceFirst.lineLe4')})</span>` : null}</span>
+        <span class="tests-measure-label">${isValue ? t('tests.priceFirst.measureValue') : t('tests.priceFirst.measureProp')}${isValue && test.rule !== 'context' ? html` <span class="tests-muted">(${t('tests.priceFirst.gateLineShort')})</span>` : null}</span>
         ${ev.mean != null ? html`<span class="tests-measure-value num" data-testid=${`ev-${test.id}`}>${t('tests.frozen.measureValue', { mean: formatPct(ev.mean), n: ev.n })}</span>` : null}
       </div>
       ${ev.mean != null
