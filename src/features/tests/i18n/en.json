@@ -1,16 +1,194 @@
 {
   "reviewTitle": "Next Shadow review",
-  "reviewDue": "Due from {date} and at {rows} graded rows (now {graded}): {days} days and {left} rows to go.",
   "reviewUnknown": "There is no \"Revisión Sombra\" row in Decisions to count from.",
   "frozenTitle": "Frozen tests",
-  "frozenRule": "One decision per test at {graded} graded rows with {close} two-sided closes; it passes when the EV against the close is {z} standard errors above zero.",
-  "test": "Test",
   "graded": "Graded",
   "withClose": "With a close",
-  "state": "State",
   "states": {
     "collecting": "Collecting rows",
-    "pass": "Passes: propose 0.25u",
-    "stop": "Fails: propose stopping"
+    "pass": "Would pass",
+    "stop": "Would stop",
+    "extended": "Goes on to 120",
+    "context": "Context"
+  },
+  "strip": {
+    "label": "Tests at a glance",
+    "collecting": {
+      "one": "test collecting rows",
+      "other": "tests collecting rows"
+    },
+    "ready": {
+      "one": "reached its decision count",
+      "other": "reached their decision count"
+    },
+    "closest": "Closest to a decision",
+    "closestValue": "{share} of the way",
+    "none": "None"
+  },
+  "howTo": {
+    "summary": "How to read this screen",
+    "priceTitle": "Price against the close, not results",
+    "price": "A test is judged by how much better your price was than the closing price without the book's margin ({term}), not by how many picks won. A pick's result swings wildly; price against the close swings little, so 50 rows with a close say more than hundreds of results.",
+    "seTitle": "What 2 standard errors mean",
+    "se": "The {term} measures how far the mean could move by luck alone; a mean 2 standard errors or more above zero is hard to put down to luck.",
+    "onceTitle": "Why a test is decided once",
+    "once": "If you look at a test every week and decide when it looks good, sooner or later one passes by pure luck. So each test is decided once, when it reaches its count, by a rule fixed before the data was seen. Yield and hit rate are shown as context: they decide nothing.",
+    "barsTitle": "The bars",
+    "bars": "Each test has two bars: graded rows and rows with a two-sided close. It needs both. The strip shows the mean with its ±2 standard error interval against the zero line.",
+    "termFairClose": "EV against the close",
+    "termSe": "standard error"
+  },
+  "review": {
+    "rule": "A Shadow review is due only when both hold: at least {days} days since the last \"Revisión Sombra\" row in Decisions, and at least {rows} rows graded since it.",
+    "last": "Last one: {topic}, {date}.",
+    "days": "Days since the last one",
+    "rows": "Rows graded since the last one",
+    "ofDays": "{n} of {total} days",
+    "ofRows": "{n} of {total} rows",
+    "dueNow": "Due now",
+    "notDue": "Not yet",
+    "dueWhen": "Due from {date} and at {rows} graded rows in Shadow (now {graded}).",
+    "left": "{days} days and {rows} rows to go.",
+    "leftDays": {
+      "one": "{n} day to go; the rows are there.",
+      "other": "{n} days to go; the rows are there."
+    },
+    "leftRows": {
+      "one": "{n} row to go; the days have passed.",
+      "other": "{n} rows to go; the days have passed."
+    },
+    "dueBody": "Both the days and the rows are met: the review runs in milestone-reviewer.",
+    "history": "Past reviews",
+    "historyEmpty": "No \"Revisión Sombra\" rows yet.",
+    "historyItem": "{topic}",
+    "decisionRow": "Decisions row {row}",
+    "more": "Rule and past reviews"
+  },
+  "frozen": {
+    "intro": "Model tests that keep being logged exactly as they are. Rule of row 111: each is decided once, at {graded} rows, by price against the close and not by results; if it passes you are offered real money at {stake}u, never applied on its own.",
+    "since": "Since {date}",
+    "sinceFirst": "Since its first row ({date})",
+    "sinceNone": "No rows yet",
+    "closeSources": "own book {own}, bet365 feed {feed}",
+    "pending": {
+      "one": "{n} pending",
+      "other": "{n} pending"
+    },
+    "measure": "EV of the price against the close",
+    "measureValue": "{mean} (n {n})",
+    "interval": "±2 SE: {lo} to {hi}",
+    "z": "z {z}",
+    "noMeasure": "No rows with a two-sided close yet.",
+    "ruleCollecting": "Nothing is decided until {graded} graded rows with {close} closes, whatever the results look like.",
+    "ruleCollectingCloses": "It already has {graded} graded rows; it waits until {close} have a two-sided close.",
+    "rulePass": "With z {z} (2 or more), the review would offer you real money at {stake}u on this test. It is never applied on its own: you decide.",
+    "ruleStop": "With z {z} (under 2), the review would propose stopping the category.",
+    "context": "Context, decides nothing",
+    "contextLine": "Record {record}; yield {yield} (n {n}); hit rate {hit} (n {n})",
+    "projection": "Estimate: it would reach its decision around {date}, at the pace of the last {days} days.",
+    "projectionReached": "It has reached its decision count.",
+    "projectionNone": "No graded rows in the last {days} days: no pace to estimate from.",
+    "projectionPace": "{graded} graded and {close} with a close per day",
+    "explorer": "See the rows in the Explorer",
+    "explorerHint": "The Explorer filter is an approximation: it can include a few rows the test does not count.",
+    "decision": "Decisions row {row}",
+    "chart": "EV against the close {mean}, interval {lo} to {hi}, n {n}.",
+    "chartNone": "No interval: it needs at least two matches with a close.",
+    "what": {
+      "rule30_pass_all": "Match-total corners and cards that passed every filter and are held back only by the rule 30 pause.",
+      "cards_under": "The model's match-total card unders, priced 1.70–4.0, both teams 10+ games, whether or not they pass the filters.",
+      "under45_control": "The Under 4.5 line inside the card-under test, with its own decision.",
+      "corner_rejects": "Match-total corners the model likes but a filter rejected (F-gap, F-ratio or razor), priced 1.70–2.0.",
+      "team_corners": "One team's corners that passed every filter (rule 32).",
+      "model_only_shots": "The daily team-shots pick with the model's highest probability, even when the book disagrees; priced 1.70–4.0.",
+      "match_total_shots": "Match-total shots and shots on target with the verdict SHADOW (rule 25).",
+      "relaxed_sample_corners": "Match-total corners with the relaxed 6–9 game sample (rule 18)."
+    },
+    "of": "{n} of {total}",
+    "decisions": "Decisions",
+    "rowShort": "row {row}"
+  },
+  "priceFirst": {
+    "title": "Price-first tests",
+    "intro": "Picks judged against a consensus fair price across books, with no model. Each has its own rule, not row 111's.",
+    "what": {
+      "value": "Results and goals where a book pays 3% or more over the consensus fair price (rule 29).",
+      "near_value": "Results and goals where a book pays 0% to 3% over the fair price: they judge the 3% threshold.",
+      "prop_value": "Match-total corners and cards where a book, priced 1.70–4.0, pays 3% or more over the consensus of books with both sides.",
+      "prop_near_value": "Match-total corners and cards 0% to 3% over the consensus, up to 3 per slate."
+    },
+    "rule": {
+      "value": "Decided before the data (rows 79 and 80): the deciding line is price 4.0 or less. It passes with 30+ graded rows with fair-close EV, a mean above zero and positive flat yield. If it passes, real money is proposed on ≤4.0, or only on ≤3.0 if the 3.0–4.0 band has 10+ rows with a negative mean. If ≤4.0 fails but ≤3.0 passes, ≤3.0 is judged only on rows from 30 Oct. If neither passes, results and goals stay SHADOW. Always at a small stake and with your approval.",
+      "near_value": "No decision of its own: reported apart from VALOR to see whether the 3% threshold is right.",
+      "prop_value": "Fixed on 6 Nov before any rows (row 97): at {first} graded rows with a two-sided bet365 close, if it is CLEAR (the whole 95% interval above zero and positive flat yield) you are offered real money at {stake}u; if the mean is zero or less, stopping is proposed; otherwise it goes on to {final}, where CLEAR is proposed and anything else stops.",
+      "prop_near_value": "No decision of its own: reported apart from VALOR PROP."
+    },
+    "case": {
+      "a": "The ≤4.0 line clears the gate: real money on ≤4.0 would be proposed.",
+      "a_le3": "The ≤4.0 line clears it, but the 3.0–4.0 band is negative on 10+ rows: only ≤3.0 would be proposed.",
+      "b": "≤4.0 fails but ≤3.0 passes, also on the rows since 30 Oct: ≤3.0 would be proposed.",
+      "b_waiting": "≤4.0 fails and ≤3.0 passes, but ≤3.0 must pass on rows since 30 Oct alone: not yet.",
+      "c": "Neither ≤4.0 nor ≤3.0 passes: results and goals stay SHADOW."
+    },
+    "propState": {
+      "collecting": "Not yet at {target} rows with a two-sided bet365 close: nothing is decided.",
+      "pass": "CLEAR: the whole 95% interval above zero and positive yield. Real money at {stake}u would be proposed.",
+      "stop": "Stopping the category would be proposed.",
+      "extended": "Neither clear nor negative at {first}: it goes on to {final} rows."
+    },
+    "measureValue": "Fair-close EV (opening against the close at the same source)",
+    "measureProp": "EV against the bet365 close without the margin (power method)",
+    "interval95": "95% CI: {lo} to {hi}",
+    "lines": "By price band",
+    "books": "By the price's book",
+    "line": "Line",
+    "lineAll": "All",
+    "lineLe4": "≤ 4.0 (the deciding line)",
+    "lineLe3": "≤ 3.0 (check)",
+    "line34": "3.0–4.0",
+    "lineGt4": "> 4.0",
+    "lineFresh": "≤ 3.0 since 30 Oct",
+    "book": "Book",
+    "bookOther": "Feed or other",
+    "colN": "Graded",
+    "colRecord": "Record",
+    "colYield": "Yield",
+    "colEv": "EV (n)",
+    "pinnacle": "Graded VALOR and VALOR CASI rows with a Pinnacle id",
+    "pinnacleNote": "At {total} with a Pinnacle close, VALOR is also judged against Pinnacle's fair price. The join with the Pinnacle close is done by the review, not by this app.",
+    "perSlate": "{n} rows per slate over {slates} slates",
+    "perSlateLow": "Fewer than 1 per slate: the review reports it and asks whether to widen to any line two books share.",
+    "contextOnly": "Context: yield {yield} (n {n}), record {record}",
+    "valueCollecting": "Not yet {total} rows with fair-close EV on the ≤4.0 line: nothing is decided.",
+    "linesAndBooks": "By price band and by book",
+    "gateLabel": "Rows ≤4.0 with fair-close EV",
+    "propLabel": "With a two-sided bet365 close",
+    "gateLineShort": "≤4.0 line"
+  },
+  "stopped": {
+    "title": "Stopped categories and rows that don't count",
+    "intro": "No longer logged (or their rows never count), but still in the sheet. When and why they stopped, with their final numbers.",
+    "when": "Stopped on {date}",
+    "final": "Record {record}; yield {yield} (n {n}); EV against the close {ev} (n {evn})",
+    "span": "Rows from {first} to {last}",
+    "empty": "No rows in the data.",
+    "why": {
+      "ai_watch_corners": "Sofascore's AI on corners did not beat the close; it stopped being logged.",
+      "ai_watch_cards": "Sofascore's AI on cards did not beat the close either; stopped at the 500-row review.",
+      "team_corner_rejects": "Since 2 Nov only team corners that pass every filter are logged; the rejects did worse against the close.",
+      "team_shots": "Team shots lost to the market; only match totals and the MODELO SOLO pick remain.",
+      "corner_card_fillers": "Corner and card rejects used as fillers lost to the close whatever the rejection reason.",
+      "shots_fillers": "Shots rejects stopped being fillers: only a shots pick with the verdict SHADOW is logged.",
+      "model_only_shots_low": "MODELO SOLO rows under 1.70: they could never be a bet (rule 5), so they don't count toward the test."
+    },
+    "summary": "Stopped categories ({n})"
+  },
+  "withCloseTwo": "With a two-sided close",
+  "list": {
+    "graded": "Graded",
+    "closes": "With a close",
+    "ev": "EV vs close",
+    "evValue": "{mean} n {n}",
+    "glossary": "{label} in the glossary"
   }
 }
