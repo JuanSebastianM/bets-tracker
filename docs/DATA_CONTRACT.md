@@ -46,6 +46,30 @@ Columns are found **by header text, never by position**, so a moved column canno
 Scrubbing free text is best effort: a sentence such as "tengo cuatro millones" would pass. The audit step
 reads the live feed for that; the durable fix is to not write balances in notes.
 
+Added by the audit (15 Nov 2026; every shape has a made-up case in `tests/fixtures/privacy-money.json`,
+`auditTexts`, checked with its exact scrubbed output by `tests/unit/audit-feed.test.mjs`):
+
+- more text shapes: millions in words or slang after a number (`millones`, `millón`, `mill.`, `MM`, `palos`,
+  `lucas`), a capital `M` after a number, `mil` after a number unless a count of things follows
+  (`caracteres`, `tokens`, `filas`, `partidos`…), thousands written with spaces (also no-break and thin
+  spaces), other currencies before or after a number (`€`, `£`, `euros`, `libras`, `dólares`, `USD`, `EUR`,
+  `GBP`), a colon or a dot between `COP`/`pesos` and the number, a number followed by `$`, a money-sized
+  number (a thousand group, four or more digits, or a `k`/`mil`/`M` suffix) within 25 characters after a
+  money word (`bank`, `banca`, `saldo`, `freebet`, `apuesta gratis`, `bono`, `depósito`, `retiro`, `unidad`,
+  `gané`, `perdí`, `aposté`, `apuesta de`, `pagó`, `cobré`, `1u =`), and a bare integer of five or more
+  digits (`id 12345678` stays). Still missed, on purpose or by limit: amounts in words (`cuarenta mil
+  pesos`) and a single thousand group with no money word next to it (`80.000 en Betano`).
+- numeric cells outside plausible bounds are dropped and counted as redactions: `int` above 10,000,
+  `price` and `units` above 1,000 in absolute value, `prob` above 1 (after the `59.7` → 0.597 rule), `frac`
+  above 100. Pinnacle's `mins_before_kickoff` has its own kind (`minutes`) without a bound.
+- a whitelisted header that appears twice in a tab is ambiguous: neither column is read and the header
+  is listed in `meta.missingHeaders`.
+
+On the real sheet (read 15 Nov 2026) the first scrubber hid 3 amounts (one Apuestas note, one decision)
+and the extended one hides 1 more cell part (a third-party subscription price in a decision); nothing
+else changed. Units remain public by design; note that `Stake máx. (u)` (¼ Kelly × the bank in units)
+lets a reader estimate the bank **in units**, never in money.
+
 ## 3. Feed JSON (schema 1)
 
 `GET <web app URL>` returns `application/json`:
@@ -262,7 +286,7 @@ in this order:
 | `shadow_rule30` | `SHADOW` and (`regla 30` or `pasó todos los filtros`) | passed every filter, held by the rule 30 pause (also the early forms `SHADOW: córners pausados (regla 30)`) |
 | `shadow` | `SHADOW` | other shadow picks (new market, short sample) |
 | `ai_watch` | `IA-WATCH` | Sofascore AI watch rows (stopped) |
-| `low_edge` | `Pasó todos los filtros` / `Stake <` | passed the filters but the stake fell under the 0.25u minimum (3 early rows, 9–10 Oct) |
+| `low_edge` | `Pasó todos los filtros` / `Stake <` | passed the filters but the stake fell under the 0.25u minimum (early rows; 4 on 15 Nov 2026) |
 | `filter_reject` | anything else | rejected by a filter (Filtro 4/5, regla 23, brecha, ratio, muestra, razor, `SKIP`, `Salto`…) |
 
 Matching is on the start of the text, upper-cased (as review.py does): a row whose reason starts with the
@@ -278,7 +302,7 @@ cotizado…`), and `grok_other` when it is empty.
 
 **Inventory of the real sheet (read only, 15 Nov 2026; counts, no data).** Sombra rows 2–711 (710 rows;
 Estado: Ganada, Perdida, Nula, Pendiente). Grok rows 2–154 (Estado: Ganada, Perdida, Nula, Medio perdida;
-the verdict column always starts `Cotizado`, `Cotizado (regla 29)` or `No cotizado`). Apuestas rows 2–20
+the verdict column starts `Cotizado`, `Cotizado (regla 29)` or `No cotizado`, except four October rows: three `Mercado primero (regla 29)…` / `Mercado primero: …`, classified as priced by rule 29, and one `Marcador exacto no cotizado; …`, classified as not priced; audit, 15 Nov 2026). Apuestas rows 2–20
 (Estado: Ganada, Perdida, Nula). Decisiones rows 2–125 (Estado: Vigente, Provisional, Abierta,
 Reemplazada). Every one of the 710 `Motivo de descarte` values classifies as intended with the table
 above; the prefixes found were the ones listed plus these filter-reject shapes: `F-gap…`, `F-sample…`,
