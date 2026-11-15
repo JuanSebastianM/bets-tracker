@@ -9,5 +9,8 @@ export const feature = {
   order: 5,
   i18n: true,
   descKey: 'nav.desc.analysis',
-  routes: [{ path: '/analysis', component: AnalysisScreen }],
+  routes: [
+    { path: '/analysis', component: AnalysisScreen },
+    { path: '/analysis/:part', component: AnalysisScreen },
+  ],
 };

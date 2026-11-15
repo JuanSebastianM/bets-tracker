@@ -16,6 +16,9 @@ export const ROUTES = [
   { path: '/decisions/14', title: 'Decisión', ready: 'decision-related' },
   { path: '/glossary/rule-29', title: 'Glosario', ready: 'glossary-term' },
   { path: '/glossary/near-value', title: 'Glosario', ready: 'glossary-term' },
+  { path: '/analysis/calibration', title: 'Análisis', ready: 'calibration-chart' },
+  { path: '/analysis/close', title: 'Análisis', ready: 'close-histogram' },
+  { path: '/analysis/grok', title: 'Análisis', ready: 'grok-text' },
 ];
 
 /**
