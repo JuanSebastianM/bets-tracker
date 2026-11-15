@@ -188,6 +188,32 @@ groups: result, goals, corners, team_corners, cards, shots — the frozen tests 
 `result`, `freeBet`…; Grok `verdict`, `reason`, `minPrice`, `result`) and the measures `clvSource`,
 `openingFairEv`, `closeMargin`, `evVsFeed`, `need`, `hasTwoSidedClose` (section 6).
 
+Fields added with the line filter (`src/data/lines.js`, called from `normalize.js`):
+
+- `line: number | null`: the line of the selection (4.5, 9.5, 2.75; signed for Asian handicaps: 0.25, −1).
+- `lineKey: string | null`: `<scope>:<over|under>:<value>` for totals (`cards:under:4.5`,
+  `corners_team:over:5.5`, `goals:under:2.75`) and `ah:<signed value>` for Asian handicaps (`ah:+0.25`,
+  `ah:-1`, `ah:0`). The scope keeps the same words apart when they are different bets ("Under 4.5" cards
+  vs team corners): `cards`, `cards_team`, `corners`, `corners_team`, `goals`, `goals_team`, `goals_1h`,
+  `shots`, `shots_team`, `sot`, `sot_team`, `ah`. It comes from the market family and the raw market
+  (`Tiros al arco …` → `sot`, `… equipo` → `_team`, `Goles 1er tiempo` → `goals_1h`).
+- Read from the selection: the first `Over|Under|Más de|Menos de <number>` (any case, comma decimals),
+  so `Fürth over 4.5`, `Club X córners Over 5.5`, `Over 13.5 (tomada al descanso con 9)`, `Under 3 asiático`
+  and `X Over 0.5 goles` all parse; for `Hándicap asiático`, the last signed number (`Vélez +0.25`).
+- No line (`null`): result markets other than the handicap (1X2, doble oportunidad — `Tucumán X2 (+0.5)`
+  included —, DNB, 1er/2.º tiempo), BTTS, correct score, scorers, `Más córners`/`Córners 1X2`/`Tarjetas
+  1X2`/`Más tarjetas` (three-way, no line), combos (Apuestas `Doble` / `Crear apuesta`, markets with
+  `+`/`×`, selections with `×` or ` + `).
+- `side` is unchanged: review.py's `side()` on the selection (over / under / ''), which the frozen tests
+  use. On every total it agrees with the kind in `lineKey`; a handicap has side '' and kind `ah`. Known
+  quirk kept for review.py parity: `X con más córners` (Grok, `Córners 1X2`) has side `over`.
+- Labels are built with `t()` (`lineLabel(key)` → "Under 4.5", "Hándicap +0.25"; `{ scope: true }` →
+  "Tarjetas: Under 4.5").
+
+Shapes of the real sheet (read only, `Sombra!D:E`, `Grok!E:F`, `Apuestas!F:G`, 15 Nov 2026): every
+selection in a totals, team-totals or handicap market has one of the shapes above, so none failed to give
+a line; every shape has a synthetic copy in `tests/unit/lines.test.mjs`.
+
 Definitions that follow review.py rather than the first draft of this contract:
 
 - `fairCloseEv` is review.py's *price-vs-close EV* (`pvc`): `price × p − 1` with p the proportionally
