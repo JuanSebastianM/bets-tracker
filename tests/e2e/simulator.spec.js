@@ -39,9 +39,9 @@ test('from the Explorer link with filters; changing the stake changes the headli
 
 test('each staking mode explains itself and changes the result', async ({ page }) => {
   await openApp(page, '/simulator?src=shadow');
-  await mode(page, '% banca').click();
+  await mode(page, '% bank').click();
   await expect(page).toHaveURL(/mode=percent/);
-  await expect(page.getByTestId('sim-mode-help')).toContainText('banca con que empezó ese día');
+  await expect(page.getByTestId('sim-mode-help')).toContainText('bank con que empezó ese día');
   await page.getByTestId('sim-percent').fill('2');
   await expect(profit(page)).toHaveText('+5.49u');
   await expect(page.getByTestId('sim-final-bank')).toContainText('105.49u');
@@ -71,11 +71,11 @@ test('the whole state survives a reload; the detail blocks open', async ({ page 
   const before = await profit(page).textContent();
   await page.reload();
   await expect(profit(page)).toHaveText(before || '');
-  await expect(mode(page, '% banca')).toHaveAttribute('aria-checked', 'true');
+  await expect(mode(page, '% bank')).toHaveAttribute('aria-checked', 'true');
   await expect(page.getByTestId('sim-percent')).toHaveValue('3');
   await expect(page.getByTestId('sim-bank')).toHaveValue('50');
   await page.getByTestId('sim-risk').getByText('Caídas y rachas').click();
-  await expect(page.getByTestId('sim-max-dd')).toContainText('de la banca inicial');
+  await expect(page.getByTestId('sim-max-dd')).toContainText('del bank inicial');
   await page.getByTestId('sim-breakdown').getByText('Desglose').click();
   const first = page.getByTestId('sim-breakdown-rows').getByRole('link').first();
   await expect(first).toHaveAttribute('href', /#\/explorer\?src=shadow&tag=/);

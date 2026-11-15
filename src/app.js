@@ -66,8 +66,15 @@ function SyncStamp() {
   </div>`;
 }
 
-/** Offline / cached / missing-columns banners above every page. */
-function FeedBanners() {
+/** Sections that show the "missing columns" banner (the others would only repeat it on every page). */
+const MISSING_BANNER_ON = new Set(['overview', 'settings']);
+
+/**
+ * Fixture and offline / cached banners above every page; the missing-columns banner only on the
+ * Overview and Settings.
+ * @param {{ featureId: string }} props
+ */
+function FeedBanners({ featureId }) {
   const s = useFeed();
   useLocale();
   const out = [];
@@ -81,7 +88,7 @@ function FeedBanners() {
       >${t('feed.showingCached', { ago: formatAgo(s.fetchedAt) })}</${Banner}>`);
   }
   const missing = s.data?.meta?.missingHeaders || [];
-  if (missing.length) out.push(html`<${Banner} tone="warning" testId="banner-missing">${t('feed.missingHeaders', { list: missing.join(', ') })}</${Banner}>`);
+  if (missing.length && MISSING_BANNER_ON.has(featureId)) out.push(html`<${Banner} tone="warning" testId="banner-missing">${t('feed.missingHeaders', { list: missing.join(', ') })}</${Banner}>`);
   return out.length ? html`<div class="stack-sm banners">${out}</div>` : null;
 }
 
@@ -164,7 +171,7 @@ export function App() {
     <${Header} title=${t(route.titleKey)} path=${loc.path} />
     <main id="main" class="app-main" tabindex="-1" data-route=${route.path}>
       <div class="stack">
-        <${FeedBanners} />
+        <${FeedBanners} featureId=${route.featureId} />
         <${Screen} key=${loc.path + locale} params=${params} query=${loc.query} />
       </div>
     </main>

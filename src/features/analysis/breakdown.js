@@ -203,7 +203,7 @@ function GroupTable({ rows, labelOf, linkOf, small, view, onSort, dimName }) {
     { key: 'units', label: t('analysis.col.units'), sort: 'units', num: true },
     { key: 'ev', label: t('analysis.col.ev'), sort: 'ev', num: true },
   ];
-  return html`<div class="table-wrap an-table" data-testid="bd-rows">
+  return html`<div class="table-wrap table-sticky an-table" data-testid="bd-rows">
     <table class="table">
       <caption class="sr-only">${t('analysis.bd.groupsTitle', { dim: dimName })}</caption>
       <thead><tr>

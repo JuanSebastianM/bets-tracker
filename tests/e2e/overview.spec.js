@@ -25,9 +25,9 @@ test('the period switch lives in the URL and survives a reload', async ({ page }
   await expect(page.getByTestId('overview-links').getByRole('link', { name: 'Simular' })).toHaveAttribute('href', '#/simulator?date=7d');
   await expect(page.getByTestId('overview-links').getByRole('link', { name: 'Tests' })).toHaveAttribute('href', '#/tests?date=7d');
 
-  await page.getByRole('radio', { name: 'Última jornada' }).click();
+  await page.getByRole('radio', { name: 'Último slate' }).click();
   await expect(page).toHaveURL(/date=last_slate/);
-  await expect(page.getByTestId('period-note')).toHaveText('Jornada del 14 nov 2026');
+  await expect(page.getByTestId('period-note')).toHaveText('Slate del 14 nov 2026');
   await expect(page.getByTestId('overview-links').getByRole('link', { name: 'Ver todos los picks' })).toHaveAttribute('href', '#/explorer?slate=2026-11-14');
 
   await page.getByRole('radio', { name: 'Todo' }).click();
@@ -112,7 +112,7 @@ test('English: titles, summaries and verdicts', async ({ page }) => {
 
 test('Spanish summaries are built from the figures', async ({ page }) => {
   await openApp(page, '/');
-  await expect(page.getByTestId('brief-last-slate')).toContainText('Última jornada calificada (14 nov)');
+  await expect(page.getByTestId('brief-last-slate')).toContainText('Último slate calificado (14 nov)');
   await expect(page.getByTestId('summary-shadow')).toContainText('a cuota media');
   await expect(page.getByTestId('real-summary')).toContainText('Las apuestas reales van');
 });

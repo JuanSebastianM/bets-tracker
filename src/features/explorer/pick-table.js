@@ -37,7 +37,7 @@ export function PickTable({ picks, sort, dir, onSort, hrefOf, caption }) {
     fairCloseEv: (p) => formatPct(p.fairCloseEv),
     status: (p) => html`<${StatusBadge} status=${p.status} raw=${p.statusRaw} />`,
   };
-  return html`<div class="table-wrap ex-table-wrap" data-testid="explorer-table">
+  return html`<div class="table-wrap table-sticky ex-table-wrap" data-testid="explorer-table">
     <table class="table ex-table">
       <caption class="sr-only">${caption}</caption>
       <thead>

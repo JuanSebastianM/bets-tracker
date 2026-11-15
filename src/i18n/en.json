@@ -68,7 +68,7 @@
     "fairCloseEv": "EV vs close",
     "nClose": "n {n} with a close",
     "pending": "Pending",
-    "maxDrawdown": "Worst drawdown"
+    "maxDrawdown": "Worst drop"
   },
   "filters": {
     "source": "Source",

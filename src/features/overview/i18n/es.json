@@ -11,8 +11,8 @@
     "all": "Todo",
     "30d": "30 días",
     "7d": "7 días",
-    "last_slate": "Última jornada",
-    "slateOf": "Jornada del {date}",
+    "last_slate": "Último slate",
+    "slateOf": "Slate del {date}",
     "range": "Del {from} al {to}",
     "allTime": "Desde el primer pick"
   },
