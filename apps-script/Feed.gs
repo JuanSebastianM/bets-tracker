@@ -1,4 +1,3 @@
-/** @OnlyCurrentDoc */
 /*
  * Bets Tracker feed: a read-only JSON web app over this spreadsheet.
  * Contract: docs/DATA_CONTRACT.md, sections 2 and 3 (schema 1).
@@ -20,12 +19,19 @@
  * INSTALL (once)
  *   1. Open the spreadsheet > Extensiones > Apps Script.
  *   2. Archivo + > Secuencia de comandos, name it "Feed", paste this whole file, save.
- *   3. In the function menu pick btFeedSelfTest and press Ejecutar. Authorise when asked (it asks
- *      only for this spreadsheet because of @OnlyCurrentDoc). Read the log: rows per tab,
+ *   3. In the function menu pick btFeedSelfTest and press Ejecutar. No new authorisation should be
+ *      needed (see SCOPES). Read the log: rows per tab,
  *      meta.redactions, meta.missingHeaders and the JSON size. missingHeaders should be [].
  *   4. Implementar > Nueva implementación > tipo "Aplicación web".
  *      Ejecutar como: "Yo". Quién tiene acceso: "Cualquier usuario". Implementar.
  *   5. Copy the web app URL (ends in /exec) into src/config.js (FEED_URL) and push.
+ *
+ * SCOPES
+ *   This file deliberately has no scope annotation (the usual "only current doc" one). The project
+ *   was already authorised with the spreadsheet scope by the Pinnacle script and its time triggers run
+ *   under that authorisation. An annotation here would change the scopes of the whole project and stop
+ *   those triggers until someone re-authorised them. This file needs nothing beyond what is already
+ *   granted: it reads the active spreadsheet and uses the script cache and lock.
  *
  * CACHE
  *   Responses are cached for 5 minutes (BT_FEED_CACHE_TTL): the app's refresh button can show data up

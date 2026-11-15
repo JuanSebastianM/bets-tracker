@@ -37,7 +37,8 @@ test('only read calls on the spreadsheet', () => {
   for (const forbidden of ['setValue', 'setValues', 'appendRow', 'insertRow', 'deleteRow', 'clear', 'clearContents', 'setFormula', 'insertSheet', 'copyTo']) {
     assert.ok(!calls.includes(forbidden), forbidden);
   }
-  assert.match(FEED_GS_SOURCE, /@OnlyCurrentDoc/);
+  // No scope annotation on purpose: it would change the scopes of the shared project (see SCOPES in Feed.gs).
+  assert.doesNotMatch(FEED_GS_SOURCE, /@OnlyCurrentDoc/);
   for (const tab of ['Bank', 'Resumen mensual', 'Por mercado', 'Por liga']) assert.ok(!FEED_GS_SOURCE.includes(`'${tab}'`), tab);
 });
 
