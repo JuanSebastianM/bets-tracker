@@ -28,8 +28,8 @@ test('dimension switch and sort live in the URL', async ({ page }) => {
   await page.getByLabel('Partir por').selectOption('priceBand');
   await expect(page).toHaveURL(/dim=priceBand/);
   const keys = page.getByTestId('bd-rows').locator('li');
-  await expect(keys.first()).toHaveAttribute('data-key', 'le170');
-  await expect(page.getByTestId('analysis-bars').locator('.range-row').first()).toContainText('≤ 1.70');
+  await expect(keys.first()).toHaveAttribute('data-key', 'lt170');
+  await expect(page.getByTestId('analysis-bars').locator('.range-row').first()).toContainText('< 1.70');
   await page.getByRole('radio', { name: 'Yield' }).click();
   await expect(page).toHaveURL(/measure=yield/);
   await page.getByLabel('Ordenar por').selectOption('n');

@@ -152,7 +152,7 @@ test('withSlice adds one group to the current filters, and its link lands on exa
 
 test('sortRows: natural order for bands and months, measures with nulls last, label', () => {
   const { rows } = breakdown(fixture.picks, 'priceBand');
-  assert.deepEqual(rows.map((r) => r.key), ['le170', '170_200', '200_250', '250_400', 'gt400'].filter((k) => rows.some((r) => r.key === k)));
+  assert.deepEqual(rows.map((r) => r.key), ['lt170', '170_200', '200_250', '250_400', 'gt400'].filter((k) => rows.some((r) => r.key === k)));
   const months = breakdown(fixture.picks, 'month').rows.map((r) => r.key);
   assert.deepEqual(months, [...months].sort());
   const byYield = sortRows(breakdown(fixture.picks, 'tag').rows, 'yield', 'desc', 'tag');
