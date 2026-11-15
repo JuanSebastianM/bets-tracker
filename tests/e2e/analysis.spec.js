@@ -43,16 +43,18 @@ test('dimension switch and sort live in the URL', async ({ page }) => {
 test('minimum n greys small groups, or hides them', async ({ page }) => {
   const { errors } = await openApp(page, '/analysis');
   const rows = page.getByTestId('bd-rows').locator('li');
-  const all = await rows.count();
+  // Wait for the list before counting: count() does not wait, and on a slow runner it read 0.
   await expect(page.getByTestId('bd-rows').locator('li.an-small').first()).toBeVisible();
+  const all = await rows.count();
+  expect(all).toBeGreaterThan(0);
   await page.getByTestId('minn-slider').fill('20');
   await expect(page).toHaveURL(/minn=20/);
   await expect(page.getByTestId('breakdown-text')).toContainText('al menos 20 calificadas');
   await page.getByTestId('hide-small').check();
   await expect(page).toHaveURL(/small=hide/);
   await expect(page.getByTestId('bd-hidden')).toBeVisible();
-  expect(await rows.count()).toBeLessThan(all);
-  expect(await page.getByTestId('bd-rows').locator('li.an-small').count()).toBe(0);
+  await expect.poll(() => rows.count()).toBeLessThan(all);
+  await expect(page.getByTestId('bd-rows').locator('li.an-small')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 
