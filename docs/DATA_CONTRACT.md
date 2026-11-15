@@ -334,3 +334,27 @@ with both sides, exactly as `milestone-reviewer` describes. A row without both s
 - Real bets (`Apuestas`): profit is the sheet's `Ganancia (u)` (it knows about free bets and odd
   settlements); the app only recomputes it in the Simulator.
 - Never show a rate over fewer than 5 graded picks without its `n` next to it.
+
+## 8. Derived data used by the screens (added with the integration pass)
+
+- **Exact breakdown links** (`src/data/analysis.js`): `rowPatch(f, dim, key, ctx)` narrows a list field to
+  the key or intersects a range (dates, model probability, logged EV, price) with the current filter;
+  `exactRowFilter` / `exactCellFilter` add `exactSlice` (graded, no PUBLICADA Y APOSTADA, priced) and then
+  check that the link's picks are exactly the row's counted picks, returning `null` otherwise (weekday;
+  a second book or reason of a pick filtered by another one). The `line` dimension groups by `lineKey`
+  in line order.
+- **Decision themes** (`src/data/decisions.js` `decisionTheme`, `decisionThemeMatch`): narrow topic
+  shapes first (scripts, audits, closing tasks, the Sofascore AI, backtests, the value scan, rule 25,
+  topics that start with "Prueba"), then the broad patterns, then an explicit workflow pattern; the
+  decision text only when the topic matches nothing, and the catch-all (`by: 'fallback'`) only when
+  neither does. Checked on every real topic (`Decisiones!B:B`, read only, 15 Nov 2026: none reached the
+  catch-all); unit tests use synthetic topics of the same shapes. `THEME_IDS` is a fixed display order.
+- **Staking rules** (Reglas tab, numbered lines): `sheetRuleSlug(line, n)` links by rule number when the
+  line still has that rule's keyword (`SHEET_RULE_BY_N`, from the real lines 2–11, read only from
+  `Reglas!A8:A40`; the text is not copied), else by keyword, else the "Reglas (pestaña)" entry.
+- **Rules content** (`src/content/rules.*.json`): every rule has `short`, one plain sentence without
+  jargon ("En corto"), shown first; a unit test keeps it one sentence and free of jargon and money.
+- **Inline term links** (`src/data/content.js` `buildTermIndex`, `linkTerms`): the glossary's terms and
+  aliases (whole terms first, then "Term (other name)" parts and aliases; first entry in the file wins);
+  capitalised sheet words (DNB, VALOR CASI) match as written, the rest without case or accents; common
+  words are skipped (`TERM_SKIP`); the first occurrence per paragraph is linked. Tokens only.
