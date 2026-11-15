@@ -94,8 +94,8 @@
     "date": "Fecha del slate",
     "datePresets": "Periodo",
     "dateRange": "Rango de fechas",
-    "from": "Desde",
-    "to": "Hasta",
+    "from": "Desde el día",
+    "to": "Hasta el día",
     "slate": "Un slate (fecha del partido)",
     "anySlate": "Cualquier fecha",
     "since": "Desde el",
@@ -279,6 +279,7 @@
     "decisionTopic": "{label} · {topic}",
     "inGlossary": "En el glosario",
     "tagMeanings": "Qué significa cada etiqueta",
-    "whatIs": "Qué es {term}"
+    "whatIs": "Qué es {term}",
+    "dateHint": "Día del partido; toca el campo para elegirlo en el calendario."
   }
 }

@@ -10,6 +10,8 @@ import { toast } from '../../lib/toast.js';
 import { href } from '../../lib/router.js';
 import { APP_TIMEZONE, FEED_SCHEMA, FEED_URL } from '../../config.js';
 import { APP_VERSION } from '../../version.js';
+import { updateStore, applyUpdate, isServiceWorkerDisabled, isStandalone } from '../../lib/pwa.js';
+import { useStore } from '../../lib/store.js';
 
 function Appearance() {
   const locale = useLocale();
@@ -121,11 +123,24 @@ function FeedStatus() {
   </${Card}>`;
 }
 
+/** Whether this copy of the app is the newest one (the service worker's update flow, src/lib/pwa.js). */
+function AppStatus() {
+  const { ready } = useStore(updateStore);
+  const off = isServiceWorkerDisabled() || !('serviceWorker' in navigator);
+  const text = off ? t('settings.appOffline') : ready ? t('settings.appUpdate') : isStandalone() ? t('settings.appUpToDateInstalled') : t('settings.appUpToDate');
+  return html`<dt>${t('settings.appStatus')}</dt>
+    <dd data-testid="app-status">
+      <span>${text}</span>
+      ${ready && !off ? html` <${Button} variant="primary" icon="refresh" onClick=${() => applyUpdate()} data-testid="app-update">${t('pwa.reload')}</${Button}>` : null}
+    </dd>`;
+}
+
 function About() {
   return html`<${Card} title=${t('settings.about')}>
     <p class="small">${t('settings.aboutBody')}</p>
     <dl class="kv">
       <dt>${t('settings.version')}</dt><dd class="num" data-testid="app-version">${APP_VERSION}</dd>
+      <${AppStatus} />
       <dt>${t('settings.schema')}</dt><dd class="num">${FEED_SCHEMA}</dd>
       <dt>${t('settings.feedUrl')}</dt><dd>${FEED_URL ? t('settings.feedUrlSet') : t('settings.feedUrlUnset')}</dd>
     </dl>

@@ -94,8 +94,8 @@
     "date": "Slate date",
     "datePresets": "Period",
     "dateRange": "Date range",
-    "from": "From",
-    "to": "To",
+    "from": "From the day",
+    "to": "To the day",
     "slate": "One slate (match date)",
     "anySlate": "Any date",
     "since": "Since",
@@ -279,6 +279,7 @@
     "decisionTopic": "{label} · {topic}",
     "inGlossary": "In the glossary",
     "tagMeanings": "What each tag means",
-    "whatIs": "What {term} means"
+    "whatIs": "What {term} means",
+    "dateHint": "Match day; tap the field to pick it from the calendar."
   }
 }

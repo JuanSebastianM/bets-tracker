@@ -107,8 +107,10 @@ function TermsList({ content, query }) {
     for (const e of all) by[e.category] = (by[e.category] || 0) + 1;
     return { all: all.length, by };
   }, [content, q]);
-  // With a query the list is ranked, so the A–Z grouping only applies without one.
-  const groups = useMemo(() => (q ? null : groupByLetter(list)), [list, q]);
+  // With a query the list is ranked (flat). Without one: all categories as collapsed groups (the
+  // long list stays short on a phone), or one category A–Z with the letter bar.
+  const grouped = !q && !cat;
+  const groups = useMemo(() => (q || grouped ? null : groupByLetter(list)), [list, q, grouped]);
   const catLabel = new Map(content.categories.map((c) => [c.id, c.label]));
   return html`
     <div class="gl-cats" role="group" aria-label=${t('glossary.categories')}>
@@ -130,6 +132,19 @@ function TermsList({ content, query }) {
     <div class="gl-list" data-testid="glossary-tags">
       ${list.length === 0
         ? html`<${EmptyState} icon="search" title=${t('glossary.noResults')} body=${t('glossary.noResultsBody')} />`
+        : grouped
+          ? content.categories.map((c) => {
+              const items = list.filter((e) => e.category === c.id);
+              if (!items.length) return null;
+              return html`<details class="gl-group" data-cat=${c.id}>
+                <summary class="gl-group-sum">
+                  <span class="gl-group-title">${c.label}</span>
+                  <span class="gl-group-n num">${items.length}</span>
+                  <${Icon} name="chevron-down" size=${16} />
+                </summary>
+                <ul class="gl-items">${items.map((e) => html`<${TermItem} entry=${e} q=${q} catLabel=${''} />`)}</ul>
+              </details>`;
+            })
         : groups
           ? groups.map(
               (g) => html`<section class="gl-letter" id=${`gl-letter-${g.letter}`} aria-labelledby=${`gl-h-${g.letter}`}>

@@ -3,7 +3,7 @@
 // decisions it cites and the ones that cite it, and the staking rules of the Reglas tab.
 // Sheet text is shown as written; references inside it become links (src/lib/ui/ref-text.js).
 import { html, useMemo, useState, useId } from '../../../vendor/preact.js';
-import { t } from '../../lib/i18n.js';
+import { t, getLocale } from '../../lib/i18n.js';
 import { href, navigate } from '../../lib/router.js';
 import { Card, FilterChip, SegmentedControl, SearchInput, EmptyState, Button, Icon, Pagination, pageOf, FeedGate, RefText, Highlight } from '../../lib/ui/index.js';
 import { glossaryHref, decisionHref, ruleSlug, sheetRuleSlug } from '../../lib/glossary-links.js';
@@ -142,7 +142,9 @@ function DateField({ label, value, onValue, testId }) {
   const id = useId();
   return html`<div class="field">
     <label class="field-label" for=${id}>${label}</label>
-    <div class="input-wrap"><input id=${id} type="date" value=${value} data-testid=${testId} onChange=${(/** @type {any} */ e) => onValue(e.currentTarget.value)} /></div>
+    <div class="input-wrap"><input id=${id} type="date" lang=${getLocale()} value=${value} data-testid=${testId} aria-describedby=${`${id}-hint`}
+      onChange=${(/** @type {any} */ e) => onValue(e.currentTarget.value)} /></div>
+    <span class="sr-only" id=${`${id}-hint`}>${t('decisions.dateHint')}</span>
   </div>`;
 }
 
@@ -152,6 +154,12 @@ function Timeline({ decisions, f, known, onPage }) {
   const { items, page, pageCount } = pageOf(ordered, f.page, PAGE);
   const months = groupByMonth(items);
   return html`
+    ${months.length > 1
+      ? html`<nav class="djump" aria-label=${t('decisions.jumpMonth')}>
+          ${months.map((m) => html`<button type="button" class="chip djump-btn"
+            onClick=${() => document.getElementById(`dm-${m.month}`)?.scrollIntoView({ block: 'start' })}>${m.month.length === 7 ? formatMonth(m.month) : m.month} · ${m.items.length}</button>`)}
+        </nav>`
+      : null}
     <div class="dtimeline" data-testid="decisions-timeline">
       ${months.map(
         (m) => html`<section class="dmonth" aria-labelledby=${`dm-${m.month}`}>
@@ -216,15 +224,13 @@ function DecisionCard({ d, q, known }) {
       <span class="dtheme-label">${t(`decisions.themes.${theme}`)}</span>
     </div>
     <h3 class="dtopic" id=${`d-${d.row}`}><a href=${decisionHref(d.row)}><${Highlight} text=${d.topic} q=${q} /></a></h3>
-    <p class="dtext"><${RefText} text=${d.decision} q=${q} known=${known} /></p>
-    ${d.evidence
-      ? html`<${LazyDisclosure} key=${`e${inEvidence}`} summary=${inEvidence ? t('decisions.evidenceMatch') : t('decisions.evidence')} open=${inEvidence} testId=${`decision-evidence-${d.row}`}>
-          ${() => html`<${LongText} text=${d.evidence} q=${q} known=${known} />`}
-        </${LazyDisclosure}>`
-      : null}
-    ${d.review
-      ? html`<${LazyDisclosure} key=${`r${inReview}`} summary=${inReview ? t('decisions.reviewMatch') : t('decisions.review')} open=${inReview}>
-          ${() => html`<${LongText} text=${d.review} q=${q} known=${known} />`}
+    <p class=${`dtext${q ? '' : ' dtext-clamp'}`}><${RefText} text=${d.decision} q=${q} known=${known} /></p>
+    ${d.evidence || d.review
+      ? html`<${LazyDisclosure} key=${`e${inEvidence || inReview}`} open=${inEvidence || inReview} testId=${`decision-evidence-${d.row}`}
+          summary=${inEvidence || inReview ? t('decisions.moreMatch') : d.evidence && d.review ? t('decisions.more') : d.evidence ? t('decisions.evidence') : t('decisions.review')}>
+          ${() => html`
+            ${d.evidence ? html`<h4 class="dsub">${t('decisions.evidence')}</h4><${LongText} text=${d.evidence} q=${q} known=${known} />` : null}
+            ${d.review ? html`<h4 class="dsub">${t('decisions.review')}</h4><${LongText} text=${d.review} q=${q} known=${known} />` : null}`}
         </${LazyDisclosure}>`
       : null}
   </article>`;
