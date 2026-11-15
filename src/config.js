@@ -2,10 +2,11 @@
 
 /**
  * URL of the Apps Script web app that serves the feed (apps-script/Feed.gs), ending in /exec.
- * Empty until the script is deployed: the app then shows "feed not configured" unless the page is
- * opened with ?feed=fixture (synthetic data from tests/fixtures/feed.json).
+ * Public by design (the feed holds only whitelisted, scrubbed columns). If it is ever empty the app
+ * shows "feed not configured"; ?feed=fixture always loads the synthetic data in tests/fixtures/feed.json.
  */
-export const FEED_URL = '';
+export const FEED_URL =
+  'https://script.google.com/macros/s/AKfycbz6dApRR-E-oyHSoXz-pqCw9YOSgPRiHP9Tgk2xCmHqIliEVvZESiFm7Ro3LuAfbyWXRw/exec';
 
 /** Feed schema this app understands. A newer schema is refused with a clear message. */
 export const FEED_SCHEMA = 1;

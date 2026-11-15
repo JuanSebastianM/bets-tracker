@@ -35,8 +35,9 @@ Columns are found **by header text, never by position**, so a moved column canno
    - any number with two or more thousand groups (`1.234.567`, `9,876,543`): no price or stat looks like that.
    Prices keep three decimals in notes (`feed 4.333`, `apertura feed 1.833`), so a single thousand group
    is **not** scrubbed on its own.
-4. After the JSON is built the script searches the whole string for `COP` and `$`; a hit means a bug:
-   the cell is scrubbed and counted in `meta.redactions`.
+4. After the JSON is built the script searches the whole string for `COP` and for a `$` next to a number;
+   a hit means a bug: the whole cell is replaced and counted in `meta.redactions`. A `$` with no number
+   beside it is not money (one decision quotes a `$(…)` template placeholder) and stays readable.
 5. Units are fine (`Stake (u)`, `Ganancia (u)`, `Stake máx. (u)`): they say nothing about the bankroll.
 6. The repository holds no sheet data. Fixtures are synthetic: invented teams and results, real formats.
 7. `tests/unit/privacy.test.mjs` runs the scrubber on a fixture that has money in every shape above, in

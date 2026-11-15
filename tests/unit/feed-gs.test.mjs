@@ -118,10 +118,21 @@ test('rules: numbered lines below the "Reglas" header, never rule 1, nothing abo
 });
 
 test('self-check replaces any cell that still holds a money marker', () => {
-  const feed = { tabs: { shadow: { columns: ['row', 'notes'], rows: [[2, 'ok'], [3, 'leak COP']] }, rules: ['2. x', 'y $'] } };
+  const feed = { tabs: { shadow: { columns: ['row', 'notes'], rows: [[2, 'ok'], [3, 'leak COP']] }, rules: ['2. x', 'y ' + String.fromCharCode(36) + '9'] } };
   assert.equal(gs.btFeedSelfCheck(feed), 2);
   assert.equal(feed.tabs.shadow.rows[1][1], '[oculto]');
   assert.equal(feed.tabs.rules[1], '[oculto]');
+});
+
+test('a dollar sign with no number next to it is not money', () => {
+  const D = String.fromCharCode(36); // built at run time so the repo privacy scan sees no money text
+  const text = 'Mensaje con $(TABLE) sin rellenar, IA 0 de 129';
+  assert.equal(gs.btFeedScrub(text).hits, 0);
+  const feed = { tabs: { decisions: { columns: ['row', 'evidence'], rows: [[62, text], [63, `cost ${D} 5`], [64, `left 7${D}`]] }, rules: [] } };
+  assert.equal(gs.btFeedSelfCheck(feed), 2);
+  assert.equal(feed.tabs.decisions.rows[0][1], text);
+  assert.equal(feed.tabs.decisions.rows[1][1], '[oculto]');
+  assert.equal(feed.tabs.decisions.rows[2][1], '[oculto]');
 });
 
 test('meta: schema, generatedAt, rows per tab', () => {

@@ -138,8 +138,11 @@ var BT_FEED_MONEY_PATTERNS = [
   /\d{1,3}(?:[.,]\d{3}){2,}(?![\d])/g,
 ];
 
-/** Leftover money markers searched in the final JSON (a hit means a scrubbing bug). */
-var BT_FEED_LEFTOVER = /\bCOP\b|\$/;
+/**
+ * Leftover money markers searched in the final JSON (a hit means a scrubbing bug). A dollar sign only
+ * counts next to a number: text such as "$(TABLE)" in a decision is not money and must stay readable.
+ */
+var BT_FEED_LEFTOVER = /\bCOP\b|\$\s*[+\-−]?\d|\d\s*\$/;
 
 /**
  * Scrub one text cell. Returns { text, hits }.
@@ -371,7 +374,8 @@ function btFeedBuild(tabValues, timeZone, now, formatDate) {
 }
 
 /**
- * Final self-check: any string cell that still holds COP or $ is replaced whole by [oculto].
+ * Final self-check: any string cell that still holds COP, or a $ next to a number, is replaced whole
+ * by [oculto].
  * Returns the number of cells replaced (each one is a scrubbing bug worth looking at).
  */
 function btFeedSelfCheck(feed) {

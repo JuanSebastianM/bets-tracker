@@ -106,11 +106,25 @@ test('offline: the saved copy is shown with a banner', async ({ page }) => {
   await expect(page.getByTestId('banner-stale')).toContainText('Sin conexión');
 });
 
-test('without a configured feed the app says so and offers the example data', async ({ page }) => {
+test('the live feed is read from the script URL and shown without the example banner', async ({ page }) => {
+  // The real script is never called from tests: the request is answered with the synthetic fixture.
+  let calls = 0;
+  await page.route('https://script.google.com/**', async (route) => {
+    calls++;
+    const fixture = await page.request.get('/tests/fixtures/feed.json');
+    await route.fulfill({ contentType: 'application/json', body: await fixture.text() });
+  });
   await openApp(page, '/', { fixture: false });
-  await expect(page.getByTestId('feed-unconfigured')).toBeVisible();
-  await page.getByRole('link', { name: 'Ver con datos de ejemplo' }).click();
   await expect(page.getByTestId('source-shadow')).toBeVisible();
+  await expect(page.getByTestId('banner-fixture')).toHaveCount(0);
+  expect(calls).toBeGreaterThan(0);
+});
+
+test('when the live feed cannot be reached and nothing is cached the app says so and offers a retry', async ({ page }) => {
+  await page.route('https://script.google.com/**', (route) => route.abort());
+  await openApp(page, '/', { fixture: false });
+  await expect(page.getByTestId('feed-error')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Reintentar' })).toBeVisible();
 });
 
 test('a newer feed schema is refused with a clear message', async ({ page }) => {

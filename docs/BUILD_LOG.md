@@ -65,3 +65,24 @@ carries money text (the scrubber hides it).
 - The privacy grep caught money-looking strings in the code and tests (a regex back-reference, a test
   literal); they were rewritten so the only money text is the privacy fixture and the contract's examples.
 - Spanish dates came out as "15 de nov de 2026" from `Intl`; `formatDate` now assembles "15 nov 2026".
+
+## 2026-11-15: feed installed and connected (orchestrator)
+
+- `Feed.gs` was added as a second file to the sheet's existing Apps Script project (the one that holds
+  the Pinnacle puller) through the owner's browser; `Code.gs` was not touched. The file was loaded from
+  this repository at a pinned commit and its SHA-256 was compared in the page before saving.
+- The scope annotation ("only current doc") was removed before installing. The project was authorised
+  with the full spreadsheet scope by the Pinnacle script, whose time trigger runs every 15 minutes;
+  an annotation in a new file would have changed the scopes of the whole project and could have stopped
+  that trigger until someone re-authorised it. The run that followed the change completed normally.
+- `btFeedSelfTest` on the real sheet: all whitelisted headers found, a handful of redactions, no money
+  marker left. Deployed as a web app (execute as the owner, anyone can access) and its URL set in
+  `src/config.js`.
+- First check of the live feed, done in the browser from the app's own origin: no currency code, no
+  dollar amount, no number with two or more thousand groups.
+- Bug found by that check: the final self-check treated any dollar sign as money and replaced a whole
+  `Decisiones` evidence cell that only quotes a `$(…)` template placeholder. The leftover check now
+  needs a number next to the sign. Unit test added.
+- The e2e test for "feed not configured" was replaced by two tests that intercept the script URL (live
+  feed shown without the example banner; unreachable feed with no cache shows the retry state). Tests
+  never call the real script.
