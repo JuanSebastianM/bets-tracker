@@ -289,3 +289,32 @@ test('explorer filters by tag', async ({ page }) => {
   vendor workflow).
 - Don't use colour alone for meaning; won/lost also differ by icon or sign.
 - Do append a dated entry to `docs/BUILD_LOG.md`: what you built, decisions and why, problems solved.
+
+## 10. Linking to the Glossary and the Decisions
+
+Every section links terms, tags and rules to the Glossary, and decision rows to the Decisions log, with
+the helpers in `src/lib/glossary-links.js` (never build these URLs by hand):
+
+```js
+import { glossaryHref, tagSlug, ruleSlug, decisionHref, sheetRuleSlug } from '../../lib/glossary-links.js';
+import { Term, RefText, TagBadge } from '../../lib/ui/index.js';
+
+glossaryHref('fair-close-ev');                 // '#/glossary/fair-close-ev'
+html`<${TagBadge} tag=${p.tag} href=${glossaryHref(tagSlug(p.tag))} />`;   // near_value -> #/glossary/near-value
+html`<${Term} slug="clv">CLV</${Term}>`;        // inline link (dotted underline)
+html`<a href=${glossaryHref(ruleSlug(29))}>regla 29</a>`;                   // #/glossary/rule-29
+html`<a href=${decisionHref(110)}>fila 110</a>`;                            // #/decisions/110 (Decisiones sheet row)
+html`<${RefText} text=${p.notes} known=${{ decisionRows, ruleNumbers }} q=${query} />`;
+```
+
+- Slugs are stable kebab-case English. Tag entries are the kebab-case of the TagId (`prop_near_value` →
+  `prop-near-value`); the 36 betting-analyst rules are `rule-1` … `rule-36`; market families, statuses,
+  filter reasons and note fields each have an entry (the `covers` field in `src/content/glossary.*.json`
+  says which). Useful slugs: `fair-close-ev`, `clv`, `de-vig`, `yield`, `hit-rate`, `break-even`,
+  `standard-error`, `two-se`, `brier`, `calibration`, `frozen-tests`, `gate`, `unit`, `stake`, `kelly`,
+  `drawdown`, `blend`, `consensus`, `shadow-tab`, `bets-tab`, `grok-tab`, `decisions-tab`.
+- `RefText` turns "fila N" / "Decisiones row N" into decision links and "regla N" / "rule N" into rule
+  links, safely (tokens, never innerHTML), and highlights `q`. Pass the decision rows of the dataset
+  (`data.decisions.map((d) => d.row)`) so rows of other tabs ("Sombra fila 412") stay plain text.
+- The theme of a decision, its status kind, the citation graph and the Decisions URL state live in
+  `src/data/decisions.js`; the glossary loader and search in `src/data/content.js`.
