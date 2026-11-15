@@ -4,6 +4,7 @@ import { html } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
 import { Icon, StatusBadge, TagBadge } from '../../lib/ui/index.js';
 import { formatDate, formatPct, formatPrice } from '../../lib/format.js';
+import { tagHref } from '../../lib/glossary-links.js';
 
 /** @typedef {import('../../data/types').Pick} Pick */
 
@@ -28,7 +29,7 @@ export function PickTable({ picks, sort, dir, onSort, hrefOf, caption }) {
   const cell = {
     date: (p) => html`<span class="num" title=${formatDate(p.date, 'medium')}>${formatDate(p.date, 'short')}</span><span class="ex-td-sub">${t(`sources.${p.source}`)}</span>`,
     match: (p) => html`<a class="ex-match-link" href=${hrefOf(p)} data-uid=${p.uid}>${p.match || '–'}</a><span class="ex-td-sub">${p.league}</span>`,
-    tag: (p) => html`<${TagBadge} tag=${p.tag} />`,
+    tag: (p) => html`<${TagBadge} tag=${p.tag} href=${tagHref(p.tag)} />`,
     selection: (p) => html`<span class="ex-td-sub ex-td-market">${p.marketRaw || '–'}</span>${p.selection || '–'}`,
     price: (p) => formatPrice(p.price),
     close: (p) => formatPrice(p.closePrice),

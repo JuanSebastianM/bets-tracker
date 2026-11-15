@@ -6,6 +6,7 @@ import { tagLabel } from '../../data/tags.js';
 import { PRICE_PRESETS } from '../../data/filters.js';
 import { PROB_BANDS, EV_BANDS } from '../../data/analysis.js';
 import { optionLabel } from '../../lib/ui/index.js';
+import { lineLabel } from '../../data/lines.js';
 
 /** A band as text ("40–50%", "< 0%", "≥ 20%"). @param {{ min: number, max: number }} b @param {boolean} signed */
 function bandText(b, signed) {
@@ -49,6 +50,8 @@ export function groupLabel(dimId, key) {
       return optionLabel('reasons', key);
     case 'sample':
       return key === '6-9' ? '6–9' : key;
+    case 'line':
+      return lineLabel(key, { scope: true });
     default:
       return key;
   }

@@ -2,20 +2,14 @@
 import { html, useId } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
 import { href } from '../../lib/router.js';
-import { Chip } from '../../lib/ui/index.js';
 import { formatPct, formatRecord } from '../../lib/format.js';
 import { toQueryString } from '../../data/filters.js';
-import { verdictLabel } from '../../data/summaries.js';
 
 /** @typedef {import('../../data/stats.js').Summary} Summary */
 /** @typedef {import('../../data/stats.js').MeanStat} MeanStat */
 
-const VERDICT_TONE = { above: 'won', below: 'lost', lean_above: 'neutral', lean_below: 'neutral', too_early: 'pending', none: 'neutral' };
-
-/** The verdict word against the close (the Overview's words). @param {{ v: import('../../data/overview.js').Verdict }} props */
-export function VerdictChip({ v }) {
-  return html`<${Chip} tone=${VERDICT_TONE[v]} class="an-verdict">${verdictLabel(v)}</${Chip}>`;
-}
+/** The verdict word against the close: the shared chip (src/lib/ui), re-exported for this section's parts. */
+export { VerdictChip } from '../../lib/ui/index.js';
 
 /** Explorer href for a filter state. @param {import('../../data/filters.js').FilterState} f */
 export function explorerHref(f) {

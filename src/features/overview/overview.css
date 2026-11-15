@@ -18,7 +18,7 @@
 .overview .ov-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .overview .ov-stats .stat-value { font-size: var(--fs-lg); }
 .overview .ov-verdict-stat { display: grid; gap: 4px; align-content: start; justify-items: start; }
-.overview .ov-verdict { white-space: nowrap; }
+
 
 /* Group table (tags, markets): one link per row */
 .overview .ov-glist { list-style: none; margin: 0; padding: 0; display: grid; border-top: var(--border); }

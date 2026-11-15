@@ -285,3 +285,15 @@ mark.hl { background: var(--c-accent-soft); color: inherit; border-radius: 3px; 
 .chart-svg .hist-bar { fill: var(--c-accent); fill-opacity: 0.8; }
 .chart-svg .hist-below { fill: var(--c-void); fill-opacity: 0.55; }
 .chart-svg .hist-zero { stroke: var(--c-ink-2); stroke-width: 1.5; stroke-dasharray: 3 3; }
+
+/* Decision links with their topic ("Decisiones fila 28 · Cuota de cierre"), and the line of glossary
+   links under a table of tags. */
+.dlink-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.dlink { display: inline; min-height: 0; }
+.dlink-list .dlink { display: inline-block; min-height: var(--tap); padding: 10px 0; line-height: 1.35; }
+.dlink-row { font-weight: 650; white-space: nowrap; }
+.dlink-topic { color: var(--c-muted); font-weight: 400; }
+.tag-gloss { font-size: var(--fs-sm); color: var(--c-muted); line-height: 2; margin: 0; }
+.tag-gloss-label { margin-right: var(--sp-1); }
+.tag-gloss .term { display: inline-block; padding: 2px 0; font-weight: 650; white-space: nowrap; }
+.verdict-chip { white-space: nowrap; }

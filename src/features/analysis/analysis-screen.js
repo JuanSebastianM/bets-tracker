@@ -81,7 +81,7 @@ function Analysis({ data, query, part, bare }) {
         </div>
         <${ActiveFilters} filters=${filters} onChange=${setFilters} />
 
-        ${part === 'breakdown' ? html`<${Breakdown} picks=${list} filters=${filters} view=${view} setView=${setView} />` : null}
+        ${part === 'breakdown' ? html`<${Breakdown} picks=${list} all=${data.picks} today=${today} filters=${filters} view=${view} setView=${setView} />` : null}
         ${part === 'calibration' ? html`<${Calibration} picks=${list} view=${view} setView=${setView} />` : null}
         ${part === 'close' ? html`<${CloseQuality} picks=${list} pinnacle=${data.pinnacle} />` : null}
         ${part === 'grok'

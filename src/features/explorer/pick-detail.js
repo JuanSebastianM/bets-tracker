@@ -3,11 +3,10 @@
 // on wide screens.
 import { html } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
-import { BottomSheet, Button, EmptyState, StatusBadge, TagBadge, Icon } from '../../lib/ui/index.js';
+import { BottomSheet, Button, EmptyState, StatusBadge, TagBadge, Icon, RefText, Term, useGlossaryLinks } from '../../lib/ui/index.js';
 import { formatDate, formatPct, formatPrice, formatProb, formatUnits } from '../../lib/format.js';
 import { formatDateTime } from '../../lib/i18n.js';
-import { href } from '../../lib/router.js';
-import { tagSlug } from '../../data/tags.js';
+import { tagHref, tagSlug, REASON_SLUGS } from '../../lib/glossary-links.js';
 import { lineAddsInfo, lineLabel } from '../../data/lines.js';
 import { pinnacleFor } from '../../data/explore.js';
 import { sheetProfit } from '../../data/stats.js';
@@ -72,6 +71,7 @@ function BooksTable({ pick: p }) {
  *   onPrev: (() => void) | null, onNext: (() => void) | null, onClose: () => void }} props
  */
 export function PickDetail({ pick: p, pinnacle, position, onPrev, onNext, onClose }) {
+  const gl = useGlossaryLinks();
   const footer = html`<div class="ex-detail-nav">
     <${Button} variant="secondary" icon="chevron-left" onClick=${onPrev || undefined} disabled=${!onPrev} data-testid="pick-prev">${t('explorer.d.prev')}</${Button}>
     <span class="muted small num" data-testid="pick-position">${position.index >= 0 ? t('explorer.d.position', { i: position.index + 1, n: position.total }) : ''}</span>
@@ -108,10 +108,14 @@ export function PickDetail({ pick: p, pinnacle, position, onPrev, onNext, onClos
       </div>
 
       <${Block} title=${t('explorer.d.tag')} testId="pick-tag">
-        <div class="row-wrap"><${TagBadge} tag=${p.tag} href=${href(`/glossary/${tagSlug(p.tag)}`)} /></div>
-        <p class="small">${t(`explorer.tagMeaning.${p.tag}`)}</p>
+        <div class="row-wrap"><${TagBadge} tag=${p.tag} href=${tagHref(p.tag)} /></div>
+        <p class="small"><${RefText} text=${t(`explorer.tagMeaning.${p.tag}`)} terms=${gl.terms} known=${{ ruleNumbers: gl.ruleNumbers || [] }} exclude=${[tagSlug(p.tag)]} /></p>
         ${p.tagRaw ? html`<p class="small ex-quote">${p.tagRaw}</p>` : null}
-        ${pp.filters.length ? html`<div class="row-wrap">${pp.filters.map((r) => html`<span class="chip">${t(`filters.reasons.${r}`)}</span>`)}</div>` : null}
+        ${pp.filters.length
+          ? html`<div class="row-wrap" data-testid="pick-reasons">${pp.filters.map((r) => (REASON_SLUGS[r]
+              ? html`<${Term} slug=${REASON_SLUGS[r]} class="chip">${t(`filters.reasons.${r}`)}</${Term}>`
+              : html`<span class="chip">${t(`filters.reasons.${r}`)}</span>`))}</div>`
+          : null}
       </${Block}>
 
       <${Block} title=${t('explorer.d.prices')} testId="pick-prices">

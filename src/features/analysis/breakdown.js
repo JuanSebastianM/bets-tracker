@@ -4,10 +4,11 @@
 // greyed or hidden; each group links to the Explorer with its slice added to the current filters.
 import { html, useMemo, useState } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
-import { Card, Select, SegmentedControl, IconButton, Icon, Disclosure, Button, useMediaQuery } from '../../lib/ui/index.js';
+import { Card, Select, SegmentedControl, IconButton, Icon, Disclosure, Button, useMediaQuery, TagGlossaryLinks } from '../../lib/ui/index.js';
+import { MARKET_SLUGS, REASON_SLUGS } from '../../lib/glossary-links.js';
 import { RangeChart } from '../../lib/charts/index.js';
 import { formatPct, formatRecord, formatUnits } from '../../lib/format.js';
-import { DIMENSION_IDS, breakdown, sortRows, sortDefaultDir, withSlice, twoWay, SORTS } from '../../data/analysis.js';
+import { DIMENSION_IDS, breakdown, sortRows, sortDefaultDir, twoWay, SORTS, exactRowFilter, exactCellFilter } from '../../data/analysis.js';
 import { VerdictChip, explorerHref, evText, rangeText, hitText, signClass, MinNSlider } from './parts.js';
 import { groupLabel, dimLabel } from './labels.js';
 import { breakdownText, measureOf, measureN } from './text.js';
@@ -23,9 +24,9 @@ const CHART_MAX = 12;
 const LIST_STEP = 20;
 
 /**
- * @param {{ picks: Pick[], filters: import('../../data/filters.js').FilterState, view: View, setView: (patch: Partial<View>) => void }} props
+ * @param {{ picks: Pick[], all: Pick[], today: string, filters: import('../../data/filters.js').FilterState, view: View, setView: (patch: Partial<View>) => void }} props
  */
-export function Breakdown({ picks, filters, view, setView }) {
+export function Breakdown({ picks, all, today, filters, view, setView }) {
   const wide = useMediaQuery('(min-width: 720px)');
   const [showAll, setShowAll] = useState(false);
   const labelOf = (/** @type {string} */ k) => groupLabel(view.dim, k);
@@ -69,10 +70,19 @@ export function Breakdown({ picks, filters, view, setView }) {
     })),
   };
 
-  const linkOf = (/** @type {string} */ k) => {
-    const f = withSlice(filters, view.dim, k);
-    return f ? explorerHref(f) : null;
-  };
+  // Each row links to exactly the picks it counts (checked in src/data/analysis.js exactRowFilter); a
+  // row no filter can express has no link. Only the rows on screen are linked, once per view.
+  const fqs = JSON.stringify(filters);
+  const links = useMemo(() => {
+    /** @type {Map<string, string | null>} */
+    const m = new Map();
+    for (const r of shown) {
+      const f = exactRowFilter(all, picks, filters, view.dim, r.key, { today });
+      m.set(r.key, f ? explorerHref(f) : null);
+    }
+    return m;
+  }, [all, picks, fqs, view.dim, shown.map((r) => r.key).join('|'), today]);
+  const linkOf = (/** @type {string} */ k) => (links.has(k) ? links.get(k) : null);
   const setSort = (/** @type {string} */ sort) => setView({ sort, dir: /** @type {any} */ (sort === view.sort ? (view.dir === 'asc' ? 'desc' : 'asc') : sortDefaultDir(sort)) });
 
   return html`<div class="stack an-part" data-testid="analysis-breakdown">
@@ -131,10 +141,12 @@ export function Breakdown({ picks, filters, view, setView }) {
         ${base.left ? html`<p class="an-note">${t('analysis.bd.leftNote', { count: base.left, k: base.left, dim: dimName })}</p>` : null}
         ${view.dim === 'book' || view.dim === 'reason' ? html`<p class="an-note">${t('analysis.bd.multiNote')}</p>` : null}
         ${view.dim === 'weekday' ? html`<p class="an-note">${t('analysis.bd.noLinkNote')}</p>` : null}
+        ${view.dim !== 'weekday' && shown.some((r) => linkOf(r.key) == null) ? html`<p class="an-note" data-testid="bd-nolink">${t('analysis.bd.someNoLink')}</p>` : null}
       </div>
+      <${GlossaryLine} dim=${view.dim} keys=${shown.map((r) => r.key)} />
     </${Card}>
 
-    <${TwoWay} picks=${picks} filters=${filters} view=${view} setView=${setView} labelOf=${labelOf} />
+    <${TwoWay} picks=${picks} all=${all} today=${today} filters=${filters} view=${view} setView=${setView} labelOf=${labelOf} />
   </div>`;
 }
 
@@ -226,9 +238,9 @@ function GroupTable({ rows, labelOf, linkOf, small, view, onSort, dimName }) {
 /**
  * Optional second dimension: the largest groups of both, crossed. Cells show the chosen measure and n,
  * greyed under the minimum n, and link to the Explorer with both slices.
- * @param {{ picks: Pick[], filters: import('../../data/filters.js').FilterState, view: View, setView: (p: Partial<View>) => void, labelOf: (k: string) => string }} props
+ * @param {{ picks: Pick[], all: Pick[], today: string, filters: import('../../data/filters.js').FilterState, view: View, setView: (p: Partial<View>) => void, labelOf: (k: string) => string }} props
  */
-function TwoWay({ picks, filters, view, setView, labelOf }) {
+function TwoWay({ picks, all, today, filters, view, setView, labelOf }) {
   const table = useMemo(() => (view.dim2 ? twoWay(picks, view.dim, view.dim2) : null), [picks, view.dim, view.dim2]);
   const label2 = (/** @type {string} */ k) => groupLabel(view.dim2, k);
   const options = [{ value: '', label: t('analysis.tw.none') }, ...DIMENSION_IDS.filter((d) => d !== view.dim).map((d) => ({ value: d, label: dimLabel(d) }))];
@@ -252,8 +264,7 @@ function TwoWay({ picks, filters, view, setView, labelOf }) {
                       const cell = table.cells[r][c];
                       if (!cell) return html`<td class="ta-r num an-dim">–</td>`;
                       const v = measureOf(cell, view.measure);
-                      const f1 = withSlice(filters, view.dim, r);
-                      const f2 = f1 ? withSlice(f1, view.dim2, c) : null;
+                      const f2 = exactCellFilter(all, picks, filters, [[view.dim, r], [view.dim2, c]], { today });
                       const body = html`<span class=${signClass(v)}>${formatPct(v)}</span><span class="an-dim"> n ${measureN(cell, view.measure)}</span>`;
                       return html`<td class=${`ta-r num${cell.summary.n < view.minn ? ' an-small' : ''}`}>${f2 ? html`<a href=${explorerHref(f2)}>${body}</a>` : body}</td>`;
                     })}
@@ -266,4 +277,17 @@ function TwoWay({ picks, filters, view, setView, labelOf }) {
         : html`<p class="an-muted">${t('analysis.text.bdEmpty')}</p>`
       : null}
   </${Disclosure}>`;
+}
+
+/**
+ * Under the groups: glossary links for what the groups are, when the glossary explains them (tags,
+ * market families, filter reasons).
+ * @param {{ dim: string, keys: string[] }} props
+ */
+function GlossaryLine({ dim, keys }) {
+  if (dim === 'tag') return html`<${TagGlossaryLinks} tags=${keys} testId="bd-glossary" />`;
+  const map = dim === 'market' ? MARKET_SLUGS : dim === 'reason' ? REASON_SLUGS : null;
+  if (!map) return null;
+  const items = keys.filter((k) => map[k]).map((k) => ({ slug: map[k], label: groupLabel(dim, k) }));
+  return html`<${TagGlossaryLinks} items=${items} label=${t('links.inGlossary')} testId="bd-glossary" />`;
 }

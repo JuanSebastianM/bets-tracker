@@ -14,6 +14,21 @@ export const glossaryHref = (slug) => `#/glossary/${encodeURIComponent(slug)}`;
 /** Glossary slug of a tag id ('prop_near_value' -> 'prop-near-value'). @param {string} tagId */
 export const tagSlug = (tagId) => String(tagId).replace(/_/g, '-').toLowerCase();
 
+/** Link to the glossary entry of a sheet tag ('near_value' -> '#/glossary/near-value'). @param {string} tagId */
+export const tagHref = (tagId) => glossaryHref(tagSlug(tagId));
+
+/** Glossary entry of each filter reason (`parsed.filters`, src/data/tags.js FILTER_REASONS). */
+export const REASON_SLUGS = /** @type {Record<string, string>} */ ({
+  gap: 'f-gap', ratio: 'f-ratio', sample: 'f-sample', razor: 'razor', filter4: 'filter-4', filter5: 'filter-5',
+  rule1: 'other-side', rule18: 'relaxed-sample', rule23: 'totals-gap', low_stake: 'low-stake',
+});
+
+/** Glossary entry of each market family (src/data/tags.js MARKET_FAMILIES). */
+export const MARKET_SLUGS = /** @type {Record<string, string>} */ ({
+  result: '1x2', goals: 'totals', corners_total: 'corners', corners_team: 'corners', cards_total: 'cards', cards_team: 'cards',
+  shots: 'shots', combo: 'builder', other: 'other-markets',
+});
+
 /** Glossary slug of a betting-analyst rule number. @param {number | string} n */
 export const ruleSlug = (n) => `rule-${parseInt(String(n), 10)}`;
 

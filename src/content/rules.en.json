@@ -3,6 +3,7 @@
   "rules": [
     {
       "n": 1, "slug": "rule-1", "title": "Never bet against the model",
+      "short": "If our numbers say the other outcome is more likely, there is no bet.",
       "says": "If the model thinks the other side is the likelier one, there is no bet. Every pick shows the model probability for that exact line next to the market probability without the margin, so you can see whether they agree.",
       "state": "in_force", "since": null,
       "stateNote": "For results and goals rule 29 replaces it since 11 Oct 2026; it still applies to corners, cards and shots.",
@@ -10,6 +11,7 @@
     },
     {
       "n": 2, "slug": "rule-2", "title": "The blend decides the stake",
+      "short": "The smaller the edge we see, the smaller the bet; with almost no edge, no bet.",
       "says": "The blend is half model and half margin-free market. If the blend edge or the conservative edge is under 4%, the stake is at most 0.5u or the pick is skipped. A thin edge is a pass by default.",
       "state": "in_force", "since": null,
       "stateNote": "For results and goals rule 29 replaces it since 11 Oct 2026.",
@@ -17,84 +19,98 @@
     },
     {
       "n": 3, "slug": "rule-3", "title": "Razor",
+      "short": "If the line sits almost exactly on what we expect to happen, it is a coin flip and is not played.",
       "says": "No goals, corners or cards line within 0.5 of the model mean is played: it is too close for the model to know which side it falls on. In a builder, take the line further from the mean.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["razor", "model-mean", "totals", "builder"]
     },
     {
       "n": 4, "slug": "rule-4", "title": "How the stake is set",
+      "short": "Never bet a lot at once: each bet has a ceiling, and it is not raised because the price got better.",
       "says": "The stake is the lower of 2u and a quarter Kelly on the blend probability, against the current bank. The minimum is 0.25u. A stake is never raised because the price drifted in your favour.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["stake", "kelly", "blend", "bankroll", "unit"]
     },
     {
       "n": 5, "slug": "rule-5", "title": "Minimum price 1.70 on a single",
+      "short": "A single bet has to pay at least 1.70.",
       "says": "A single bet needs a price of at least 1.70. If one book clears it and another doesn't, both are named and the one that clears is used.",
       "state": "in_force", "since": null,
       "decisions": [13], "terms": ["minimum-price", "decimal-odds", "line-shopping"]
     },
     {
       "n": 6, "slug": "rule-6", "title": "Builders: at most 2 legs",
+      "short": "Combined bets hold two picks at most; no long accumulators.",
       "says": "A builder has at most 2 legs and is priced as the joint probability from one simulation. If it is on the same idea as a single, it is an optional extra of at most 0.5u. A double across two matches needs each leg at 80% or more (rule 4 of the Reglas tab). No parlays of 3 or more legs.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["builder", "double-bet", "parlay", "thesis", "sheet-rules"]
     },
     {
       "n": 7, "slug": "rule-7", "title": "Always price ML, DNB and double chance",
+      "short": "For each team the different ways of backing it are compared, and the one that pays best for the risk wins.",
       "says": "For any side, the moneyline (ML), draw no bet (DNB) and double chance are priced, plus the matching Asian line, and the one with the best blend EV is kept. When the draw weighs a lot, double chance usually wins.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["1x2", "dnb", "double-chance", "asian-handicap", "ev"]
     },
     {
       "n": 8, "slug": "rule-8", "title": "Goal timing",
+      "short": "When each team tends to score helps choose the bet: if the opponent scores late, prefer one that refunds you on a draw.",
       "says": "With fstats minute bands: if the favourite's opponent scores more than 30% of its goals after 75', DNB beats ML. If either side scores late, for unders prefer the 1st-half under or the Asian under 3 over under 2.5. Early-scoring teams: 1st-half goal or goal-before-X markets. If the underdog concedes 60% or more in the 2nd half and the other side scores 25% or more after 75', double chance beats DNB.",
       "state": "in_force", "since": null,
       "decisions": [19], "terms": ["fstats", "dnb", "double-chance", "first-half", "totals"]
     },
     {
       "n": 9, "slug": "rule-9", "title": "Corner and card unders: look at the opponent",
+      "short": "To bet on few corners or few cards, look at what the opponent allows too, not just one team.",
       "says": "For a corners or cards under, the team's own average is not enough: check what the opponent concedes. The season average beats a 3-game spike.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["corners", "cards", "totals"]
     },
     {
       "n": 10, "slug": "rule-10", "title": "Live bets",
+      "short": "During the match, watch how it is being played, not only the score, and never try to win back what you just lost.",
       "says": "Live, first understand the game state before extrapolating the pace: a leading favourite in control means fewer late corners. Trust xG over the score. Never re-enter a market you just lost in the same match.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["live-bet", "corners"]
     },
     {
       "n": 11, "slug": "rule-11", "title": "Short favourites near 1.85",
+      "short": "A favourite priced around 1.85 where we see little edge is not bet.",
       "says": "A short favourite around 1.85 with a thin blend edge is a pass.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["favorite-underdog", "blend", "ev"]
     },
     {
       "n": 12, "slug": "rule-12", "title": "How Asian lines settle",
+      "short": "Some bets are won or lost by half, or refunded, depending on the exact result.",
       "says": "At +0.25 a draw is a half win and a one-goal loss is a full loss. Asian under 3: exactly 3 goals refunds the stake, 4 or more loses. Quarter lines split the stake across the two neighbouring lines.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["asian-handicap", "quarter-line", "half-won", "half-lost", "void"]
     },
     {
       "n": 13, "slug": "rule-13", "title": "One match, one thesis",
+      "short": "In one match you do not bet twice on the same idea.",
       "says": "No doubled exposure to the same side or the same total in a match unless you ask for it, and then the second stake is cut.",
       "state": "in_force", "since": null,
       "decisions": [21], "terms": ["thesis", "stake"]
     },
     {
       "n": 14, "slug": "rule-14", "title": "H2H is a check, not a bet",
+      "short": "Past meetings between the two teams are for checking, not for deciding.",
       "says": "Head-to-head results are there to check, never to decide on their own. The sample size is always given.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["h2h", "sample-size"]
     },
     {
       "n": 15, "slug": "rule-15", "title": "Verify every fact",
+      "short": "Injuries, coach, referee and date are confirmed in a current source; what is not confirmed changes nothing.",
       "says": "Coach, injuries, suspensions, standings, who travelled, referee and kickoff date are checked in a current source: ge.globo for Brazil, otherwise the club or league site, Sofascore, FotMob or a dated preview. Two sources disagree → unconfirmed; if referee averages differ, the range is given. An unconfirmed absence never changes a lambda.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["sofascore", "lambda"]
     },
     {
       "n": 16, "slug": "rule-16", "title": "Sofascore AI is a contrast, never a filter",
+      "short": "The Sofascore app's prediction is read as one more opinion, but it never decides a bet.",
       "says": "The Sofascore AI is opened on every slate for context and its probability is recorded, but it never feeds the model, the blend, the stake or any filter. If a pick passes everything it is published even when the AI disagrees, with one line when they differ by 5 points or more. The one exception is rule 23, where the AI can only help lift a cap.",
       "why": "Its numbers seem to track the market closely, so they add little information of their own.",
       "state": "in_force", "since": "2026-10-09",
@@ -102,12 +118,14 @@
     },
     {
       "n": 17, "slug": "rule-17", "title": "Only what you confirm is logged",
+      "short": "Only what you say you bet is logged as a real bet.",
       "says": "Apuestas holds only what you confirm you placed, with book and price. The one existing tracker is edited, never a copy. The Sombra tab is the only exception.",
       "state": "in_force", "since": null,
       "decisions": [10], "terms": ["bets-tab", "shadow-tab"]
     },
     {
       "n": 18, "slug": "rule-18", "title": "F-sample: minimum sample",
+      "short": "If the teams have not played enough games to judge them, no bet.",
       "says": "Goals, results and cards need 10 league games for both teams. Count stats (corners, shots, shots on target) settle faster: with 6–9 games a pick that passes everything else gets SHADOW (logged in Sombra, no stake); under 6 games it is skipped.",
       "state": "in_force", "since": "2026-10-09",
       "stateNote": "The 6–9 games part was logged as Provisional in Decisiones.",
@@ -115,6 +133,7 @@
     },
     {
       "n": 19, "slug": "rule-19", "title": "F-gap: model and market too far apart",
+      "short": "If our numbers and the bookmakers' are far apart, the mistake is most likely ours, and there is no bet.",
       "says": "Skip if the model and the margin-free market differ by more than 10 percentage points. For corners, cards and shots totals the market is the line's shared reference (rule 36), never the book being priced.",
       "state": "in_force", "since": null,
       "stateNote": "For results and goals rule 29 replaces it since 11 Oct 2026.",
@@ -122,6 +141,7 @@
     },
     {
       "n": 20, "slug": "rule-20", "title": "F-ratio: inflated probabilities",
+      "short": "If we think something is much likelier than the bookmakers do, we distrust it and do not bet.",
       "says": "Skip if the model probability is more than 1.35× the market's (the shared reference, rule 36, for corners, cards and shots totals).",
       "why": "At long odds a small probability error becomes a huge fake EV.",
       "state": "in_force", "since": null,
@@ -130,6 +150,7 @@
     },
     {
       "n": 21, "slug": "rule-21", "title": "Filter 4: form",
+      "short": "If the edge disappears when you look at the last few games, no bet.",
       "says": "The model uses whole-season numbers (Todos). The last 5 games are the check: if re-running with a last-5 screen drops the blend EV under 4%, the bet does not qualify. The last 3 are context only. The data window is never switched to hunt for a pick.",
       "state": "in_force", "since": null,
       "stateNote": "For results and goals rule 29 replaces it since 11 Oct 2026.",
@@ -137,12 +158,14 @@
     },
     {
       "n": 22, "slug": "rule-22", "title": "Two-way prices only",
+      "short": "If a bookmaker offers only one side of a bet, its fair price cannot be known, so no bet.",
       "says": "A market offered on one side only can't have its margin removed, so it is skipped.",
       "state": "in_force", "since": null,
       "decisions": [39], "terms": ["two-way-only", "de-vig", "margin"]
     },
     {
       "n": 23, "slug": "rule-23", "title": "Model-vs-market gap on totals",
+      "short": "If our goal or corner count is far from the bookmakers', the bet is small or skipped.",
       "says": "If the model mean differs from the market-implied mean by more than 0.5 goals (match total) or 1.5 corners, and neither H2H nor the Sofascore AI backs the model's side, stake at most 0.5u or skip, even with positive EV. When it caps or skips a pick, it is logged in Sombra with the reason “rule 23”.",
       "why": "It comes from a single result (HJK–VPS Under 3, which lost 6-0; Grok proposed it), so it is provisional. It has been dormant since rules 29 and 30: it only acts on staked picks, and no goals or corners pick has had a stake since 11–12 Oct.",
       "state": "provisional", "since": "2026-10-09",
@@ -151,12 +174,14 @@
     },
     {
       "n": 24, "slug": "rule-24", "title": "Filter 5: the referee",
+      "short": "On card bets the referee's card count matters; if it wipes out the edge, no bet.",
       "says": "When the referee has 20+ games, a card bet (or a builder with a card leg) must keep a 4% blend EV after the card total is moved halfway to the referee's cards per game. Card picks it removes go to Sombra. It can only remove bets, never add them.",
       "state": "in_force", "since": "2026-10-09",
       "decisions": [6, 46, 47], "terms": ["filter-5", "cards", "blend"]
     },
     {
       "n": 25, "slug": "rule-25", "title": "Shots and shots on target are SHADOW",
+      "short": "Shot bets are logged only to follow them, never with money.",
       "says": "The script prices team and match shots and shots on target, but any pick with a shots leg gets SHADOW: logged in Sombra, never published or staked. Since 2 Nov 2026 team shots are no longer logged; only match totals with the SHADOW verdict and the one MODELO SOLO pick per slate.",
       "why": "At the 24 Oct review there were 30 rows, 11-19, −23.4% flat; shot counts were checked and the sources agree, so the data is not the cause. At the 500-row review team shots were 8-21, −44.3% flat.",
       "state": "in_force", "since": "2026-10-09",
@@ -164,6 +189,7 @@
     },
     {
       "n": 26, "slug": "rule-26", "title": "Price exceptions are your call",
+      "short": "If you want something that pays a little under the minimum, it is your call, and you are told so plainly.",
       "says": "If you want a pick priced a little under the minimum, you are told plainly that it breaks the rule, with the blend EV and the fair odds. If it is still positive EV and one thesis per match holds, it is accepted at a stake no larger than the script's. A negative-EV price is not an exception. A stake is never raised for being an exception.",
       "why": "The first was NYCFC DNB at 3.00 against a minimum of 3.03 (blend EV +2.9%). After 30 graded rows, check whether exceptions did worse than the rest.",
       "state": "in_force", "since": "2026-10-09",
@@ -171,6 +197,7 @@
     },
     {
       "n": 27, "slug": "rule-27", "title": "Early-payout markets",
+      "short": "Betano's bet that wins if your team ever goes two goals up is priced on its own.",
       "says": "Betano's “2 goles de ventaja” bet wins if the team wins or is ever two goals ahead. It is priced as its own market, never from the ML: goals are simulated under the model lambdas and under the market lambdas, at random minutes, and the two probabilities are averaged; minimum price = 1.04 / blend. It beats the plain ML mainly when the opponent concedes early or the favourite leaks late goals.",
       "why": "On 9 Oct Houston (blend 33.9%, minimum 3.07) and Brommapojkarna (33.1%, minimum 3.14) were taken at 3.20 and 3.25, both above their minimums.",
       "state": "in_force", "since": "2026-10-09",
@@ -178,6 +205,7 @@
     },
     {
       "n": 28, "slug": "rule-28", "title": "Cards: yellow 1, red 2, at most 3 per player",
+      "short": "To count cards, a yellow is 1, a red is 2 and one player adds 3 at most.",
       "says": "A first yellow counts 1 and a red counts 2, direct or from a second yellow. The second yellow is not counted again: it becomes the red, so one player adds at most 3. When a match has a red, count player by player; if it can't be told, grade only when the result is the same under both readings.",
       "why": "fstats counts a red as 1, so the model's card totals run slightly low against the books' lines.",
       "state": "in_force", "since": "2026-10-10",
@@ -185,6 +213,7 @@
     },
     {
       "n": 29, "slug": "rule-29", "title": "Market first for results and goals",
+      "short": "On results and goals the bookmakers know more than we do, so we only look for a bookmaker that clearly pays more than the others.",
       "says": "For ML, 1st-half result, DNB, double chance, Asian handicap, BTTS, goal-before and any goals total, the fair probability is the consensus: the Sofascore/bet365 feed price with the margin removed by the power method. The only possible edge is price: Betano, Betsson or Stake paying at least 3% more than that fair price. Those picks are VALOR and go to Sombra with no stake until 30–50 graded rows show positive value against the close and a positive flat return. The value scan covers every Favorites match, cups included.",
       "why": "A backtest of 12,662 matches showed the model adds nothing to the market for 1X2 and goals, and blending it in made the forecast worse. Since version 4.6 there is no value verdict when the reference carries more than 10% margin, and since 4.7 none when the price is above 4.0.",
       "state": "in_force", "since": "2026-10-11",
@@ -192,6 +221,7 @@
     },
     {
       "n": 30, "slug": "rule-30", "title": "Corners and cards: shrunk and paused",
+      "short": "On corners and cards we trust our numbers less, so for now no money is bet there: they are only logged to follow them.",
       "says": "The script keeps only 36% of the model's deviation from the league average on corner totals and 17% on cards. A corners or cards pick that passes every filter is SHADOW, never CANDIDATE: today the system recommends no staked bets, and “No bet” is the expected slate result. Real money comes back only when 30+ graded Sombra rows from the shrunk model (dated 13 Oct 2026 or later) show positive value against the close and a positive flat return.",
       "why": "A backtest of 13,853 matches found the model's averages right but its match-by-match differences far too big: where it said 60–65% it won 52–55% on corners and 49–53% on cards.",
       "state": "paused", "since": "2026-10-12",
@@ -200,6 +230,7 @@
     },
     {
       "n": 31, "slug": "rule-31", "title": "AI watch on corners and cards",
+      "short": "Bets that came from Sofascore's prediction on corners and cards are no longer logged, because they lost.",
       "says": "IA-WATCH picks were logged when the Sofascore AI differed by 4+ points from the feed's corners or cards line, as Sombra rows with no stake. They are no longer logged or shown: corners stopped on 29 Oct and cards on 2 Nov 2026. The AI's numbers are still read for rule 23 and the “IA media X” note.",
       "why": "A backtest showed the AI improving on corners, but in Sombra the corners IA-WATCH rows were 25-37 (−24.0% flat) and the cards had fair-close EV −5.5%.",
       "state": "stopped", "since": "2026-10-12",
@@ -208,6 +239,7 @@
     },
     {
       "n": 32, "slug": "rule-32", "title": "Team corners are tracked on their own",
+      "short": "One team's corners are worked out on their own, and for now they are only logged to follow them.",
       "says": "One team's corners are priced with the raw team numbers (10+ games) or keeping 47% of their deviation (6–9 games), while totals stay shrunk. They stay SHADOW with their own Sombra category; real money only with 50+ graded rows showing positive value against the close and a positive flat return, and your approval. Since 2 Nov 2026 only those with the SHADOW verdict are logged.",
       "why": "A backtest of 27,844 predictions showed that with 10+ games 96% of the model's deviation shows up on the pitch. At the 500-row review they were 22-40, −15.9% flat.",
       "state": "in_force", "since": "2026-10-15",
@@ -215,12 +247,14 @@
     },
     {
       "n": 33, "slug": "rule-33", "title": "Always all three books",
+      "short": "All three bookmakers (Betano, Betsson and Stake) are always checked, because any of them may pay better.",
       "says": "Every market read from the books is checked at Betano, Betsson and Stake, never at one only: one may offer a market the others don't, and the best price can be at any of them. A book that offers only one side is priced against the other side of the same line at another book, and the note says so. Saying a market “doesn't exist” means all three were opened and named.",
       "state": "in_force", "since": "2026-10-15",
       "decisions": [39, 48], "terms": ["betano", "betsson", "stake-book", "line-shopping", "book-prices"]
     },
     {
       "n": 34, "slug": "rule-34", "title": "CLV is measured within one source",
+      "short": "To know whether a price was good, it is compared with the last price at the same bookmaker, never with another's.",
       "says": "CLV compares a price with the close of the same source, never one book's price with another book's close. That is why Sombra rows note “feed X” and G is the feed's close. The headline measure is fair-close EV: opening price × margin-free closing probability − 1. “Positive CLV” before real money means that mean EV above zero over 30+ rows, a positive flat yield and your approval; raw CLV never clears a gate alone. In Apuestas a close counts only if it is at the bet's own book.",
       "why": "Betano at logging against bet365 at the close showed +19.7% “CLV” on a line that never moved. At the 22 Oct audit raw CLV was +2.5% but fair-close EV −5.0%.",
       "state": "in_force", "since": "2026-10-15",
@@ -229,6 +263,7 @@
     },
     {
       "n": 35, "slug": "rule-35", "title": "The value scan reads all three books",
+      "short": "When looking for prices that pay too much, all three bookmakers are read, not just one.",
       "says": "Since rule 29 leaves price as the only edge on results and goals, the scan prices every match at Betano, Betsson and Stake, not at Betano alone. Each price is its own bet with the same reference, a value pick names the book that pays it, and the best price is logged. A book that doesn't list the match is recorded as such, never guessed.",
       "why": "On the 17 Oct slate Betsson was read for 1 of 110 matches and Stake for none: two thirds of the possible value finds were never looked at.",
       "state": "in_force", "since": "2026-10-16",
@@ -236,6 +271,7 @@
     },
     {
       "n": 36, "slug": "rule-36", "title": "One market reference per line",
+      "short": "Every bookmaker is judged against the same reference price, so the only difference between them is what they pay.",
       "says": "For corners, cards, team-corner and shots totals, the market probability used by rule 1, the blend, F-gap and F-ratio comes from one shared reference per match, line and side: the bet365 feed when it prices that line; otherwise the margin-free average of the books that show both sides; with only one such book, that book. So every book gets the same verdict and only the EV changes with the price. Rows note “ref feed”, “ref N casas” or “ref 1 casa”.",
       "why": "On the 19 Oct slate Tottenham U10.5 passed F-gap at Betano 1.75 and failed at Stake 1.80: the better price got the worse verdict because each book was judged against its own opinion.",
       "state": "in_force", "since": "2026-10-19",

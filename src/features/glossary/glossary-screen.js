@@ -5,7 +5,7 @@
 import { html, useMemo } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
 import { href, navigate } from '../../lib/router.js';
-import { Card, FilterChip, SegmentedControl, SearchInput, EmptyState, Skeleton, Banner, Button, Icon, RefText, Highlight } from '../../lib/ui/index.js';
+import { Card, FilterChip, SegmentedControl, SearchInput, EmptyState, Skeleton, Banner, Button, Icon, RefText, Highlight, termIndexOf } from '../../lib/ui/index.js';
 import { glossaryHref, decisionHref, ruleSlug } from '../../lib/glossary-links.js';
 import { formatDate, formatCount } from '../../lib/format.js';
 import { useDataset } from '../../data/store.js';
@@ -185,7 +185,7 @@ function RulesList({ content, query }) {
                 <span class="gl-rule-n num" aria-hidden="true">${r.n}</span>
                 <span class="gl-rule-body">
                   <span class="gl-rule-head"><span class="gl-rule-title"><span class="sr-only">${t('glossary.ruleN', { n: r.n })}: </span><${Highlight} text=${r.title} q=${q} /></span><${RuleState} state=${r.state} /></span>
-                  <span class="gl-rule-says"><${Highlight} text=${r.says} q=${q} /></span>
+                  <span class="gl-rule-says">${r.short ? html`<span class="gl-inshort">${t('glossary.inShort')}: </span>` : null}<${Highlight} text=${r.short || r.says} q=${q} /></span>
                 </span>
               </a>
             </li>`,
@@ -211,6 +211,7 @@ function SlugLinks({ slugs, content }) {
 /** @param {{ entry: GlossaryEntry, content: Content }} props */
 function EntryDetail({ entry: e, content }) {
   const known = useKnown(content);
+  const terms = termIndexOf(content);
   const data = useDataset();
   const cat = content.categories.find((c) => c.id === e.category);
   const tagIds = e.covers?.tags || [];
@@ -227,10 +228,10 @@ function EntryDetail({ entry: e, content }) {
         <h2 id="gl-entry-title" class="gl-entry-title">${e.term}</h2>
         ${e.aliases?.length ? html`<p class="muted small">${t('glossary.aliases')}: ${e.aliases.join(' · ')}</p>` : null}
       </header>
-      <p class="gl-entry-short">${e.short}</p>
+      <p class="gl-entry-short"><${RefText} text=${e.short} known=${known} terms=${terms} exclude=${[e.slug]} /></p>
       <section class="gl-sec">
         <h3>${t('glossary.inSheet')}</h3>
-        <p><${RefText} text=${e.inSheet} known=${known} /></p>
+        <p><${RefText} text=${e.inSheet} known=${known} terms=${terms} exclude=${[e.slug]} /></p>
       </section>
       ${e.example
         ? html`<section class="gl-example" aria-label=${t('glossary.example')}>
@@ -262,6 +263,7 @@ function EntryDetail({ entry: e, content }) {
 /** @param {{ rule: RuleEntry, content: Content }} props */
 function RuleDetail({ rule: r, content }) {
   const known = useKnown(content);
+  const terms = termIndexOf(content);
   const data = useDataset();
   const byRow = useMemo(() => new Map((data?.decisions || []).map((d) => [d.row, d])), [data]);
   const idx = content.rules.indexOf(r);
@@ -277,16 +279,19 @@ function RuleDetail({ rule: r, content }) {
           <${RuleState} state=${r.state} />
           <span class="muted small">${r.since ? t('glossary.since', { date: formatDate(r.since) }) : t('glossary.noDate')}</span>
         </p>
-        ${r.stateNote ? html`<p class="small gl-state-note"><${RefText} text=${r.stateNote} known=${known} /></p>` : null}
+        ${r.stateNote ? html`<p class="small gl-state-note"><${RefText} text=${r.stateNote} known=${known} terms=${terms} /></p>` : null}
       </header>
+      ${r.short
+        ? html`<p class="gl-entry-short gl-rule-short" data-testid="rule-short"><span class="gl-inshort">${t('glossary.inShort')}: </span>${r.short}</p>`
+        : null}
       <section class="gl-sec">
         <h3>${t('glossary.says')}</h3>
-        <p><${RefText} text=${r.says} known=${known} /></p>
+        <p><${RefText} text=${r.says} known=${known} terms=${terms} /></p>
       </section>
       ${r.why
         ? html`<section class="gl-sec">
             <h3>${t('glossary.why')}</h3>
-            <p><${RefText} text=${r.why} known=${known} /></p>
+            <p><${RefText} text=${r.why} known=${known} terms=${terms} /></p>
           </section>`
         : null}
       ${r.terms?.length

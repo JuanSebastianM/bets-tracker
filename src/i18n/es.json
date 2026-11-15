@@ -273,5 +273,12 @@
     },
     "byLine": "Por línea",
     "pickLine": "Línea"
+  },
+  "links": {
+    "decisionRow": "Decisiones fila {row}",
+    "decisionTopic": "{label} · {topic}",
+    "inGlossary": "En el glosario",
+    "tagMeanings": "Qué significa cada etiqueta",
+    "whatIs": "Qué es {term}"
   }
 }

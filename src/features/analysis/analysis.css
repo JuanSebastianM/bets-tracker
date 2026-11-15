@@ -11,7 +11,7 @@
 .analysis .an-notes:empty { display: none; }
 .analysis .an-dim { color: var(--c-muted); font-weight: 400; }
 .analysis .an-link { justify-self: start; min-height: var(--tap); display: inline-flex; align-items: center; text-decoration: none; }
-.analysis .an-verdict { white-space: nowrap; }
+
 
 /* Part switch: one row of links (the part is in the path), scrolls inside itself if it must. */
 .analysis .an-tabs {

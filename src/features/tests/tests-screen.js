@@ -4,7 +4,7 @@
 import { html, useMemo, useEffect, useRef } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
 import { href, navigate } from '../../lib/router.js';
-import { Card, FeedGate, DataTable, Disclosure, TagBadge } from '../../lib/ui/index.js';
+import { Card, FeedGate, DataTable, Disclosure, TagBadge, DecisionLink } from '../../lib/ui/index.js';
 import { formatDate, formatPct, formatRecord, todayIn } from '../../lib/format.js';
 import { formatNumber } from '../../lib/i18n.js';
 import { APP_TIMEZONE } from '../../config.js';
@@ -14,7 +14,7 @@ import {
   testsOverview, shadowReviewHistory, shadowReviewParts, PRICE_FIRST_TESTS, priceFirstProgress, VALUE_RULE, PROP_RULE,
   STOPPED_CATEGORIES, stoppedSummary,
 } from '../../data/tests-config.js';
-import { Meter, StateChip, EvStrip, MiniEv, MiniBar, TermSentence, tagSlug, decisionHref } from './tests-parts.js';
+import { Meter, StateChip, EvStrip, MiniEv, MiniBar, TermSentence, tagHref, decisionHref } from './tests-parts.js';
 import { Icon } from '../../lib/ui/index.js';
 
 /** @typedef {import('../../data/types').Dataset} Dataset */
@@ -166,8 +166,8 @@ function FrozenDetail({ p, today }) {
       : null}</p>
     <div class="tests-links">
       <a class="btn btn-secondary tests-link" href=${explorerHref(test.explorer || {})} data-testid=${`explorer-${test.id}`}>${t('tests.frozen.explorer')}</a>
-      ${test.decisionRow ? html`<a class="link-btn tests-link-sm" href=${decisionHref(test.decisionRow)}>${t('tests.frozen.decision', { row: test.decisionRow })}</a>` : null}
     </div>
+    ${test.decisionRow ? html`<ul class="dlink-list"><li><${DecisionLink} row=${test.decisionRow} class="tests-link-sm" /></li></ul>` : null}
     ${test.explorer && test.explorerExact === false ? html`<p class="tests-muted tests-small" data-testid=${`explorer-approx-${test.id}`}>${t('tests.frozen.explorerApprox')}</p>` : null}
   </div>`;
 }
@@ -244,9 +244,10 @@ function PriceFirstDetail({ p }) {
       : null}
     <div class="tests-links">
       <a class="btn btn-secondary tests-link" href=${explorerHref(test.explorer)} data-testid=${`explorer-${test.id}`}>${t('tests.frozen.explorer')}</a>
-      <a class="link-btn tests-link-sm" href=${href(`/glossary/${tagSlug(test.tag)}`)} data-testid=${`glossary-${test.id}`}>${t('tests.list.glossary', { label: test.sheetLabel })}</a>
-      <span class="tests-decision-links"><span class="tests-muted">${t('tests.frozen.decisions')}</span>
-        ${test.decisionRows.map((/** @type {number} */ row) => html`<a class="link-btn tests-link-sm" href=${decisionHref(row)} aria-label=${t('tests.frozen.decision', { row })}>${t('tests.frozen.rowShort', { row })}</a>`)}</span>
+      <a class="link-btn tests-link-sm" href=${tagHref(test.tag)} data-testid=${`glossary-${test.id}`}>${t('tests.list.glossary', { label: test.sheetLabel })}</a>
+    </div>
+    <div class="tests-decision-links"><span class="tests-muted tests-small">${t('tests.frozen.decisions')}</span>
+      <ul class="dlink-list">${test.decisionRows.map((/** @type {number} */ row) => html`<li><${DecisionLink} row=${row} class="tests-link-sm" /></li>`)}</ul>
     </div>
   </div>`;
 }
@@ -275,8 +276,8 @@ function StoppedSection({ data }) {
               <div class="tests-links">
                 ${rows.length ? html`<a class="link-btn tests-link-sm" href=${explorerHref(c.explorer)}>${t('tests.frozen.explorer')}</a>` : null}
                 ${rows.length && c.explorerExact === false ? html`<span class="tests-muted tests-small">${t('tests.frozen.explorerApprox')}</span>` : null}
-                <a class="link-btn tests-link-sm" href=${decisionHref(c.decisionRow)}>${t('tests.frozen.decision', { row: c.decisionRow })}</a>
               </div>
+              <ul class="dlink-list"><li><${DecisionLink} row=${c.decisionRow} class="tests-link-sm" /></li></ul>
             </div>
           </details>
         </li>`)}

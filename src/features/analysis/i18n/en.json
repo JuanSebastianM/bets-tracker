@@ -34,7 +34,8 @@
     "sample": "Sample",
     "fuerza": "FUERZA",
     "reason": "Rejection reason",
-    "source": "Source"
+    "source": "Source",
+    "line": "Line"
   },
   "sort": {
     "natural": "Own order",
@@ -75,6 +76,7 @@
     "hiddenNote": { "one": "{k} group with fewer than {n} graded is hidden.", "other": "{k} groups with fewer than {n} graded are hidden." },
     "leftNote": { "one": "{k} pick has no value for “{dim}” and is in no group.", "other": "{k} picks have no value for “{dim}” and are in no group." },
     "multiNote": "A pick can be in several groups (several books or several reasons), so the groups do not add up to the total.",
+    "someNoLink": "Some groups do not open the Explorer: no filter selects exactly their picks (for example, a second book of a pick filtered by another one).",
     "noLinkNote": "There is no weekday filter, so these groups do not open the Explorer."
   },
   "tw": {

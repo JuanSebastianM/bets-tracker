@@ -77,3 +77,8 @@
   .glossary .gl-cats > * { flex: none; }
   .glossary .gl-az-btn { flex: none; min-width: 36px; min-height: var(--tap); }
 }
+
+/* "En corto": the one plain sentence, shown before the rule's full text. */
+.glossary .gl-inshort { font-weight: 700; color: var(--c-accent); }
+.glossary .gl-rule-short { padding: var(--sp-3); border-radius: var(--r-ctl); background: var(--c-accent-soft); }
+.glossary .gl-rule-says .gl-inshort { color: var(--c-ink); }

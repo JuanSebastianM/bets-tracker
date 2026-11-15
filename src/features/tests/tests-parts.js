@@ -3,16 +3,12 @@
 // as the values src/data/ returned.
 import { html } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
-import { href } from '../../lib/router.js';
 import { Icon } from '../../lib/ui/index.js';
 import { formatPct } from '../../lib/format.js';
 
-/** Glossary slug of a tag id (kebab-case of the id, the Glossary's convention). @param {string} tagId */
-export const tagSlug = (tagId) => tagId.replace(/_/g, '-');
-/** Hash link to a glossary entry. @param {string} slug */
-export const glossaryHref = (slug) => href(`/glossary/${slug}`);
-/** Hash link to one decision of the log. @param {number} row */
-export const decisionHref = (row) => href(`/decisions/${row}`);
+// Glossary and decision links come from the one shared implementation.
+export { tagSlug, glossaryHref, decisionHref, tagHref } from '../../lib/glossary-links.js';
+import { glossaryHref } from '../../lib/glossary-links.js';
 
 /**
  * A labelled progress bar with its figures in text ("15 de 100 calificadas").

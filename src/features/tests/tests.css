@@ -94,7 +94,7 @@
 /* ---- stopped categories: a compact ledger */
 .tests .tests-stopped-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--sp-1) var(--sp-3); align-items: baseline; }
 .tests .tests-links { gap: var(--sp-1) var(--sp-4); }
-.tests .tests-decision-links { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0 var(--sp-3); font-size: var(--fs-md); }
+.tests .tests-decision-links { display: grid; gap: 2px; }
 
 /* ---- the list of tests: one scannable row per test, expands in place */
 .tests .tests-group { display: grid; gap: 0; background: var(--c-surface); border: var(--border); border-radius: var(--r-card); overflow: hidden; min-width: 0; }

@@ -4,7 +4,8 @@
 import { html, useMemo, useEffect, useState } from '../../../vendor/preact.js';
 import { t, useLocale } from '../../lib/i18n.js';
 import { href, navigate } from '../../lib/router.js';
-import { Card, Stat, Scoreboard, FeedGate, SegmentedControl, Chip, Button, Icon } from '../../lib/ui/index.js';
+import { Card, Stat, Scoreboard, FeedGate, SegmentedControl, Chip, Button, Icon, TagGlossaryLinks, VerdictChip } from '../../lib/ui/index.js';
+import { MARKET_SLUGS } from '../../lib/glossary-links.js';
 import { Sparkline, LineChart } from '../../lib/charts/index.js';
 import { formatPct, formatUnits, formatPrice, formatRecord, formatDate, formatAgo, todayIn } from '../../lib/format.js';
 import { readJSON, writeJSON } from '../../lib/storage.js';
@@ -85,13 +86,6 @@ function useMarkSeen(data) {
 /** Explorer-style query string: period + extra filter fields. */
 function qs(/** @type {Partial<import('../../data/filters.js').FilterState>} */ extra) {
   return toQueryString({ ...defaultFilters(), ...extra });
-}
-
-const VERDICT_TONE = { above: 'won', below: 'lost', lean_above: 'neutral', lean_below: 'neutral', too_early: 'pending', none: 'neutral' };
-
-/** @param {{ v: import('../../data/overview.js').Verdict }} props */
-function VerdictChip({ v }) {
-  return html`<${Chip} tone=${VERDICT_TONE[v]} class="ov-verdict">${verdictLabel(v)}</${Chip}>`;
 }
 
 // ---------------------------------------------------------------- per source
@@ -400,6 +394,7 @@ function Overview({ data, query }) {
         linesOf=${tagLines}
         lineLinkOf=${(/** @type {string} */ k, /** @type {string} */ lk) => href(`/explorer?${qs({ ...periodPart, sources: ['shadow'], tags: [k], lines: [lk] })}`)}
       />
+      <${TagGlossaryLinks} tags=${tagRows.map((r) => r.key)} testId="overview-tag-glossary" />
     </${Card}>
 
     <${Card} title=${t('overview.tags.markets')} subtitle=${t('overview.tags.marketsSub')} testId="overview-markets">
@@ -410,6 +405,8 @@ function Overview({ data, query }) {
         testId="market-table"
         compact
       />
+      <${TagGlossaryLinks} items=${marketRows.filter((r) => MARKET_SLUGS[r.key]).map((r) => ({ slug: MARKET_SLUGS[r.key], label: t(`markets.${r.key}`) }))}
+        label=${t('links.inGlossary')} testId="overview-market-glossary" />
     </${Card}>
 
     <${RealBetsCard} bets=${bets} bankrollU=${bankrollU} />
