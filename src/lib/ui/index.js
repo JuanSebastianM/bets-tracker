@@ -7,3 +7,4 @@ export { BottomSheet, Dialog } from './overlay.js';
 export { DataTable, Pagination, PickCard, pageOf } from './data.js';
 export { FeedGate } from './feed-gate.js';
 export { Toaster } from './toaster.js';
+export { FilterPanel, ActiveFilters, FilterButton, SavedFilters, useMediaQuery, entryLabel, optionLabel, FILTER_SECTIONS } from './filter-panel.js';

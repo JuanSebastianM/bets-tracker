@@ -215,6 +215,44 @@ import { Card, Stat, Scoreboard, StatusBadge, TagBadge, Banner, EmptyState, Skel
 
 Toasts: `toast(t('…'), { tone: 'success' })` from `src/lib/toast.js`.
 
+### Filter panel (`src/lib/ui/filter-panel.js`)
+
+The shared panel over the filter state of `src/data/filters.js`, built with the Explorer and meant to be
+dropped into the Simulator and Analysis as is. It is controlled: the screen owns the state (the hash
+query) and passes `filters` + `onChange`; the panel never touches the URL. Styles live in
+`src/styles/filter-panel.css`, strings under `filters.*` in `src/i18n/*.json`.
+
+```js
+import { FilterPanel, ActiveFilters, FilterButton, SavedFilters, BottomSheet, useMediaQuery } from '../../lib/ui/index.js';
+import { fromQuery, toQueryString, countActive, applyFilters } from '../../data/filters.js';
+
+const f = fromQuery(query);                                  // the screen's state
+const set = (next) => navigate(`/simulator${toQueryString(next) ? `?${toQueryString(next)}` : ''}`, { replace: true });
+const wide = useMediaQuery('(min-width: 1200px)');           // side column on wide screens, sheet on phones
+const panel = html`<${FilterPanel} picks=${data.picks} filters=${f} onChange=${set} hide=${['q']} />`;
+
+html`<${FilterButton} count=${countActive(f)} onClick=${() => setOpen(true)} />
+  <${ActiveFilters} filters=${f} onChange=${set} />
+  ${wide ? html`<aside>${panel}</aside>` : html`<${BottomSheet} open=${open} title=${t('filters.title')} onClose=${close}
+     footer=${html`<${Button} variant="primary" onClick=${close}>${t('filters.showN', { count: n, n })}</${Button}>`}>
+     <${SavedFilters} filters=${f} onApply=${set} />${panel}</${BottomSheet}>`}`;
+```
+
+- `FilterPanel` props: `picks` (all picks: options and the last slate come from them), `filters`,
+  `onChange(next)`, `hide` (section ids from `FILTER_SECTIONS`: `q, source, tag, price, date, market,
+  status, league, book, close, ref, sample, fuerza, reason, numbers`), `today` (defaults to Bogotá today).
+  It shows a live count (`filter-live-count`) and, on every option, how many picks it would give with the
+  other filters as they are (`facetCounts`); options at 0 are disabled, or hidden in the long lists
+  (leagues, raw markets). Chip test ids: `fchip-<field>-<value>`, `fchip-price-<preset>`, `fchip-date-<preset>`.
+- `ActiveFilters`: removable chips of what is on (`activeEntries` / `removeEntry`) plus "Quitar todos"
+  (`clearAll=${false}` leaves the link out). Renders nothing when no filter is on.
+- `FilterButton`: the "Filtros" button with the active count (`filter-button`).
+- `SavedFilters`: the user's saved filters (`savePreset` / `deletePreset`; Settings lists them too),
+  "save this filter", and the built-in starting points (`BUILTIN_PRESETS`), which only fill the panel.
+- Data helpers added with it: `facetCounts`, `activeEntries`, `removeEntry`, `fromQueryString`,
+  `BUILTIN_PRESETS`, `builtinPreset` (`filters.js`); `TAG_GROUPS`, `tagSlug` (`tags.js`); `sortPicks`,
+  `SORT_KEYS`, `pinnacleFor`, `neighbours` (`explore.js`).
+
 ## 5. Charts (`src/lib/charts/index.js`)
 
 ```js
