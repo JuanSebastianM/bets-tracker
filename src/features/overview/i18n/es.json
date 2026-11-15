@@ -4,6 +4,74 @@
     "shadow": "Picks en sombra, a 1u cada uno; nada apostado",
     "grok": "Los picks de Grok, a 1u cada uno"
   },
-  "sparkline": "Curva acumulada de {source}",
-  "seePicks": "Ver los picks"
+  "sparkline": "Curva acumulada de {source}: {profit} en {n} calificadas",
+  "seePicks": "Ver los picks",
+  "period": {
+    "label": "Periodo",
+    "all": "Todo",
+    "30d": "30 días",
+    "7d": "7 días",
+    "last_slate": "Última jornada",
+    "slateOf": "Jornada del {date}",
+    "range": "Del {from} al {to}",
+    "allTime": "Desde el primer pick"
+  },
+  "brief": {
+    "title": "En pocas palabras",
+    "gap": "{source}: {text}"
+  },
+  "since": {
+    "title": "Desde tu última visita",
+    "when": "Última visita {ago}",
+    "seeGraded": "Ver los calificados"
+  },
+  "verdict": "Veredicto",
+  "hit": "Acierto",
+  "needs": "necesita {be}",
+  "evRange": "{lo} a {hi}",
+  "tags": {
+    "title": "Sombra por etiqueta",
+    "sub": "1u en cada pick. Ordenadas por su EV contra el cierre; sin {min} cierres el veredicto es «muy pronto».",
+    "markets": "Sombra por mercado",
+    "marketsSub": "Las mismas cuentas, agrupadas por tipo de mercado.",
+    "rowLabel": "{label}: {verdict}. {record}, yield {yield}, n {n}. EV contra el cierre {ev}, n {nClose}. Ver en el Explorador.",
+    "meta": "n {n} · {record} · yield {yield}",
+    "ev": "EV {ev}",
+    "evN": "n {n}",
+    "noClose": "sin cierre",
+    "empty": "No hay picks de Sombra calificados en este periodo.",
+    "axis": "Escala de {min} a {max}; la línea es el cero."
+  },
+  "pending": {
+    "title": "Hoy y pendientes",
+    "today": "Hoy",
+    "count": { "one": "{n} pendiente", "other": "{n} pendientes" },
+    "seeAll": { "one": "Ver el pendiente en el Explorador", "other": "Ver los {n} pendientes en el Explorador" },
+    "more": { "one": "y {n} más", "other": "y {n} más" },
+    "overdue": { "one": "{n} pick de días anteriores sigue sin calificar en la hoja.", "other": "{n} picks de días anteriores siguen sin calificar en la hoja." },
+    "empty": "Nada pendiente desde hoy."
+  },
+  "real": {
+    "title": "Apuestas reales",
+    "sub": "Con la ganancia que registra la hoja (sabe de apuestas gratis y liquidaciones raras).",
+    "chart": "Unidades acumuladas por día de las apuestas reales: {total} al final, peor caída {dd}.",
+    "currentDd": "Bajo el pico",
+    "maxDd": "Peor caída",
+    "ofBank": "{pct} de tu bank",
+    "noBank": "Pon tu bank en Ajustes para verlo en %",
+    "avgStake": "Stake medio",
+    "bestDay": "Mejor día",
+    "worstDay": "Peor día",
+    "none": "–",
+    "colDate": "Día",
+    "colN": "Apuestas",
+    "colProfit": "Del día",
+    "colCum": "Acumulado"
+  },
+  "links": {
+    "title": "Seguir mirando",
+    "picks": "Ver todos los picks",
+    "simulate": "Simular",
+    "tests": "Tests"
+  }
 }

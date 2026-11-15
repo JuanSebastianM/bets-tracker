@@ -4,6 +4,74 @@
     "shadow": "Shadow picks at 1u each; nothing staked",
     "grok": "Grok's picks at 1u each"
   },
-  "sparkline": "Cumulative curve of {source}",
-  "seePicks": "See the picks"
+  "sparkline": "Cumulative curve of {source}: {profit} over {n} graded",
+  "seePicks": "See the picks",
+  "period": {
+    "label": "Period",
+    "all": "All",
+    "30d": "30 days",
+    "7d": "7 days",
+    "last_slate": "Last slate",
+    "slateOf": "Slate of {date}",
+    "range": "From {from} to {to}",
+    "allTime": "Since the first pick"
+  },
+  "brief": {
+    "title": "In short",
+    "gap": "{source}: {text}"
+  },
+  "since": {
+    "title": "Since your last visit",
+    "when": "Last visit {ago}",
+    "seeGraded": "See the graded picks"
+  },
+  "verdict": "Verdict",
+  "hit": "Hit rate",
+  "needs": "needs {be}",
+  "evRange": "{lo} to {hi}",
+  "tags": {
+    "title": "Shadow by tag",
+    "sub": "1u on each pick. Ranked by EV against the close; under {min} closes the verdict is “too early”.",
+    "markets": "Shadow by market",
+    "marketsSub": "The same figures, grouped by market type.",
+    "rowLabel": "{label}: {verdict}. {record}, yield {yield}, n {n}. EV against the close {ev}, n {nClose}. Open in the Explorer.",
+    "meta": "n {n} · {record} · yield {yield}",
+    "ev": "EV {ev}",
+    "evN": "n {n}",
+    "noClose": "no close",
+    "empty": "No graded Shadow picks in this period.",
+    "axis": "Scale from {min} to {max}; the line is zero."
+  },
+  "pending": {
+    "title": "Today and pending",
+    "today": "Today",
+    "count": { "one": "{n} pending", "other": "{n} pending" },
+    "seeAll": { "one": "See the pending pick in the Explorer", "other": "See the {n} pending picks in the Explorer" },
+    "more": { "one": "and {n} more", "other": "and {n} more" },
+    "overdue": { "one": "{n} pick from earlier days is still ungraded in the sheet.", "other": "{n} picks from earlier days are still ungraded in the sheet." },
+    "empty": "Nothing pending from today on."
+  },
+  "real": {
+    "title": "Real bets",
+    "sub": "With the profit the sheet records (it knows about free bets and odd settlements).",
+    "chart": "Cumulative units per day of the real bets: {total} at the end, worst drop {dd}.",
+    "currentDd": "Below the peak",
+    "maxDd": "Worst drop",
+    "ofBank": "{pct} of your bankroll",
+    "noBank": "Set your bankroll in Settings to see it in %",
+    "avgStake": "Average stake",
+    "bestDay": "Best day",
+    "worstDay": "Worst day",
+    "none": "–",
+    "colDate": "Day",
+    "colN": "Bets",
+    "colProfit": "That day",
+    "colCum": "Cumulative"
+  },
+  "links": {
+    "title": "Keep looking",
+    "picks": "See all picks",
+    "simulate": "Simulate",
+    "tests": "Tests"
+  }
 }
