@@ -247,3 +247,11 @@ button.pick-card:hover { border-color: var(--c-line-strong); }
 .toast-msg { flex: 1; }
 .toast-action, .toast-close { background: none; border: 0; color: inherit; font-weight: 700; min-height: var(--tap); min-width: var(--tap); cursor: pointer; }
 @media (min-width: 960px) { .toaster { bottom: var(--sp-6); left: var(--rail-w); } }
+
+/* Term: inline link to a glossary entry (src/lib/ui/term.js). */
+.term { color: inherit; text-decoration: underline dotted var(--c-accent); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+.term:hover { color: var(--c-accent); }
+
+/* RefText: cross-reference links and search highlights (src/lib/ui/ref-text.js). */
+.ref { font-weight: 600; text-underline-offset: 2px; }
+mark.hl { background: var(--c-accent-soft); color: inherit; border-radius: 3px; padding: 0 1px; box-shadow: 0 -2px 0 var(--c-accent) inset; }

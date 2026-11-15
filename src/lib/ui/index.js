@@ -7,3 +7,5 @@ export { BottomSheet, Dialog } from './overlay.js';
 export { DataTable, Pagination, PickCard, pageOf } from './data.js';
 export { FeedGate } from './feed-gate.js';
 export { Toaster } from './toaster.js';
+export { Term } from './term.js';
+export { RefText, Highlight } from './ref-text.js';
