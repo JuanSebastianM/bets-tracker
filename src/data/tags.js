@@ -203,3 +203,20 @@ export function booksInReason(reason) {
   if (!m) return [];
   return m[1].split('/').map((b) => BOOKS.find((x) => x.toLowerCase() === b.toLowerCase())).filter(Boolean);
 }
+
+/**
+ * Tags in groups for the filter panel (label key `filters.tagGroup.<id>`). Every id of TAGS is in
+ * exactly one group.
+ * @type {Array<{ id: string, tags: TagId[] }>}
+ */
+export const TAG_GROUPS = [
+  { id: 'price_first', tags: ['value', 'near_value', 'prop_value', 'prop_near_value'] },
+  { id: 'model_tests', tags: ['cards_under', 'team_corners', 'corner_rejects', 'model_only_shots', 'shadow_rule30', 'shadow', 'low_edge'] },
+  { id: 'published', tags: ['published', 'published_bet'] },
+  { id: 'rejects', tags: ['filter_reject', 'ai_watch'] },
+  { id: 'bets', tags: ['bet'] },
+  { id: 'grok', tags: ['grok_priced', 'grok_not_priced', 'grok_other'] },
+];
+
+/** Glossary slug of a tag ('near_value' -> 'near-value', the `#/glossary/:term` form). @param {TagId} id */
+export const tagSlug = (id) => String(id).replace(/_/g, '-');

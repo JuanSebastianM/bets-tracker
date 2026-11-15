@@ -323,3 +323,156 @@ export function filterOptions(picks) {
   }
   return out;
 }
+
+// ---------------------------------------------------------------- facet counts (filter panel)
+
+/** List fields of the state, with the value(s) a pick has for each (filterOptions uses the same). */
+const FACET_VALUES = /** @type {Record<string, (p: Pick) => Array<string | null>>} */ ({
+  sources: (p) => [p.source],
+  tags: (p) => [p.tag],
+  markets: (p) => [p.market],
+  marketsRaw: (p) => [p.marketRaw],
+  leagues: (p) => [p.league],
+  books: (p) => p.books,
+  statuses: (p) => [p.status],
+  refs: (p) => [refOf(p)],
+  samples: (p) => [p.parsed.sample],
+  fuerza: (p) => [p.parsed.fuerza],
+  reasons: (p) => p.parsed.filters,
+});
+
+/** The list fields that facetCounts counts. */
+export const FACET_FIELDS = Object.keys(FACET_VALUES);
+
+/**
+ * How many picks each option would show **under the other active filters** (the option's own field
+ * left out), so the panel can grey out options that would give nothing. One count map per list field
+ * (`{ value: count }`), plus `pricePresets`, `datePresets`, `slates`, `hasClose` / `twoSidedClose`
+ * (`{ yes, no }`) and `total` (picks under the full state).
+ * @param {Pick[]} picks all picks (the last slate is taken from them)
+ * @param {FilterState} f
+ * @param {{ today: string, lastSlate?: string | null }} ctx
+ * @returns {Record<string, Record<string, number>> & { total: number }}
+ */
+export function facetCounts(picks, f, ctx) {
+  const c = { lastSlate: lastSlate(picks), ...ctx };
+  const d = defaultFilters();
+  // Text, EV and probability are never faceted: apply them once.
+  const base = applyFilters(picks, { ...d, q: f.q, ev: f.ev, prob: f.prob }, c);
+  const rest = { ...f, q: '', ev: d.ev, prob: d.prob };
+  /** @type {any} */
+  const out = { total: applyFilters(base, rest, c).length };
+  const tally = (/** @type {Pick[]} */ list, /** @type {(p: Pick) => Array<string | null>} */ get) => {
+    /** @type {Record<string, number>} */
+    const m = {};
+    for (const p of list) for (const v of new Set(get(p))) if (v != null && v !== '') m[v] = (m[v] || 0) + 1;
+    return m;
+  };
+  for (const field of FACET_FIELDS) {
+    out[field] = tally(applyFilters(base, { ...rest, [field]: [] }, c), FACET_VALUES[field]);
+  }
+  const noPrice = applyFilters(base, { ...rest, pricePreset: null, price: d.price }, c);
+  out.pricePresets = Object.fromEntries(PRICE_PRESETS.map((p) => [p.id, applyFilters(noPrice, { ...d, pricePreset: p.id }, c).length]));
+  const noDate = applyFilters(base, { ...rest, datePreset: null, dateFrom: null, dateTo: null, slate: null }, c);
+  out.datePresets = Object.fromEntries(
+    DATE_PRESETS.map((id) => [id, id === 'since' && !f.dateFrom ? noDate.length : applyFilters(noDate, { ...d, datePreset: id, dateFrom: f.dateFrom }, c).length]),
+  );
+  out.slates = tally(noDate, (p) => [p.date]);
+  for (const field of /** @type {const} */ (['hasClose', 'twoSidedClose'])) {
+    const list = applyFilters(base, { ...rest, [field]: null }, c);
+    const yes = list.filter((p) => (field === 'hasClose' ? p.closePrice != null : p.hasTwoSidedClose)).length;
+    out[field] = { yes, no: list.length - yes };
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------- active filters as removable entries
+
+/**
+ * @typedef {object} ActiveEntry
+ * @property {string} field   state field ('tags', 'pricePreset', 'price', 'date', 'q'…)
+ * @property {string} [value] the list value, for list fields
+ */
+
+/**
+ * Every active filter as one entry (one per list value), in panel order, for removable chips.
+ * The date fields (datePreset, dateFrom, dateTo, slate) are one entry 'date' unless a slate is set.
+ * @param {FilterState} f
+ * @returns {ActiveEntry[]}
+ */
+export function activeEntries(f) {
+  /** @type {ActiveEntry[]} */
+  const out = [];
+  const list = (/** @type {keyof FilterState} */ field) => {
+    for (const value of /** @type {string[]} */ (f[field])) out.push({ field, value });
+  };
+  list('sources');
+  list('tags');
+  if (f.pricePreset) out.push({ field: 'pricePreset', value: f.pricePreset });
+  if (f.price.min != null || f.price.max != null) out.push({ field: 'price' });
+  if (f.slate) out.push({ field: 'slate', value: f.slate });
+  if (f.datePreset || f.dateFrom || f.dateTo) out.push({ field: 'date' });
+  list('markets');
+  list('marketsRaw');
+  list('statuses');
+  list('leagues');
+  list('books');
+  if (f.hasClose != null) out.push({ field: 'hasClose', value: f.hasClose ? 'yes' : 'no' });
+  if (f.twoSidedClose != null) out.push({ field: 'twoSidedClose', value: f.twoSidedClose ? 'yes' : 'no' });
+  list('refs');
+  list('samples');
+  list('fuerza');
+  list('reasons');
+  if (f.ev.min != null || f.ev.max != null) out.push({ field: 'ev' });
+  if (f.prob.min != null || f.prob.max != null) out.push({ field: 'prob' });
+  if (f.q) out.push({ field: 'q', value: f.q });
+  return out;
+}
+
+/**
+ * The state without one active entry (from activeEntries).
+ * @param {FilterState} f @param {ActiveEntry} e
+ * @returns {FilterState}
+ */
+export function removeEntry(f, e) {
+  const d = defaultFilters();
+  const next = { ...f };
+  const field = /** @type {keyof FilterState} */ (e.field);
+  if (Array.isArray(d[field])) /** @type {any} */ (next)[field] = /** @type {string[]} */ (f[field]).filter((v) => v !== e.value);
+  else if (e.field === 'date') Object.assign(next, { datePreset: null, dateFrom: null, dateTo: null });
+  else /** @type {any} */ (next)[field] = d[field];
+  return next;
+}
+
+/**
+ * Parse a stored query string ('tag=value&price=le200', as savePreset keeps it) into a state.
+ * @param {string} qs
+ * @returns {FilterState}
+ */
+export function fromQueryString(qs) {
+  /** @type {Record<string, string>} */
+  const q = {};
+  for (const [k, v] of new URLSearchParams(String(qs || '').replace(/^[?#]/, ''))) q[k] = v;
+  return fromQuery(q);
+}
+
+/**
+ * Built-in starting points for the panel ("only fill the panel"): a label key under `filters.builtin`
+ * and the state patch.
+ * @type {Array<{ id: string, patch: Partial<FilterState> }>}
+ */
+export const BUILTIN_PRESETS = [
+  { id: 'value_le200', patch: { tags: ['value'], pricePreset: 'le200' } },
+  { id: 'near_value_le200', patch: { tags: ['near_value'], pricePreset: 'le200' } },
+  { id: 'cards_under', patch: { tags: ['cards_under'] } },
+  { id: 'team_corners_10', patch: { tags: ['team_corners'], samples: ['10+'] } },
+  { id: 'prop_value', patch: { tags: ['prop_value', 'prop_near_value'] } },
+  { id: 'real_bets', patch: { sources: ['bets'] } },
+  { id: 'two_sided_close', patch: { sources: ['shadow'], twoSidedClose: true } },
+];
+
+/** Full state of a built-in preset. @param {string} id @returns {FilterState | null} */
+export function builtinPreset(id) {
+  const b = BUILTIN_PRESETS.find((x) => x.id === id);
+  return b ? { ...defaultFilters(), ...b.patch } : null;
+}

@@ -468,6 +468,22 @@ for (let i = 0; i < 12; i++) {
     api_last_update: `${d}T19:19:58Z`,
   });
 }
+// Edge case (Explorer): one Pinnacle row joins a Sombra pick through the notes' `pin id`, so the pick
+// detail can show Pinnacle 1X2 open -> last. Added after the loop and without rand(), so nothing above
+// changes.
+{
+  const withPin = [...shadowRows].reverse().find((r) => /pin id [0-9a-f]{32}/.test(r.notes || ''));
+  if (withPin) {
+    const id = withPin.notes.match(/pin id ([0-9a-f]{32})/)[1];
+    const [home, away] = withPin.match.split(' vs ');
+    const d = withPin.date;
+    pinRows.push({
+      id, sport_key: 'soccer_ficticia', league: withPin.league, kickoff_utc: `${d}T23:00:00Z`, kickoff_bogota: `${d} 18:00`, home, away,
+      open_1: 2.1, open_x: 3.4, open_2: 3.6, open_read_utc: `${d}T03:10:00Z`, last_1: 2.02, last_x: 3.45, last_2: 3.85,
+      last_read_utc: `${d}T22:50:00Z`, mins_before_kickoff: 10, api_last_update: `${d}T22:49:30Z`,
+    });
+  }
+}
 const rules = [
   '2. Stake entre 0,25u y 2u por apuesta.',
   '3. Sencillas: solo cuota ≥ 1,70 y EV ≥ 4% frente al modelo conservador.',
