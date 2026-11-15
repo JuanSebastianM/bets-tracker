@@ -1,1 +1,117 @@
 /* simulator section. Scope every rule under .simulator. Tokens only (src/styles/tokens.css). */
+.simulator { display: grid; gap: var(--sp-4); min-width: 0; }
+.simulator .sim-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); min-width: 0; }
+.simulator .sim-main { min-width: 0; align-content: start; grid-template-columns: minmax(0, 1fr); }
+.simulator .sim-h { font-size: var(--fs-md); font-weight: 700; }
+.simulator .pos { color: var(--c-won); }
+.simulator .neg { color: var(--c-lost); }
+
+/* Wide screens: the filter panel as a sticky side column (as in the Explorer). */
+@media (min-width: 1200px) {
+  .simulator .sim-layout { grid-template-columns: 248px minmax(0, 1fr); align-items: start; }
+  .simulator .sim-side {
+    position: sticky; top: calc(var(--header-h) + var(--sp-4)); max-height: calc(100vh - var(--header-h) - var(--sp-6));
+    overflow-y: auto; overscroll-behavior: contain; display: grid; gap: var(--sp-3); padding: var(--sp-4); background: var(--c-surface);
+    border: var(--border); border-radius: var(--r-card);
+  }
+  .simulator .sim-side-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+  .simulator .sim-side-title { font-size: var(--fs-lg); }
+  .simulator .sim-side .disclosure { border-radius: var(--r-ctl); }
+  .simulator .sim-side .disclosure summary { padding: 0 var(--sp-3); font-size: var(--fs-sm); }
+  .simulator .sim-side .disclosure-body { padding: 0 var(--sp-3) var(--sp-3); }
+}
+
+/* Setup: the picks, then the plan. Side by side from 760 px. */
+.simulator .sim-setup { gap: var(--sp-4); }
+.simulator .sim-picks, .simulator .sim-plan { display: grid; gap: var(--sp-2); min-width: 0; align-content: start; }
+.simulator .sim-plan { border-top: var(--border); padding-top: var(--sp-3); }
+.simulator .sim-picks-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+.simulator .sim-count { font-weight: 650; color: var(--c-ink-2); font-size: var(--fs-sm); }
+@media (min-width: 760px) {
+  .simulator .sim-setup { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: var(--sp-5); }
+  .simulator .sim-plan { border-top: 0; padding-top: 0; border-left: var(--border); padding-left: var(--sp-5); }
+}
+
+/* Staking controls */
+.simulator .sim-staking { display: grid; gap: var(--sp-2); min-width: 0; }
+.simulator .sim-staking .seg { padding: 0 4px; font-size: var(--fs-sm); white-space: nowrap; }
+.simulator .sim-mode-help { color: var(--c-ink-2); max-width: 68ch; }
+.simulator .sim-fields { display: grid; gap: var(--sp-2); }
+.simulator .sim-quick { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+.simulator .sim-quick .field-label { flex-basis: 100%; }
+.simulator .sim-staking .field { gap: 4px; }
+.simulator .sim-staking .input-wrap { max-width: 14rem; }
+.simulator .sim-staking-compact .sim-mode-help { font-size: var(--fs-xs); }
+
+/* Headline */
+.simulator .sim-result { gap: var(--sp-4); }
+.simulator .sim-head { display: grid; gap: 2px; }
+.simulator .sim-lead { font-size: var(--fs-md); color: var(--c-ink-2); font-weight: 600; }
+.simulator .sim-big {
+  font-family: var(--font-num); font-size: var(--fs-score); font-weight: 800; line-height: 1.05; letter-spacing: -0.03em;
+}
+.simulator .sim-won { color: var(--c-won); }
+.simulator .sim-lost { color: var(--c-lost); }
+.simulator .sim-money { font-weight: 650; color: var(--c-ink-2); }
+.simulator .sim-chance { color: var(--c-muted); }
+.simulator .sim-record .scoreboard { max-width: 18rem; }
+.simulator .sim-note { color: var(--c-pending); }
+.simulator .sim-sentence { color: var(--c-ink-2); max-width: 68ch; padding: var(--sp-2) var(--sp-3); background: var(--c-surface-2); border-radius: var(--r-ctl); }
+
+/* Collapsible blocks: the summary carries the key figure. */
+.simulator .sim-blocks { min-width: 0; }
+.simulator .sim-block { min-width: 0; }
+.simulator .sim-sum { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--sp-3); min-width: 0; }
+.simulator .sim-sum-fig { font-weight: 500; font-size: var(--fs-sm); color: var(--c-muted); }
+.simulator .sim-block .disclosure summary { padding-top: 6px; padding-bottom: 6px; }
+.simulator .sim-block .kv dd { white-space: normal; }
+.simulator .sim-verdict { color: var(--c-ink-2); padding: var(--sp-2) var(--sp-3); background: var(--c-surface-2); border-radius: var(--r-ctl); }
+.simulator .sim-block .table th, .simulator .sim-block .table td { padding: 8px 8px; }
+.simulator .sim-block .table th:first-child, .simulator .sim-block .table td:first-child { padding-left: 12px; }
+.simulator .sim-block .table th:last-child, .simulator .sim-block .table td:last-child { padding-right: 12px; }
+.simulator [data-testid='sim-compare-table'] td:first-child { white-space: normal; min-width: 6.5em; }
+
+/* Breakdown rows: compact, one link per slice. */
+.simulator .sim-rows { list-style: none; margin: 0; padding: 0; display: grid; border-top: var(--border); }
+.simulator .sim-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 var(--sp-3); padding: var(--sp-2) 0; min-height: var(--tap);
+  border-bottom: var(--border); color: var(--c-ink); text-decoration: none; align-items: center;
+}
+.simulator .sim-row:hover .sim-row-name { color: var(--c-accent); text-decoration: underline; }
+.simulator .sim-row-name { font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.simulator .sim-row-rec, .simulator .sim-row-y { font-size: var(--fs-xs); color: var(--c-muted); }
+.simulator .sim-row-pl { font-weight: 700; text-align: right; }
+.simulator .sim-row-y { text-align: right; }
+
+/* Compare */
+.simulator .sim-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.simulator .sim-ab { display: grid; gap: 4px; }
+.simulator .sim-ab-line { display: flex; gap: var(--sp-2); align-items: baseline; color: var(--c-ink-2); }
+.simulator .sim-ab-key {
+  flex: none; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: var(--r-pill);
+  border: 2px solid var(--c-chart-line); font-weight: 800; font-size: var(--fs-xs);
+}
+.simulator .sim-ab-b { border-style: dashed; border-color: var(--c-chart-2); }
+.simulator .sim-b-setup { display: grid; gap: var(--sp-2); padding: var(--sp-3); border: 1px dashed var(--c-line-strong); border-radius: var(--r-card); }
+.simulator .sim-ab-figs { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); margin: 0; }
+.simulator .sim-ab-figs > div { display: grid; gap: 2px; }
+.simulator .sim-ab-figs dt { font-size: var(--fs-xs); color: var(--c-muted); font-weight: 700; }
+.simulator .sim-ab-figs dd { margin: 0; font-family: var(--font-num); font-size: var(--fs-xl); font-weight: 800; }
+
+/* Saved scenarios */
+.simulator .sim-saved { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.simulator .sim-saved-item { display: flex; align-items: center; gap: var(--sp-2); border: var(--border); border-radius: var(--r-ctl); padding-left: var(--sp-2); }
+.simulator .sim-saved-current { border-color: var(--c-accent); }
+.simulator .sim-saved-apply {
+  flex: 1; min-width: 0; min-height: var(--tap); display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: var(--sp-2);
+  align-items: center; background: none; border: 0; text-align: left; color: var(--c-ink); cursor: pointer; padding: 4px 0;
+}
+.simulator .sim-saved-name { font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.simulator .sim-saved-kind { grid-column: 2; }
+.simulator .sim-saved-b { min-height: var(--tap); white-space: nowrap; }
+.simulator .sim-save { display: grid; gap: var(--sp-2); justify-items: start; }
+.simulator .sim-save .field { width: 100%; max-width: 24rem; }
+
+/* Filter sheet (phones) */
+.simulator .sim-sheet-foot { display: flex; width: 100%; gap: var(--sp-2); justify-content: space-between; }
+.simulator .sim-sheet-foot .btn-primary { flex: 1; max-width: 22rem; }

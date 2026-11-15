@@ -213,3 +213,70 @@ export function Sparkline({ values, summary, width = 96, height = 28 }) {
     <path d=${d} />
   </svg>`;
 }
+
+/**
+ * Y range of several series together with the zero line (shared by MultiLineChart). null when there is no value.
+ * @param {Array<{ values: number[] }>} series
+ * @returns {[number, number] | null}
+ */
+export function seriesExtent(series) {
+  const all = series.flatMap((s) => s.values).filter((v) => Number.isFinite(v));
+  if (!all.length) return null;
+  let min = Math.min(0, ...all);
+  let max = Math.max(0, ...all);
+  if (min === max) max = min + 1;
+  return [min, max];
+}
+
+/**
+ * Several cumulative lines on one x axis (same length), with a legend that also differs by line
+ * style (solid, dashed, dotted), so colour is never the only signal. The first series can have its
+ * drawdown shaded.
+ * @param {{ series: Array<{ values: number[], label: string, style?: 'solid' | 'dashed' | 'dotted', tone?: 'accent' | 'c2' | 'c3' | 'muted' }>,
+ *   labels?: string[], summary: string, yFormat?: (v: number) => string, height?: number, shadeDrawdown?: boolean,
+ *   table?: { columns: any[], rows: any[] }, testId?: string }} props
+ */
+export function MultiLineChart({ series, labels = [], summary, yFormat = (v) => String(v), height = 200, shadeDrawdown = false, table, testId }) {
+  const [box, W] = useWidth();
+  const H = height;
+  const pad = { l: 52, r: 12, t: 12, b: 24 };
+  const id = useId();
+  const n = Math.max(0, ...series.map((s) => s.values.length));
+  const ext = seriesExtent(series);
+  if (!n || !ext) return html`<${ChartFrame} summary=${summary} table=${table} testId=${testId}><div class="chart-empty">${t('chart.noData')}</div></${ChartFrame}>`;
+  let [min, max] = ext;
+  const padY = (max - min) * 0.08;
+  min -= padY;
+  max += padY;
+  const x = scale([0, Math.max(1, n - 1)], [pad.l, W - pad.r]);
+  const y = scale([min, max], [H - pad.b, pad.t]);
+  const ptsOf = (/** @type {number[]} */ vs) => vs.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`);
+  let dd = '';
+  if (shadeDrawdown && series[0] && series[0].values.length) {
+    const vs = series[0].values;
+    let peak = -Infinity;
+    const top = vs.map((v, i) => `${x(i).toFixed(1)},${y((peak = Math.max(peak, v, 0))).toFixed(1)}`);
+    dd = `M${top.join('L')}L${ptsOf(vs).reverse().join('L')}Z`;
+  }
+  const ticks = niceTicks(min, max, 4);
+  const xIdx = n > 1 ? [0, Math.floor((n - 1) / 2), n - 1] : [0];
+  return html`<${ChartFrame} summary=${summary} table=${table} testId=${testId}>
+    <ul class="mlc-legend" aria-hidden="true">
+      ${series.map((s) => html`<li><svg width="22" height="8"><line x1="1" x2="21" y1="4" y2="4" class=${`mlc-line mlc-${s.tone || 'accent'} mlc-${s.style || 'solid'}`} /></svg>${s.label}</li>`)}
+    </ul>
+    <div ref=${box} class="chart-box"><svg class="chart-svg" width=${W} height=${H} viewBox=${`0 0 ${W} ${H}`} role="img" aria-labelledby=${id}>
+      <title id=${id}>${summary}</title>
+      ${ticks.map(
+        (v) => html`<g>
+          <line x1=${pad.l} x2=${W - pad.r} y1=${y(v)} y2=${y(v)} class=${v === 0 ? 'grid-zero' : 'grid'} />
+          <text x=${pad.l - 6} y=${y(v) + 4} class="axis" text-anchor="end">${yFormat(v)}</text>
+        </g>`,
+      )}
+      ${dd ? html`<path d=${dd} class="dd" />` : null}
+      ${series.map((s) => (s.values.length ? html`<path d=${`M${ptsOf(s.values).join('L')}`} class=${`mlc-line mlc-${s.tone || 'accent'} mlc-${s.style || 'solid'}`} vector-effect="non-scaling-stroke" />` : null))}
+      ${xIdx.map(
+        (i, k) => html`<text x=${x(i)} y=${H - 6} class="axis" text-anchor=${k === 0 ? 'start' : k === xIdx.length - 1 ? 'end' : 'middle'}>${labels[i] || ''}</text>`,
+      )}
+    </svg></div>
+  </${ChartFrame}>`;
+}
