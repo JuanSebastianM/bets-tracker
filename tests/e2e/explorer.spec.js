@@ -190,7 +190,7 @@ test.describe('wide screen', () => {
     // the panel filters in place
     await panel.getByTestId('fchip-tags-value').click();
     await expect(count(page)).toHaveText('22 picks');
-    await table.locator('tbody tr').first().locator('a').click();
+    await table.locator('tbody tr').first().locator('a.ex-match-link').click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(page).toHaveURL(/#\/explorer\?src=shadow&tag=value&sort=price&dir=asc$/);

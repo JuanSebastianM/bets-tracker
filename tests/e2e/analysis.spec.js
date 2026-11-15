@@ -79,8 +79,9 @@ test('filters through the URL, and a group link lands on a filtered Explorer', a
   const valor = page.getByTestId('bd-rows').locator('li[data-key="value"]');
   await valor.locator('summary').click();
   await valor.getByTestId('bd-link').click();
-  await expect(page).toHaveURL(/#\/explorer\?src=shadow&tag=value/);
-  await expect(page.getByTestId('explorer-count')).toHaveText('22 picks');
+  await expect(page).toHaveURL(/#\/explorer\?src=shadow&tag=value&st=/);
+  // Exactly the row's graded picks (the pending VALOR pick is not in the row, so not in the link).
+  await expect(page.getByTestId('explorer-count')).toHaveText('21 picks');
   expect(errors).toEqual([]);
 });
 

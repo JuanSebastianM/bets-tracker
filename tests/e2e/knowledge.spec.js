@@ -34,7 +34,7 @@ test('glossary: an entry deep link shows the entry, its tag count and related li
   await expect(entry.getByRole('heading', { level: 2 })).toHaveText('VALOR CASI');
   await expect(entry).toContainText('En esta hoja');
   await expect(entry).toContainText('con la etiqueta VALOR CASI');
-  await entry.getByRole('link', { name: 'VALOR', exact: true }).click();
+  await entry.locator('.gl-links').getByRole('link', { name: 'VALOR', exact: true }).click();
   await expect(page).toHaveURL(/#\/glossary\/value$/);
   await expect(page.getByTestId('glossary-term').getByRole('heading', { level: 2 })).toHaveText('VALOR');
   await expectNoHorizontalScroll(page);

@@ -71,3 +71,14 @@
 /* The "Línea" section (src/lib/ui/filter-panel.js LineSection) */
 .filter-panel .fp-lines { display: grid; gap: var(--sp-2); }
 .filter-panel .fp-lines > .fp-group-title { margin-top: var(--sp-1); }
+
+/* The date range never pushes the panel wider than its column: the two dates share the width and
+   shrink below the browser's own minimum, and in the narrow side column they stack. */
+.filter-panel input[type='date'] { min-width: 0; }
+.filter-panel .fp-range .grid-2 > * { min-width: 0; }
+@media (min-width: 1200px) { .filter-panel .fp-range .grid-2 { grid-template-columns: minmax(0, 1fr); } }
+/* One column that may shrink: an implicit column would take the min-content width of the widest
+   control (the search box, a date) and push the panel past its side column. */
+.filter-panel { grid-template-columns: minmax(0, 1fr); }
+.fp-section-body { grid-template-columns: minmax(0, 1fr); }
+.saved-filters { min-width: 0; }
