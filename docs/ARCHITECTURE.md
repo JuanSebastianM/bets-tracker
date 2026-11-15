@@ -64,29 +64,31 @@ docs/                   ARCHITECTURE.md, DATA_CONTRACT.md, FEATURE_GUIDE.md
 
 | Route | Feature folder | What it shows |
 |---|---|---|
-| `#/` | `features/resumen` | Per source (Apuestas, Sombra, Grok): record, yield, units, CLV / fair-close EV, pending; trend sparklines; written summaries ("En Sombra, las VALOR van 31-22 a cuota media 2.10…"); what changed since the last visit |
-| `#/explorador` | `features/explorador` | Every pick as a list (cards on phones, table on wide screens) with the full filter panel, search, sort, and a detail sheet per pick with the parsed notes |
-| `#/simulador` | `features/simulador` | "If you had bet X on each": filters + stake (flat units or % of bankroll) + bankroll → curve, drawdown, streaks, yield, EV vs close, per-month table |
-| `#/tests` | `features/tests` | Each frozen test: graded rows out of 100, rows with a two-sided close out of 50, mean fair-close EV ± 2 SE, decision rule in words; countdown to the next Sombra review (14 days and 150 graded rows) |
-| `#/analisis` | `features/analisis` | Breakdowns (market, league, book, price band, tag, month, weekday), calibration (probability vs hit rate), CLV distribution, Grok vs Claude |
-| `#/decisiones` | `features/decisiones` | The decision log as a searchable timeline, with state chips, and the staking rules |
-| `#/glosario` | `features/glosario` | Betting terms, the sheet's own tags and abbreviations, and every betting-analyst rule in plain words; searchable, deep-linkable (`#/glosario/valor-casi`); terms elsewhere in the app link here |
-| `#/ajustes` | `features/ajustes` | Language, theme, bankroll and unit, feed status (rows per tab, redactions, missing headers), about |
+| `#/` | `features/overview` (Resumen) | Per source (Apuestas, Sombra, Grok): record, yield, units, CLV / fair-close EV, pending; trend sparklines; written summaries ("En Sombra, las VALOR van 31-22 a cuota media 2.10…"); what changed since the last visit |
+| `#/explorer` | `features/explorer` (Explorador) | Every pick as a list (cards on phones, table on wide screens) with the full filter panel, search, sort, and a detail sheet per pick with the parsed notes |
+| `#/simulator` | `features/simulator` (Simulador) | "If you had bet X on each": filters + stake (flat units or % of bankroll) + bankroll → curve, drawdown, streaks, yield, EV vs close, per-month table |
+| `#/tests` | `features/tests` (Tests) | Each frozen test: graded rows out of 100, rows with a two-sided close out of 50, mean fair-close EV ± 2 SE, decision rule in words; countdown to the next Sombra review (14 days and 150 graded rows) |
+| `#/analysis` | `features/analysis` (Análisis) | Breakdowns (market, league, book, price band, tag, month, weekday), calibration (probability vs hit rate), CLV distribution, Grok vs Claude |
+| `#/decisions` | `features/decisions` (Decisiones) | The decision log as a searchable timeline, with state chips, and the staking rules |
+| `#/glossary` | `features/glossary` (Glosario) | Betting terms, the sheet's own tags and abbreviations, and every betting-analyst rule in plain words; searchable, deep-linkable (`#/glossary/near-value`); terms elsewhere in the app link here |
+| `#/settings` | `features/settings` (Ajustes) | Language, theme, bankroll and unit, feed status (rows per tab, redactions, missing headers), about |
 
 Phones get a bottom bar (Resumen, Explorador, Simulador, Tests, Más); wide screens a side rail.
 
-### Filters (shared by Explorador and Simulador)
+### Filters (shared by Explorer and Simulator)
 
 Source; tag (multi); market family and raw market; league; book; status; price range with presets
 (≤1.70, 1.70–2.0, ≤2.0, 2.0–2.5, ≤2.5, 2.5–4.0, >4.0) and custom min/max; date range with presets (last
 slate, 7 days, 30 days, this month, since a date) and single slate date; has closing price; has two-sided
-close; reference (`ref feed`, books, one book); sample (10+, 6–9); FUERZA (mantiene, rechaza); filter
+close; reference (`ref feed`, books, one book); sample (10+, 6–9); FUERZA (keeps, rejects); filter
 reason (for `filtro` rows); EV range; model probability range; free-text search (match, league, notes).
 The sheet has no slate *run* date, so "slate date" is the match date.
 
 ## Conventions
 
-- Code, comments, commits, docs: English. UI strings: `t('key')`, Spanish default, English complete.
+- **All code is English**: identifiers, file and folder names, routes, feed keys, tag ids, CSS classes,
+  comments, commits, docs. Spanish appears only in `src/i18n/es.json`, `src/content/*.es.json`, the text
+  that comes from the sheet, and the patterns that match that text. UI strings: `t('key')`, Spanish default, English complete.
   Sheet text (leagues, matches, notes, decisions) is shown as written, never translated.
 - Numbers: `format.js` only. Prices 2 decimals (3 when the sheet has 3), units with sign and 2 decimals,
   percentages 1 decimal, dates `15 nov 2026`. Money appears only when a bankroll is set in Settings and

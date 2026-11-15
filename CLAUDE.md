@@ -13,8 +13,9 @@ Rules that are easy to get wrong:
   fixtures, the code, the docs, a commit message or a screenshot. The app works in units; the bankroll
   and the unit value are typed by the user in Settings and stay in that browser's `localStorage`.
   `npm run check` includes a privacy test; never weaken it to make it pass.
-- Code, comments, commits and docs in English. User-visible text goes through `t()` with Spanish and
-  English strings; Spanish is the default. Text that comes from the sheet is shown as written.
+- **All code is English**: identifiers, file and folder names, routes, feed keys, tag ids, comments,
+  commits and docs. Spanish appears only in UI strings (`t()`, Spanish default, English complete), content
+  files, text that comes from the sheet (shown as written) and the patterns that match that text.
 - No build step and no CDN. Runtime libraries are vendored in `/vendor` by the `vendor` workflow.
 - The workspace has no npm or CDN access. Use the preinstalled tools in `/opt/npm-tools/node_modules`
   through `scripts/bin.mjs`.

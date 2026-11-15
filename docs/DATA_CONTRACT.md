@@ -53,15 +53,15 @@ reads the live feed for that; the durable fix is to not write balances in notes.
 {
   "schema": 1,
   "generatedAt": "2026-11-15T16:00:00Z",
-  "meta": { "rows": { "apuestas": 19, "sombra": 700, "grok": 160, "decisiones": 124, "pinnacle": 240 },
+  "meta": { "rows": { "bets": 19, "shadow": 700, "grok": 160, "decisions": 124, "pinnacle": 240 },
             "redactions": 0, "missingHeaders": [] },
   "tabs": {
-    "apuestas":   { "columns": ["id", "fecha", ...], "rows": [[1, "2026-10-02", ...], ...] },
-    "sombra":     { "columns": [...], "rows": [...] },
-    "grok":       { "columns": [...], "rows": [...] },
-    "decisiones": { "columns": [...], "rows": [...] },
-    "pinnacle":   { "columns": [...], "rows": [...] },
-    "reglas":     ["2. Stake entre 0,25u y 2u por apuesta.", "..."]
+    "bets":      { "columns": ["row", "id", "date", ...], "rows": [[2, 1, "2026-10-02", ...], ...] },
+    "shadow":    { "columns": [...], "rows": [...] },
+    "grok":      { "columns": [...], "rows": [...] },
+    "decisions": { "columns": [...], "rows": [...] },
+    "pinnacle":  { "columns": [...], "rows": [...] },
+    "rules":     ["2. Stake entre 0,25u y 2u por apuesta.", "..."]
   }
 }
 ```
@@ -70,31 +70,34 @@ Value rules: dates `YYYY-MM-DD` (sheet time zone), times `HH:mm`, percentages as
 prices and units as numbers, empty cells `null`, text trimmed. Each row also carries `row` (the sheet row
 number) as its first column, so the app can say "Sombra fila 412" the way `Decisiones` does.
 
-Whitelist (header in the sheet → key in the feed):
+Whitelist (header in the sheet → key in the feed). Keys are English; the sheet's headers and text stay
+as they are:
 
-**Apuestas**: ID→`id`, Fecha→`fecha`, Liga→`liga`, Partido→`partido`, Tipo→`tipo`, Mercado→`mercado`,
-Pick→`pick`, Cuota→`cuota`, Stake (u)→`stakeU`, Casa→`casa`, Prob. modelo→`probModelo`, Cuota
-justa→`cuotaJusta`, EV→`ev`, Confianza→`confianza`, Estado→`estado`, Resultado partido→`resultado`,
-Ganancia (u)→`gananciaU`, Notas/lección→`notas`, Cuota cierre→`cuotaCierre`, CLV→`clv`, Excepción
-favoritos→`excepcion`, Stake máx. (u)→`stakeMaxU`, Prob. blend→`probBlend`, Prob. modelo últ.
-5→`probUlt5`, Prob. IA Sofascore→`probIA`.
+**Apuestas** (`bets`): ID→`id`, Fecha→`date`, Liga→`league`, Partido→`match`, Tipo→`type`,
+Mercado→`market`, Pick→`selection`, Cuota→`price`, Stake (u)→`stakeU`, Casa→`book`, Prob.
+modelo→`probModel`, Cuota justa→`fairOdds`, EV→`ev`, Confianza→`confidence`, Estado→`status`, Resultado
+partido→`result`, Ganancia (u)→`profitU`, Notas/lección→`notes`, Cuota cierre→`closePrice`, CLV→`clv`,
+Excepción favoritos→`favoritesException`, Stake máx. (u)→`maxStakeU`, Prob. blend→`probBlend`, Prob.
+modelo últ. 5→`probLast5`, Prob. IA Sofascore→`probAI`.
 Never: `Stake (COP)`, `Ganancia (COP)`, `Bank acumulado (COP)`.
 
-**Sombra**: Fecha→`fecha`, Liga→`liga`, Partido→`partido`, Mercado→`mercado`, Selección→`seleccion`,
-Cuota→`cuota`, Cuota cierre→`cuotaCierre`, Prob. modelo→`probModelo`, Prob. blend→`probBlend`, EV
-blend→`evBlend`, Cuota justa→`cuotaJusta`, Motivo de descarte→`motivo`, Estado→`estado`, Notas→`notas`,
-Prob. IA Sofascore→`probIA`.
+**Sombra** (`shadow`): Fecha→`date`, Liga→`league`, Partido→`match`, Mercado→`market`,
+Selección→`selection`, Cuota→`price`, Cuota cierre→`closePrice`, Prob. modelo→`probModel`, Prob.
+blend→`probBlend`, EV blend→`evBlend`, Cuota justa→`fairOdds`, Motivo de descarte→`reason`,
+Estado→`status`, Notas→`notes`, Prob. IA Sofascore→`probAI`.
 
-**Grok**: Fecha→`fecha`, Hora→`hora`, Liga→`liga`, Partido→`partido`, Mercado→`mercado`,
-Selección→`seleccion`, Cuota→`cuota`, Cuota mín. Grok→`cuotaMin`, Stake Grok (u)→`stakeU`, Motivo
-Grok→`motivo`, Nuestro veredicto→`veredicto`, Estado→`estado`, Resultado→`resultado`, Notas→`notas`.
+**Grok** (`grok`): Fecha→`date`, Hora→`time`, Liga→`league`, Partido→`match`, Mercado→`market`,
+Selección→`selection`, Cuota→`price`, Cuota mín. Grok→`minPrice`, Stake Grok (u)→`stakeU`, Motivo
+Grok→`reason`, Nuestro veredicto→`verdict`, Estado→`status`, Resultado→`result`, Notas→`notes`.
 
-**Decisiones**: Fecha→`fecha`, Tema→`tema`, Decisión→`decision`, Motivo y evidencia→`motivo`, Cómo y
-cuándo se revisa→`revision`, Estado→`estado`.
+**Decisiones** (`decisions`): Fecha→`date`, Tema→`topic`, Decisión→`decision`, Motivo y
+evidencia→`evidence`, Cómo y cuándo se revisa→`review`, Estado→`status`.
 
-**Pinnacle**: `id`, `sport_key`, `league`, `kickoff_utc`, `kickoff_bogota`, `home`, `away`, `open_1`,
-`open_x`, `open_2`, `open_read_utc`, `last_1`, `last_x`, `last_2`, `last_read_utc`,
+**Pinnacle** (`pinnacle`): `id`, `sport_key`, `league`, `kickoff_utc`, `kickoff_bogota`, `home`, `away`,
+`open_1`, `open_x`, `open_2`, `open_read_utc`, `last_1`, `last_x`, `last_2`, `last_read_utc`,
 `mins_before_kickoff`, `api_last_update` (same keys). Never the status cells to the right (credits, last run).
+
+**Reglas** (`rules`): the numbered rule lines as an array of strings, without rule 1.
 
 A whitelisted header that is missing from the sheet is listed in `meta.missingHeaders` and its key is
 `null` in every row; the app shows a banner instead of failing.
@@ -104,7 +107,7 @@ A whitelisted header that is missing from the sheet is listed in `meta.missingHe
 `normalize.js` turns the three bet tabs into one array. Every feature works on `Pick[]`.
 
 ```ts
-type Source = 'apuestas' | 'sombra' | 'grok';
+type Source = 'bets' | 'shadow' | 'grok';   // tabs Apuestas, Sombra, Grok
 type Status = 'won' | 'lost' | 'void' | 'half_won' | 'half_lost' | 'pending' | 'other';
 
 interface Pick {
@@ -124,9 +127,9 @@ interface Pick {
   statusRaw: string;
   tag: TagId;             // category, section 5
   tagRaw: string;         // the text the tag was read from
-  books: string[];        // books named for the taken price; Apuestas: [casa]
-  stakeU: number | null;  // real stake (apuestas), Grok's suggested stake (grok), null (sombra)
-  profitU: number | null; // apuestas: the sheet's Ganancia (u); others: null (computed by simulate.js)
+  books: string[];        // books named for the taken price; bets: [book]
+  stakeU: number | null;  // real stake (bets), Grok's suggested stake (grok), null (shadow)
+  profitU: number | null; // bets: the sheet's Ganancia (u); others: null (computed by simulate.js)
   probModel: number | null;
   probBlend: number | null;  // for VALOR rows this column holds the consensus fair probability
   probAI: number | null;
@@ -150,32 +153,35 @@ The foundation task lists every distinct `Estado` in the three tabs and extends 
 
 ## 5. Tags
 
+Tag ids are English; the text they are matched against is the sheet's Spanish. The UI shows the sheet's
+own label (VALOR CASI, TARJETAS UNDER…) because that is what Juan reads every day.
+
 The category of a row. For `Sombra` it is read from the start of `Motivo de descarte`; first match wins,
 in this order:
 
 | TagId | Starts with / contains | Meaning in one line |
 |---|---|---|
-| `publicada_apostada` | `PUBLICADA Y APOSTADA` | published pick Juan did bet (also in Apuestas; left out of Sombra stats) |
-| `publicada` | `PUBLICADA, NO APOSTADA` | published pick he did not bet |
-| `valor_prop_casi` | `VALOR PROP CASI` | corners/cards total 0–3% over the consensus fair price |
-| `valor_prop` | `VALOR PROP` | corners/cards total 3%+ over the consensus fair price, no model |
-| `valor_casi` | `VALOR CASI` | result/goals 0–3% over the fair price |
-| `valor` | `VALOR` | result/goals 3%+ over the fair price |
-| `tarjetas_under` | `TARJETAS UNDER` | model card-under test |
-| `corners_equipo` | `CÓRNERS EQUIPO` | team-corners test |
-| `corners_rechazo` | `CÓRNERS RECHAZO` | corner rejects priced 1.70–2.0 |
-| `modelo_solo_tiros` | `MODELO SOLO` | model-only shots pick |
-| `shadow_r30` | `SHADOW (pasó todos los filtros, regla 30)` | passed every filter, held by the rule 30 pause |
+| `published_bet` | `PUBLICADA Y APOSTADA` | published pick Juan did bet (also in Apuestas; left out of Sombra stats) |
+| `published` | `PUBLICADA, NO APOSTADA` | published pick he did not bet |
+| `prop_near_value` | `VALOR PROP CASI` | corners/cards total 0–3% over the consensus fair price |
+| `prop_value` | `VALOR PROP` | corners/cards total 3%+ over the consensus fair price, no model |
+| `near_value` | `VALOR CASI` | result/goals 0–3% over the fair price |
+| `value` | `VALOR` | result/goals 3%+ over the fair price |
+| `cards_under` | `TARJETAS UNDER` | model card-under test |
+| `team_corners` | `CÓRNERS EQUIPO` | team-corners test |
+| `corner_rejects` | `CÓRNERS RECHAZO` | corner rejects priced 1.70–2.0 |
+| `model_only_shots` | `MODELO SOLO` | model-only shots pick |
+| `shadow_rule30` | `SHADOW (pasó todos los filtros, regla 30)` | passed every filter, held by the rule 30 pause |
 | `shadow` | `SHADOW` | other shadow picks (new market, short sample) |
-| `ia_watch` | `IA-WATCH` | Sofascore AI watch rows (stopped) |
-| `filtro` | anything else | rejected by a filter (Filtro 4/5, regla 23, brecha, ratio, muestra, razor…) |
+| `ai_watch` | `IA-WATCH` | Sofascore AI watch rows (stopped) |
+| `filter_reject` | anything else | rejected by a filter (Filtro 4/5, regla 23, brecha, ratio, muestra, razor…) |
 
-`filtro` rows also get `parsed.filters: string[]` (`filtro4`, `filtro5`, `regla23`, `brecha`, `ratio`,
-`muestra`, `razor`, …) so the Explorer can filter by reason. `Apuestas` rows get tag `apuesta`; `Grok`
-rows get `grok_cotizado` / `grok_no_cotizado` from `Nuestro veredicto`.
+`filter_reject` rows also get `parsed.filters: string[]` (`filter4`, `filter5`, `rule23`, `gap`, `ratio`,
+`sample`, `razor`, …) so the Explorer can filter by reason. `Apuestas` rows get tag `bet`; `Grok`
+rows get `grok_priced` / `grok_not_priced` from `Nuestro veredicto` (`Cotizado` / `No cotizado`).
 
 The parser must classify every real row: the foundation task reads `Sombra!L:L` (read only) and checks
-that nothing unexpected lands in `filtro`. `betting-review`'s `review.py` is the reference for how reviews
+that nothing unexpected lands in `filter_reject`. `betting-review`'s `review.py` is the reference for how reviews
 group rows; where the two disagree, match `review.py` and note it here.
 
 ## 6. Parsed notes
@@ -189,7 +195,7 @@ betting-analyst skill:
 | `feedOpen`, `feedOpenOther`, `feedOpenFlipped` | `apertura feed 1.833 (otro lado 1.950)`, `…; invertida?)` |
 | `ref` (`feed` / `books` / `one_book` / `consensus`) and `refBooks` | `ref feed`, `ref 2 casas (Stake, Betsson)`, `ref 1 casa`, `ref consenso 3 fuentes` |
 | `sample` (`10+` / `6-9`) | `muestra 10+`, `muestra 6–9` |
-| `fuerza` (`mantiene` / `rechaza` / `na`), `fuerzaExpected`, `fuerzaProb` | `FUERZA: esperado 3.11, prob 37.1%, RECHAZA (…)` |
+| `fuerza` (`keeps` / `rejects` / `na`; sheet words MANTIENE / RECHAZA), `fuerzaExpected`, `fuerzaProb` | `FUERZA: esperado 3.11, prob 37.1%, RECHAZA (…)` |
 | `pin` (`{home, draw, away, readUtc, id}`) or `pinMissing` | `pin 3.54/3.76/2.00 (2026-11-13T22:05:00Z) \| pin id 0380…`, `pin n/d (sin partido)` |
 | `open1x2` | `1X2 apertura feed 1.80/3.50/4.20` |
 | `close` (`{price, source, book, other}`) | `cierre: Sofascore/bet365 1.83`, plus the other side's close when logged |
