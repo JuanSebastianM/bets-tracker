@@ -13,6 +13,9 @@ export const ROUTES = [
   { path: '/glossary', title: 'Glosario', ready: 'glossary-tags' },
   { path: '/settings', title: 'Ajustes', ready: 'settings-feed' },
   { path: '/explorer/shadow%3A169', title: 'Pick', ready: 'pick-sheet' },
+  { path: '/analysis/calibration', title: 'Análisis', ready: 'calibration-chart' },
+  { path: '/analysis/close', title: 'Análisis', ready: 'close-histogram' },
+  { path: '/analysis/grok', title: 'Análisis', ready: 'grok-text' },
 ];
 
 /**

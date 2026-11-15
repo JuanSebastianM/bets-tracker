@@ -1,1 +1,136 @@
 /* analysis section. Scope every rule under .analysis. Tokens only (src/styles/tokens.css). */
+.analysis { display: grid; gap: var(--sp-4); min-width: 0; }
+.analysis .an-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); min-width: 0; }
+.analysis .an-main { min-width: 0; align-content: start; grid-template-columns: minmax(0, 1fr); }
+.analysis .an-part { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+.analysis .an-text { color: var(--c-ink-2); font-size: var(--fs-sm); line-height: var(--lh); max-width: 72ch; }
+.analysis .an-lead { font-size: var(--fs-md); color: var(--c-ink); }
+.analysis .an-muted { color: var(--c-muted); font-size: var(--fs-sm); }
+.analysis .an-note { color: var(--c-muted); font-size: var(--fs-xs); line-height: var(--lh); max-width: 72ch; }
+.analysis .an-notes { display: grid; gap: 2px; }
+.analysis .an-notes:empty { display: none; }
+.analysis .an-dim { color: var(--c-muted); font-weight: 400; }
+.analysis .an-link { justify-self: start; min-height: var(--tap); display: inline-flex; align-items: center; text-decoration: none; }
+.analysis .an-verdict { white-space: nowrap; }
+
+/* Part switch: one row of links (the part is in the path), scrolls inside itself if it must. */
+.analysis .an-tabs {
+  display: flex; gap: 3px; padding: 3px; background: var(--c-surface-2); border: var(--border); border-radius: calc(var(--r-ctl) + 3px);
+  overflow-x: auto; scrollbar-width: none;
+}
+.analysis .an-tabs::-webkit-scrollbar { display: none; }
+.analysis .an-tab {
+  flex: 1 1 0; min-width: max-content; display: grid; place-items: center; min-height: var(--tap); padding: 0 var(--sp-3); border-radius: var(--r-ctl);
+  color: var(--c-ink-2); font-weight: 650; font-size: var(--fs-sm); text-decoration: none; white-space: nowrap;
+}
+.analysis .an-tab:hover { color: var(--c-ink); }
+.analysis .an-tab:focus-visible { outline: 2px solid var(--c-focus); outline-offset: -2px; }
+.analysis .an-tab-on { background: var(--c-surface); color: var(--c-accent); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
+[data-theme='dark'] .analysis .an-tab-on { background: var(--c-raised); }
+
+.analysis .an-toolbar { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); min-height: var(--tap); }
+.analysis .an-count { font-weight: 650; color: var(--c-ink-2); font-size: var(--fs-sm); }
+.analysis .an-sheet-foot { display: flex; justify-content: space-between; gap: var(--sp-2); width: 100%; }
+
+/* Controls */
+.analysis .an-ctl-grid { display: grid; gap: var(--sp-3); grid-template-columns: minmax(0, 1fr); }
+.analysis .an-ctl-grid .seg { font-size: var(--fs-sm); }
+.analysis .an-minn input[type='range'] { width: 100%; min-height: var(--tap); accent-color: var(--c-accent); margin: 0; }
+.analysis .an-minn-value { font-weight: 800; color: var(--c-ink); margin-left: 4px; }
+.analysis .an-check { display: flex; align-items: center; gap: var(--sp-2); min-height: var(--tap); font-size: var(--fs-sm); font-weight: 600; color: var(--c-ink-2); cursor: pointer; }
+.analysis .an-check input { width: 20px; height: 20px; accent-color: var(--c-accent); margin: 0; flex: none; }
+.analysis .an-sort { display: flex; align-items: center; gap: var(--sp-1); }
+.analysis .an-sort .field { flex: 1; }
+.analysis .an-table .an-sub { display: block; font-size: var(--fs-xs); color: var(--c-muted); font-weight: 400; margin-top: 2px; }
+.analysis .an-sort .select-wrap select { min-height: 40px; font-size: var(--fs-sm); }
+
+/* Compact rows that open (phones; Grok verdicts everywhere) */
+.analysis .an-glist { list-style: none; margin: 0; padding: 0; display: grid; border-top: var(--border); }
+.analysis .an-glist > li { border-bottom: var(--border); }
+.analysis .an-grow > summary {
+  list-style: none; display: grid; grid-template-columns: minmax(0, 1fr) auto 16px; grid-template-areas: 'name verdict chev' 'meta meta chev';
+  align-items: center; gap: 2px var(--sp-2); padding: 10px var(--sp-1); min-height: var(--tap); cursor: pointer;
+}
+.analysis .an-grow > summary::-webkit-details-marker { display: none; }
+.analysis .an-grow > summary:hover { background: var(--c-surface-2); }
+.analysis .an-grow > summary:focus-visible { outline: 2px solid var(--c-focus); outline-offset: -2px; border-radius: 4px; }
+.analysis .an-grow > summary > .icon { grid-area: chev; color: var(--c-muted); transition: transform 0.15s ease; }
+.analysis .an-grow[open] > summary > .icon { transform: rotate(180deg); }
+.analysis .an-gname { grid-area: name; font-weight: 700; font-size: var(--fs-sm); letter-spacing: 0.01em; overflow-wrap: anywhere; }
+.analysis .an-gverdict { grid-area: verdict; justify-self: end; }
+.analysis .an-gmeta { grid-area: meta; display: flex; flex-wrap: wrap; gap: 2px var(--sp-3); font-size: var(--fs-xs); color: var(--c-muted); }
+.analysis .an-gbody { display: grid; gap: var(--sp-2); padding: 0 var(--sp-1) var(--sp-3); }
+.analysis .an-small { opacity: 0.55; }
+.analysis .an-small:focus-within, .analysis .an-small:hover { opacity: 0.9; }
+
+/* Plain rows (sources, markets, Pinnacle picks) */
+.analysis .an-rows { list-style: none; margin: 0; padding: 0; display: grid; border-top: var(--border); }
+.analysis .an-rows > li {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px var(--sp-3); padding: 10px var(--sp-1);
+  border-bottom: var(--border); min-height: var(--tap);
+}
+.analysis .an-row-name { font-weight: 650; font-size: var(--fs-sm); min-width: 0; overflow-wrap: anywhere; color: inherit; }
+a.an-row-name { color: var(--c-accent); text-decoration: none; }
+.analysis a.an-row-name:hover { text-decoration: underline; }
+.analysis .an-row-figs { display: flex; flex-wrap: wrap; gap: 2px var(--sp-3); font-size: var(--fs-xs); color: var(--c-ink-2); align-items: baseline; }
+.analysis .an-row-figs b { font-size: var(--fs-sm); }
+.analysis .an-row-figs a { color: var(--c-accent); text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+.analysis .an-line { display: flex; flex-wrap: wrap; gap: 2px var(--sp-3); font-size: var(--fs-xs); color: var(--c-ink-2); }
+
+/* Tables */
+.analysis .an-table .table td.an-td-label, .analysis .an-table .table th.an-td-label { white-space: normal; overflow-wrap: normal; word-break: normal; hyphens: none; min-width: 7em; max-width: 12em; font-weight: 650; }
+.analysis .an-table .table td:not(.num) { min-width: 0; }
+.analysis .an-table .table td:first-child { min-width: 0; }
+.analysis .an-table .table td { padding: 8px 10px; }
+.analysis .an-table .table th { padding: 8px 10px; }
+.analysis .an-table a { color: var(--c-accent); text-decoration: none; }
+.analysis .an-table a:hover { text-decoration: underline; }
+.analysis .an-table .an-dim { font-size: var(--fs-xs); }
+.analysis .an-smalltag { font-size: var(--fs-xs); color: var(--c-muted); font-weight: 500; }
+.analysis .an-tw td a { display: inline-flex; gap: 2px; min-height: 32px; align-items: center; }
+
+/* Stats */
+.analysis .an-stats .stat-value { font-size: var(--fs-lg); }
+.analysis .an-range-val { font-size: var(--fs-md); white-space: nowrap; }
+
+/* Calibration */
+.analysis .an-series { list-style: none; margin: 0; padding: 0; display: grid; border-top: var(--border); }
+.analysis .an-series > li { display: grid; gap: 4px; padding: 10px var(--sp-1); border-bottom: var(--border); }
+.analysis .an-series > li.an-on { box-shadow: inset 3px 0 0 var(--c-accent); padding-left: var(--sp-3); }
+.analysis .an-series-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px var(--sp-3); align-items: baseline; }
+.analysis .an-series-name { font-weight: 700; font-size: var(--fs-sm); }
+.analysis .an-series-figs { display: flex; flex-wrap: wrap; gap: 2px var(--sp-3); font-size: var(--fs-xs); color: var(--c-muted); }
+.analysis .an-cal { display: grid; gap: var(--sp-3); justify-items: center; }
+.analysis .an-cal .chart { width: 100%; justify-items: center; }
+.analysis .an-cal .chart-caption { width: 100%; }
+.analysis .an-cal-legend { width: 100%; }
+
+/* Grok vs Claude */
+.analysis .an-versus { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); }
+.analysis .an-vs { display: grid; gap: var(--sp-2); align-content: start; min-width: 0; }
+.analysis .an-vs-title { font-weight: 700; font-size: var(--fs-sm); color: var(--c-ink-2); }
+
+@media (min-width: 540px) {
+  .analysis .an-ctl-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; }
+  .analysis .an-versus { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .analysis .an-versus .an-vs + .an-vs { border-left: var(--border); padding-left: var(--sp-4); }
+}
+
+@media (min-width: 720px) {
+  .analysis .an-cal { grid-template-columns: minmax(0, 320px) minmax(0, 1fr); align-items: start; justify-items: stretch; }
+}
+
+/* Wide screens: the filter panel as a sticky side column (as in the Explorer). */
+@media (min-width: 1200px) {
+  .analysis .an-layout { grid-template-columns: 248px minmax(0, 1fr); align-items: start; }
+  .analysis .an-side-panel {
+    position: sticky; top: calc(var(--header-h) + var(--sp-4)); max-height: calc(100vh - var(--header-h) - var(--sp-6));
+    overflow-y: auto; overscroll-behavior: contain; display: grid; gap: var(--sp-3); padding: var(--sp-4); background: var(--c-surface);
+    border: var(--border); border-radius: var(--r-card);
+  }
+  .analysis .an-side-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+  .analysis .an-side-title { font-size: var(--fs-lg); }
+  .analysis .an-side-panel .disclosure { border-radius: var(--r-ctl); }
+  .analysis .an-side-panel .disclosure summary { padding: 0 var(--sp-3); font-size: var(--fs-sm); }
+  .analysis .an-side-panel .disclosure-body { padding: 0 var(--sp-3) var(--sp-3); }
+}
