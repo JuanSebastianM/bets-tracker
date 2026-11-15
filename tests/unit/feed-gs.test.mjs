@@ -109,9 +109,9 @@ test('value conversion: Date cells, 1899 times, serials, % text, signed text, mo
 });
 
 test('rules: numbered lines below the "Reglas" header, never rule 1, nothing above it', () => {
-  const values = [['Algo arriba', 'x'], ['2. línea fuera de la lista', ''], ['Reglas'], ['1. la regla de la unidad'], ['2. Stake entre 0,25u y 2u.'], [''], ['texto suelto'], ['10. Calibración.']];
+  const values = [['Algo arriba', 'x'], ['2. línea fuera de la lista', ''], ['Reglas'], ['1. la regla de la unidad'], ['2. Stake de 0,5u a 3u.'], [''], ['texto suelto'], ['10. Calibración.']];
   const feed = gs.btFeedBuild({ Reglas: values }, TZ, NOW);
-  assert.deepEqual([...feed.tabs.rules], ['2. Stake entre 0,25u y 2u.', '10. Calibración.']);
+  assert.deepEqual([...feed.tabs.rules], ['2. Stake de 0,5u a 3u.', '10. Calibración.']);
   const none = gs.btFeedBuild({ Reglas: [['sin cabecera'], ['2. x']] }, TZ, NOW);
   assert.equal(none.tabs.rules.length, 0);
   assert.ok(none.meta.missingHeaders.includes('Reglas!Reglas'));

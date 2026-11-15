@@ -76,20 +76,38 @@ export function defaultFilters() {
  * Price presets. Bounds: min exclusive unless minInc, max inclusive unless maxExc. `hidden` presets are
  * not offered as panel chips: they exist so a breakdown row (stats.js PRICE_BANDS) can link to exactly
  * its picks, and still show as an active chip and round-trip through the URL.
+ * Labels come from priceRangeLabel (defined below; function declarations are hoisted).
  * @type {Array<{ id: string, label: string, min: number | null, max: number | null, minInc?: boolean, maxExc?: boolean, hidden?: boolean }>}
  */
 export const PRICE_PRESETS = [
-  { id: 'le170', label: '≤ 1.70', min: null, max: 1.7 },
-  { id: '170_200', label: '1.70–2.00', min: 1.7, max: 2.0, minInc: true },
-  { id: 'lt200', label: '< 2.00', min: null, max: 2.0, maxExc: true },
-  { id: 'le200', label: '≤ 2.00', min: null, max: 2.0 },
-  { id: '200_250', label: '2.00–2.50', min: 2.0, max: 2.5 },
-  { id: 'le250', label: '≤ 2.50', min: null, max: 2.5 },
-  { id: '250_400', label: '2.50–4.00', min: 2.5, max: 4.0 },
-  { id: 'le400', label: '≤ 4.00', min: null, max: 4.0 },
-  { id: 'gt400', label: '> 4.00', min: 4.0, max: null },
-  { id: 'lt170', label: '< 1.70', min: null, max: 1.7, maxExc: true, hidden: true },
-];
+  { id: 'le170', min: null, max: 1.7 },
+  { id: '170_200', min: 1.7, max: 2.0, minInc: true },
+  { id: 'lt200', min: null, max: 2.0, maxExc: true },
+  { id: 'le200', min: null, max: 2.0 },
+  { id: '200_250', min: 2.0, max: 2.5 },
+  { id: 'le250', min: null, max: 2.5 },
+  { id: '250_400', min: 2.5, max: 4.0 },
+  { id: 'le400', min: null, max: 4.0 },
+  { id: 'gt400', min: 4.0, max: null },
+  { id: 'lt170', min: null, max: 1.7, maxExc: true, hidden: true },
+].map((p) => ({ ...p, label: priceRangeLabel(p) }));
+
+/**
+ * The label of a price range, built from its bounds so it says exactly what it includes (same
+ * convention as PRICE_PRESETS: min exclusive unless minInc, max inclusive unless maxExc):
+ * "≤ 2.00", "< 2.00", "> 4.00", "≥ 1.70", "1.70–2.00" (both ends included), "> 2.00, ≤ 2.50" (low end
+ * excluded), "≥ 1.70, < 2.00" and "> 1.70, < 2.00" for the other two mixes.
+ * @param {{ min: number | null, max: number | null, minInc?: boolean, maxExc?: boolean }} r
+ */
+export function priceRangeLabel(r) {
+  const f = (/** @type {number} */ v) => v.toFixed(2);
+  const lo = r.min == null ? '' : `${r.minInc ? '≥' : '>'} ${f(r.min)}`;
+  const hi = r.max == null ? '' : `${r.maxExc ? '<' : '≤'} ${f(r.max)}`;
+  if (!lo) return hi;
+  if (!hi) return lo;
+  if (r.minInc && !r.maxExc) return `${f(/** @type {number} */ (r.min))}–${f(/** @type {number} */ (r.max))}`;
+  return `${lo}, ${hi}`;
+}
 
 /** Date presets; resolved against `today` and the data's last slate. */
 export const DATE_PRESETS = ['last_slate', '7d', '30d', 'this_month', 'since'];

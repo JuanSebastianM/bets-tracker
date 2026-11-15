@@ -5,35 +5,35 @@ import assert from 'node:assert/strict';
 import { classifyShadow, classifyGrok, marketFamily, reviewClass, sideOf, filterReasons, booksInReason, isModelTag, tagLabel, passedAll } from '../../src/data/tags.js';
 
 const CASES = [
-  ['PUBLICADA Y APOSTADA (Apuestas ID 4)', 'published_bet'],
-  ['PUBLICADA, NO APOSTADA (top #1, 1.25u)', 'published'],
-  ['VALOR PROP CASI: Betano 2.07 vs justa 2.03 (+1.7%)', 'prop_near_value'],
-  ['VALOR PROP: Betano 2.22 vs justa 2.01 (+10.3%)', 'prop_value'],
-  ['VALOR CASI: Stake 1.85 vs justa 1.818 (+1.8%)', 'near_value'],
-  ['VALOR CASI: Betano 1.90 vs justa 1.86 (+2.1%, bajo el 3%); relleno (c) nuevo', 'near_value'],
-  ['VALOR: Betano/Betsson 2.15 vs justa 2.07 (+3.9%)', 'value'],
-  ['TARJETAS UNDER (modelo): rule 3 razor; F-gap: modelo 60.1% vs mercado 49.5% (media 4.17, línea 4.5)', 'cards_under'],
-  ['CÓRNERS EQUIPO: modelo 50.6% vs mercado 35.6% (media 5.92)', 'team_corners'],
-  ['CÓRNERS EQUIPO (SHADOW, pasó todos los filtros): modelo 53.3% vs mercado 43.8% (media 6.12)', 'team_corners'],
-  ['CÓRNERS RECHAZO ≤2.0: F-gap: modelo 65.4% vs mercado 55.0% (media 9.36, línea 10.5)', 'corner_rejects'],
-  ['MODELO SOLO (tiros): modelo 76.3% vs mercado 61.0% (media 16.67, línea 20.5)', 'model_only_shots'],
-  ['SHADOW (pasó todos los filtros, regla 30): modelo 54.0% vs mercado 53.7% (media 5.06)', 'shadow_rule30'],
-  ['SHADOW: córners/tarjetas en pausa (regla 30); pasó todos los filtros, EV blend +2.0%', 'shadow_rule30'],
+  ['PUBLICADA Y APOSTADA (Apuestas ID 9)', 'published_bet'],
+  ['PUBLICADA, NO APOSTADA (top #3, 0.5u)', 'published'],
+  ['VALOR PROP CASI: Stake 1.94 vs justa 1.91 (+1.6%)', 'prop_near_value'],
+  ['VALOR PROP: Betsson 2.40 vs justa 2.18 (+10.1%)', 'prop_value'],
+  ['VALOR CASI: Betsson 2.06 vs justa 2.02 (+2.0%)', 'near_value'],
+  ['VALOR CASI: Stake 1.77 vs justa 1.74 (+1.7%, bajo el 3%); relleno (c) de prueba', 'near_value'],
+  ['VALOR: Stake/Betano 1.98 vs justa 1.90 (+4.2%)', 'value'],
+  ['TARJETAS UNDER (modelo): rule 3 razor; F-gap: modelo 57.3% vs mercado 46.2% (media 3.88, línea 4.5)', 'cards_under'],
+  ['CÓRNERS EQUIPO: modelo 48.1% vs mercado 33.0% (media 5.41)', 'team_corners'],
+  ['CÓRNERS EQUIPO (SHADOW, pasó todos los filtros): modelo 51.7% vs mercado 41.9% (media 5.73)', 'team_corners'],
+  ['CÓRNERS RECHAZO ≤2.0: F-gap: modelo 62.8% vs mercado 52.4% (media 8.94, línea 9.5)', 'corner_rejects'],
+  ['MODELO SOLO (tiros): modelo 71.9% vs mercado 58.2% (media 18.31, línea 22.5)', 'model_only_shots'],
+  ['SHADOW (pasó todos los filtros, regla 30): modelo 56.2% vs mercado 55.1% (media 4.71)', 'shadow_rule30'],
+  ['SHADOW: tarjetas/córners en pausa (regla 30); pasó todos los filtros, EV blend +1.4%', 'shadow_rule30'],
   ['SHADOW: córners pausados (regla 30)', 'shadow_rule30'],
-  ['SHADOW: córners, 6 PJ (regla 18)', 'shadow'],
-  ['SHADOW: tiros/SoT (regla 25), 8 partidos', 'shadow'],
-  ['SHADOW: relaxed sample: 9 games (count stats need 6); new market (shots/SoT): shadow until reviewed', 'shadow'],
-  ['IA-WATCH: IA media 9 vs línea 10.5 (IA 68.7% vs línea 51.6%)', 'ai_watch'],
-  ['Pasó todos los filtros; edge <4% (EV +2.9%), stake máx 0.25u. No se mostró en el slate.', 'low_edge'],
-  ['Stake < 0.25u (EV blend +0.7%); SHADOW: mercado nuevo', 'low_edge'],
-  ['F-gap; F-ratio', 'filter_reject'],
-  ['F-gap + F-ratio (modelo 67.2% vs mercado 38.1%); muestra 8 partidos; SHADOW: mercado nuevo', 'filter_reject'],
-  ['Muestra (7); brecha >10 pts; ratio 1.54x', 'filter_reject'],
-  ['Filtro 4 (últimos 5): EV blend cae a +0.2%', 'filter_reject'],
-  ['Regla 1: media modelo 10.87 bajo la línea 11.5', 'filter_reject'],
-  ['SKIP (relleno): razor, F-gap: modelo 58.4% vs mercado 46.3%', 'filter_reject'],
-  ['Salto: solo filtro 5 (árbitro 5.41/p, EV blend -0.9%)', 'filter_reject'],
-  ['rule 3 razor: line 9.5 within 0.5 of model mean 9.16', 'filter_reject'],
+  ['SHADOW: tarjetas, 7 PJ (regla 18)', 'shadow'],
+  ['SHADOW: SoT/tiros (regla 25), 9 partidos', 'shadow'],
+  ['SHADOW: short sample: 8 games (count stats need 6); market not reviewed yet (SoT): shadow only', 'shadow'],
+  ['IA-WATCH: IA media 11 vs línea 9.5 (IA 63.4% vs línea 49.8%)', 'ai_watch'],
+  ['Pasó todos los filtros; edge <4% (EV +3.1%), stake máx 0.25u. Fuera del slate.', 'low_edge'],
+  ['Stake < 0.25u (EV blend +1.1%); SHADOW: mercado sin historia', 'low_edge'],
+  ['F-ratio; F-gap', 'filter_reject'],
+  ['F-ratio + F-gap (modelo 63.9% vs mercado 41.4%); muestra 7 partidos; SHADOW: mercado sin historia', 'filter_reject'],
+  ['Muestra (6); brecha >10 pts; ratio 1.47x', 'filter_reject'],
+  ['Filtro 4 (últimos 5): EV blend baja a -0.4%', 'filter_reject'],
+  ['Regla 1: media modelo 8.62 bajo la línea 9.5', 'filter_reject'],
+  ['SKIP (relleno): razor, F-gap: modelo 55.6% vs mercado 44.9%', 'filter_reject'],
+  ['Salto: solo filtro 5 (árbitro 4.86/p, EV blend -1.3%)', 'filter_reject'],
+  ['rule 3 razor: line 10.5 within 0.5 of model mean 10.21', 'filter_reject'],
   ['', 'filter_reject'],
 ];
 
@@ -42,9 +42,9 @@ test('Sombra reasons map to the intended tag', () => {
 });
 
 test('Grok verdicts', () => {
-  assert.equal(classifyGrok('Cotizado: modelo 53.0% vs mercado 38.3% → SKIP: F-gap'), 'grok_priced');
-  assert.equal(classifyGrok('Cotizado (regla 29): consenso justo 8.8%'), 'grok_priced');
-  assert.equal(classifyGrok('No cotizado: mercado no modelado'), 'grok_not_priced');
+  assert.equal(classifyGrok('Cotizado: modelo 49.2% vs mercado 36.7% → SKIP: F-ratio'), 'grok_priced');
+  assert.equal(classifyGrok('Cotizado (regla 29): consenso justo 6.1%'), 'grok_priced');
+  assert.equal(classifyGrok('No cotizado: el modelo no cubre este mercado'), 'grok_not_priced');
   assert.equal(classifyGrok(''), 'grok_other');
 });
 
@@ -69,9 +69,9 @@ test('market families and review classes', () => {
 
 test('side, books in reason, model tags, labels, passed-all', () => {
   assert.equal(sideOf('Under 4.5'), 'under');
-  assert.equal(sideOf('Goiás tiros Over 9.5'), 'over');
-  assert.equal(sideOf('X2 (Inter o empate)'), '');
-  assert.deepEqual(booksInReason('VALOR: Betano/Stake 2.15 vs justa 2.06 (+4.4%)'), ['Betano', 'Stake']);
+  assert.equal(sideOf('Club Norte tiros Over 11.5'), 'over');
+  assert.equal(sideOf('X2 (visitante o empate)'), '');
+  assert.deepEqual(booksInReason('VALOR: Betsson/Stake 2.32 vs justa 2.21 (+5.0%)'), ['Betsson', 'Stake']);
   assert.deepEqual(booksInReason('F-gap'), []);
   assert.ok(isModelTag('filter_reject') && isModelTag('cards_under') && !isModelTag('value') && !isModelTag('ai_watch'));
   assert.equal(tagLabel('near_value'), 'VALOR CASI');
@@ -79,12 +79,12 @@ test('side, books in reason, model tags, labels, passed-all', () => {
 });
 
 test('rejection reasons follow review.py, including tags kept in the notes', () => {
-  assert.deepEqual(filterReasons('filter_reject', 'Muestra (7 partidos); ratio modelo/mercado 1.36x', ''), ['ratio', 'sample', 'rule18']);
+  assert.deepEqual(filterReasons('filter_reject', 'Muestra (8 partidos); ratio modelo/mercado 1.29x', ''), ['ratio', 'sample', 'rule18']);
   assert.deepEqual(filterReasons('filter_reject', 'Brecha >10 pts', ''), ['gap']);
   assert.deepEqual(filterReasons('cards_under', 'TARJETAS UNDER (modelo): rule 3 razor; F-gap: modelo 1% vs mercado 2%', ''), ['gap', 'razor']);
-  assert.deepEqual(filterReasons('filter_reject', 'Regla 1 (media 10.22 sobre 9.5)', ''), ['rule1']);
-  assert.deepEqual(filterReasons('filter_reject', 'Stake < 0.25u (EV +0.5%)', ''), ['low_stake']);
-  assert.deepEqual(filterReasons('shadow', 'SHADOW: 7 partidos (regla 18)', 'Betano 1.9 | también F-gap; filtro 5'), ['gap', 'filter5', 'rule18']);
-  assert.deepEqual(filterReasons('value', 'VALOR: Betano 2 vs justa 1.9 (+5%)', 'F-gap'), []);
+  assert.deepEqual(filterReasons('filter_reject', 'Regla 1 (media 11.04 sobre 10.5)', ''), ['rule1']);
+  assert.deepEqual(filterReasons('filter_reject', 'Stake < 0.25u (EV +0.8%)', ''), ['low_stake']);
+  assert.deepEqual(filterReasons('shadow', 'SHADOW: 8 partidos (regla 18)', 'Stake 2.05 | también F-gap; filtro 5'), ['gap', 'filter5', 'rule18']);
+  assert.deepEqual(filterReasons('value', 'VALOR: Stake 2.1 vs justa 2 (+5%)', 'F-gap'), []);
   assert.deepEqual(filterReasons('model_only_shots', 'MODELO SOLO (tiros): F-gap', ''), []);
 });

@@ -178,10 +178,10 @@ function shadowRow(kind, date) {
       const filt = pick(['razor', 'F-gap', 'F-gap, F-ratio', 'rule 3 razor; F-gap']);
       reason =
         kind === 'cards_under'
-          ? `TARJETAS UNDER (modelo): ${filt}: modelo ${(probModel * 100).toFixed(1)}% vs mercado ${(probBlend * 90).toFixed(1)}% (media ${mean}, línea ${ln})`
+          ? `TARJETAS UNDER (modelo) · ${filt} · modelo ${(probModel * 100).toFixed(1)}% vs mercado ${(probBlend * 90).toFixed(1)}%, media ${mean} y línea ${ln}`
           : kind === 'corner_rejects'
-            ? `CÓRNERS RECHAZO ≤2.0: ${filt}: modelo ${(probModel * 100).toFixed(1)}% vs mercado ${(probBlend * 90).toFixed(1)}% (media ${mean}, línea ${ln})`
-            : `SHADOW (pasó todos los filtros, regla 30): modelo ${(probModel * 100).toFixed(1)}% vs mercado ${(probBlend * 90).toFixed(1)}% (media ${mean}, línea ${ln})`;
+            ? `CÓRNERS RECHAZO ≤2.0 · ${filt} · modelo ${(probModel * 100).toFixed(1)}% vs mercado ${(probBlend * 90).toFixed(1)}%, media ${mean} y línea ${ln}`
+            : `SHADOW · regla 30 (pasó todos los filtros) · modelo ${(probModel * 100).toFixed(1)}% vs mercado ${(probBlend * 90).toFixed(1)}%, media ${mean} y línea ${ln}`;
       const fo = feedP();
       const refTag = pick(['ref feed', `ref 2 casas (${book}, ${books2[0]})`, `ref 1 casa (${book})`]);
       notes.push(`${book} ${price.toFixed(2)} (${sel === 'Over' ? 'under' : 'over'} ${other(price)})`, `${books2[0]} sin línea`);
@@ -202,7 +202,7 @@ function shadowRow(kind, date) {
       evBlend = r4(price * probBlend - 1);
       fairOdds = r3(1 / probBlend);
       const passed = date >= '2026-11-03' || chance(0.4);
-      reason = `CÓRNERS EQUIPO: modelo ${(probModel * 100).toFixed(1)}% vs mercado ${(probBlend * 85).toFixed(1)}% (media ${r2(ln + 0.6)})${passed ? ' | SHADOW: pasó todos los filtros' : ' | razor, F-gap'}`;
+      reason = `CÓRNERS EQUIPO · modelo ${(probModel * 100).toFixed(1)}% vs mercado ${(probBlend * 85).toFixed(1)}%, media ${r2(ln + 0.6)}${passed ? ' | pasó todos los filtros (SHADOW)' : ' | F-gap y razor'}`;
       notes.push(`${book} ${price.toFixed(2)} (${sideOU === 'Over' ? 'under' : 'over'} ${other(price)})`, `${books2[0]} ${r2(price * 0.95)} (solo over)`, `ref 2 casas (${book}, ${books2[1]})`);
       notes.push(chance(0.75) ? 'muestra 10+' : 'muestra 6–9');
       notes.push(chance(0.85) ? `1X2 apertura feed ${r2(between(1.5, 3))}/${r2(between(3, 4))}/${r2(between(2, 6))}` : '1X2 apertura feed n/a');
@@ -219,7 +219,7 @@ function shadowRow(kind, date) {
       probBlend = r4(probModel * 0.85);
       evBlend = r4(price * probBlend - 1);
       fairOdds = r3(1 / probBlend);
-      reason = `MODELO SOLO (tiros): modelo ${(probModel * 100).toFixed(1)}% vs mercado ${(probBlend * 80).toFixed(1)}% (media ${r2(ln + 3)}, línea ${ln})`;
+      reason = `MODELO SOLO (tiros) · modelo ${(probModel * 100).toFixed(1)}% vs mercado ${(probBlend * 80).toFixed(1)}%, media ${r2(ln + 3)} y línea ${ln}`;
       notes.push(`${book} ${price.toFixed(2)} (${sideOU === 'Over' ? 'U' : 'O'}${ln} ${other(price)})`, `${books2[0]} sin tiros`, `ref 1 casa (${book})`, 'muestra 10+');
       if (date >= '2026-11-06') notes.push(fuerza());
       closeKind = pick(['logger', 'logger', 'none']);
@@ -234,7 +234,7 @@ function shadowRow(kind, date) {
       probBlend = r4(probModel * 0.93);
       evBlend = r4(price * probBlend - 1);
       fairOdds = r3(1 / probBlend);
-      reason = shots ? `SHADOW: tiros (regla 25): modelo ${(probModel * 100).toFixed(1)}% vs mercado ${(probBlend * 95).toFixed(1)}%` : `SHADOW: ${pick([7, 8, 9])} partidos (regla 18)`;
+      reason = shots ? `SHADOW · tiros a prueba (regla 25) · modelo ${(probModel * 100).toFixed(1)}% vs mercado ${(probBlend * 95).toFixed(1)}%` : `SHADOW · muestra corta, ${pick([7, 8, 9])} partidos (regla 18)`;
       notes.push(`${book} ${price.toFixed(2)}`, shots ? `ref 1 casa (${book})` : 'ref feed');
       if (!shots) notes.push(`feed ${feedP()}`);
       closeKind = shots ? pick(['logger', 'none']) : 'feed';
@@ -250,7 +250,7 @@ function shadowRow(kind, date) {
       probBlend = r4(between(0.42, 0.56));
       evBlend = r4(probAI * price - 1);
       fairOdds = r3(1 / probAI);
-      reason = `IA-WATCH: IA media ${Math.round(ln + 1)} vs línea ${ln} (IA ${(probAI * 100).toFixed(1)}% vs línea ${(probBlend * 100).toFixed(1)}%)`;
+      reason = `IA-WATCH · la IA espera ${Math.round(ln + 1)} con línea ${ln}; IA ${(probAI * 100).toFixed(1)}% frente a ${(probBlend * 100).toFixed(1)}% de la línea`;
       notes.push('bet365 feed', `${book} ${r2(price * 1.02)}`);
       closeKind = 'feed';
       break;
@@ -265,7 +265,7 @@ function shadowRow(kind, date) {
       probBlend = r4(1 / price + 0.04);
       evBlend = r4(price * probBlend - 1);
       fairOdds = r3(1 / probBlend);
-      reason = kind === 'published' ? `PUBLICADA, NO APOSTADA (top #${pick([1, 2])}, ${pick(['0.5', '1', '1.25'])}u)` : `PUBLICADA Y APOSTADA (Apuestas ID ${pick([3, 7, 12])})`;
+      reason = kind === 'published' ? `PUBLICADA, NO APOSTADA (puesto ${pick([1, 2])} del top, ${pick(['0.5', '1', '1.25'])}u)` : `PUBLICADA Y APOSTADA (ID ${pick([3, 7, 12])} en Apuestas)`;
       notes.push(`Precio ${book}`, `feed ${feedP()}`);
       break;
     }
@@ -278,7 +278,7 @@ function shadowRow(kind, date) {
       probBlend = r4(1 / price + 0.01);
       evBlend = r4(price * probBlend - 1);
       fairOdds = r3(1 / probBlend);
-      reason = chance(0.5) ? `Pasó todos los filtros; edge <4% (EV +${(evBlend * 100).toFixed(1)}%), stake máx 0.25u. No se mostró en el slate.` : `Stake < 0.25u (EV blend +${(evBlend * 100).toFixed(1)}%); muestra 9 partidos`;
+      reason = chance(0.5) ? `Pasó todos los filtros, pero edge <4% con EV +${(evBlend * 100).toFixed(1)}%: stake máx 0.25u y fuera de la lista.` : `Stake < 0.25u con EV blend +${(evBlend * 100).toFixed(1)}%; muestra de 9 partidos`;
       notes.push(`Precio feed Sofascore (bet365)`);
       break;
     }
@@ -294,19 +294,19 @@ function shadowRow(kind, date) {
       evBlend = r4(price * probBlend - 1);
       fairOdds = r3(1 / probBlend);
       reason = pick([
-        'F-gap; F-ratio',
-        'F-sample (5 PJ); F-gap; F-ratio',
-        'razor (media 9.17); muestra relajada (7 PJ)',
-        'filtro 4 (últ. 5 baja EV a -3.8%)',
-        'filtro 5 (árbitro: EV -4.3%)',
-        'Regla 1 (media 10.22 sobre 9.5); muestra 9 partidos',
-        'Muestra (7); brecha >10 pts; ratio 1.54x',
-        'SKIP (relleno): razor, F-gap: modelo 58.4% vs mercado 46.3% (media 10.02, línea 10.5)',
-        'Salto: solo filtro 5 (árbitro 5.41/p, EV blend -0.9%)',
-        'regla 23; F-gap',
-        'rule 3 razor: line 9.5 within 0.5 of model mean 9.16',
+        'F-ratio; F-gap',
+        'F-sample (4 PJ); F-ratio; F-gap',
+        'razor (media 8.81); muestra relajada (8 PJ)',
+        'filtro 4 (con los últimos 5, EV -2.6%)',
+        'filtro 5 (árbitro, EV -3.1%)',
+        'Regla 1 (media 11.36 sobre 10.5); muestra 8 partidos',
+        'Muestra (6); brecha de 12 pts; ratio 1.61x',
+        'SKIP (relleno): F-gap y razor, modelo 61.2% vs mercado 49.7%, media 8.77 y línea 9.5',
+        'Salto: filtro 5 nada más (árbitro 4.93 por partido, EV blend -1.6%)',
+        'F-gap; regla 23',
+        'rule 3 razor: model mean 10.84 sits within 0.5 of line 10.5',
       ]);
-      notes.push(chance(0.5) ? 'Precio feed Sofascore (bet365/RushBet). Muestra 4-5 PJ: modelo poco fiable.' : `${book} ${price.toFixed(2)}`);
+      notes.push(chance(0.5) ? 'Precio feed Sofascore (bet365). Muestra corta (4 PJ), el modelo tiene poca base.' : `${book} ${price.toFixed(2)}`);
       if (chance(0.3)) notes.push('también F-gap; filtro 5');
       closeKind = pick(['plain', 'feed', 'none']);
     }
@@ -397,7 +397,7 @@ for (let i = 0; i < 22; i++) {
   const sameBook = chance(0.4);
   const close = st === 'Pendiente' ? null : r2(price * between(0.9, 1.06));
   let notes = `Colocada ${date} ~22:15 en ${pick(BOOKS)}. Mín. ${r2(price * 0.95)}.`;
-  if (free) notes = 'APUESTA GRATIS (freebet, cuota mín. 3.00). Stake no se devuelve: pierde 0. Ganancia (R) con fórmula propia de freebet en esta fila.';
+  if (free) notes = 'APUESTA GRATIS de prueba: freebet con cuota mínima 2.50; si pierde no cuesta nada y la ganancia sigue la regla de freebet.';
   if (close && !sameBook) notes += ` | cierre: Sofascore/bet365 ${close}`;
   betRows.push({
     id: i + 1, date, league: type === 'Doble' ? `Doble (${pick(LEAGUES)} + ${pick(LEAGUES)})` : pick(LEAGUES), match: m.name, type, market,
@@ -434,7 +434,7 @@ for (let i = 0; i < 40; i++) {
     date, time: `${pick(['9', '14', '17', '19'])}:${pick(['00', '30'])}`, league: pick(LEAGUES), match: m.name, market, selection, price,
     minPrice: i === 3 ? null : price ? r2(price * 0.93) : null, stakeU: pick([0.25, 0.5, 1]),
     reason: `${pick(['Automático', 'Manual'])}: Prob ${(between(0.3, 0.7) * 100).toFixed(1)}%, EV +${(between(2, 20)).toFixed(1)}%; razón inventada`,
-    verdict: i === 7 ? '' : priced ? `Cotizado: modelo ${(between(0.4, 0.7) * 100).toFixed(1)}% vs mercado ${(between(0.3, 0.55) * 100).toFixed(1)}% → SKIP: F-gap` : i === 7 ? '' : 'No cotizado: mercado no modelado por el script',
+    verdict: i === 7 ? '' : priced ? `Cotizado: modelo ${(between(0.4, 0.7) * 100).toFixed(1)}% vs mercado ${(between(0.3, 0.55) * 100).toFixed(1)}% → SKIP: F-gap` : i === 7 ? '' : 'No cotizado: mercado fuera del script',
     status: st, result: st === 'Pendiente' ? null : `${m.home} ${Math.floor(rand() * 4)}-${Math.floor(rand() * 4)} ${m.away}. Sofascore`,
     notes: notes.join(' | '),
   });
@@ -489,14 +489,14 @@ for (let i = 0; i < 12; i++) {
   }
 }
 const rules = [
-  '2. Stake entre 0,25u y 2u por apuesta.',
-  '3. Sencillas: solo cuota ≥ 1,70 y EV ≥ 4% frente al modelo conservador.',
-  '4. Dobles: cada selección con probabilidad estimada ≥ 80%.',
-  '5. En vivo: prohibido perseguir pérdidas.',
-  '6. No apostar líneas finas (sin margen frente a la línea justa).',
-  '7. Solo ligas favoritas.',
-  '8. Stake máximo: el menor entre 2u y 1/4 de Kelly (columna Stake máx.).',
-  '9. Registrar la cuota de cierre y seguir el CLV (cuota tomada / cuota de cierre − 1).',
+  '2. Cada apuesta lleva un stake de 0,5u a 3u.',
+  '3. Sencillas: cuota mínima 1,80 y EV de al menos 5% contra el modelo prudente.',
+  '4. Dobles: solo con selecciones de probabilidad estimada de 85% o más.',
+  '5. En vivo: nunca subir el stake para recuperar.',
+  '6. Evitar líneas finas: sin margen sobre la línea justa no hay apuesta.',
+  '7. Apostar solo en ligas favoritas de la lista.',
+  '8. Stake máximo: 3u o 1/4 de Kelly, lo que sea menor (columna Stake máx.).',
+  '9. Anotar la cuota de cierre y seguir el CLV (tomada / cierre − 1).',
 ];
 
 // ---------------------------------------------------------------- assemble

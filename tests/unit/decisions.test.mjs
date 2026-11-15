@@ -141,6 +141,6 @@ test('ordering, grouping and counts', () => {
 });
 
 test('sheet rule lines split into number and text', () => {
-  assert.deepEqual(parseSheetRule('8. Stake máximo: el menor entre 2u y 1/4 de Kelly.'), { n: 8, text: 'Stake máximo: el menor entre 2u y 1/4 de Kelly.' });
+  assert.deepEqual(parseSheetRule('8. Stake máximo: 3u o 1/4 de Kelly, lo que sea menor.'), { n: 8, text: 'Stake máximo: 3u o 1/4 de Kelly, lo que sea menor.' });
   assert.deepEqual(parseSheetRule('Sin número'), { n: null, text: 'Sin número' });
 });

@@ -38,7 +38,9 @@ Columns are found **by header text, never by position**, so a moved column canno
 4. After the JSON is built the script searches the whole string for `COP` and for a `$` next to a number;
    a hit means a bug: the whole cell is replaced and counted in `meta.redactions`. A `$` with no number
    beside it is not money (one decision quotes a `$(…)` template placeholder) and stays readable.
-5. Units are fine (`Stake (u)`, `Ganancia (u)`, `Stake máx. (u)`): they say nothing about the bankroll.
+5. Units are fine (`Stake (u)`, `Ganancia (u)`, `Stake máx. (u)`): they say nothing about the bankroll in
+   money. `Stake máx. (u)` is ¼ Kelly × the bank in units, so a reader can estimate the bank **in units**,
+   never in money (the unit value is not in the feed).
 6. The repository holds no sheet data. Fixtures are synthetic: invented teams and results, real formats.
 7. `tests/unit/privacy.test.mjs` runs the scrubber on a fixture that has money in every shape above, in
    headers and in text, and fails if any of it survives. It also greps the repo for money patterns (the made-up examples in this file are the only allowed ones).
@@ -72,14 +74,15 @@ lets a reader estimate the bank **in units**, never in money.
 
 ## 3. Feed JSON (schema 1)
 
-`GET <web app URL>` returns `application/json`:
+`GET <web app URL>` returns `application/json` (row counts in the example are the real ones of 15 Nov 2026,
+as the audit read them; Settings shows the live counts):
 
 ```jsonc
 {
   "schema": 1,
   "generatedAt": "2026-11-15T16:00:00Z",   // when the script read the sheet
   "timeZone": "America/Los_Angeles",       // the spreadsheet's time zone (dates are formatted in it)
-  "meta": { "rows": { "bets": 19, "shadow": 700, "grok": 160, "decisions": 124, "pinnacle": 240, "rules": 10 },
+  "meta": { "rows": { "bets": 19, "shadow": 710, "grok": 153, "decisions": 123, "pinnacle": 24, "rules": 10 },
             "redactions": 0, "missingHeaders": [],
             "cached": false,                // true when this JSON came from the script's response cache
             "cacheTtlSeconds": 300 },       // how long a read of the sheet is reused
@@ -89,7 +92,7 @@ lets a reader estimate the bank **in units**, never in money.
     "grok":      { "columns": [...], "rows": [...] },
     "decisions": { "columns": [...], "rows": [...] },
     "pinnacle":  { "columns": [...], "rows": [...] },
-    "rules":     ["2. Stake entre 0,25u y 2u por apuesta.", "..."]
+    "rules":     ["2. <rule text>", "..."]
   }
 }
 ```
@@ -303,8 +306,9 @@ cotizado…`), and `grok_other` when it is empty.
 **Inventory of the real sheet (read only, 15 Nov 2026; counts, no data).** Sombra rows 2–711 (710 rows;
 Estado: Ganada, Perdida, Nula, Pendiente). Grok rows 2–154 (Estado: Ganada, Perdida, Nula, Medio perdida;
 the verdict column starts `Cotizado`, `Cotizado (regla 29)` or `No cotizado`, except four October rows: three `Mercado primero (regla 29)…` / `Mercado primero: …`, classified as priced by rule 29, and one `Marcador exacto no cotizado; …`, classified as not priced; audit, 15 Nov 2026). Apuestas rows 2–20
-(Estado: Ganada, Perdida, Nula). Decisiones rows 2–125 (Estado: Vigente, Provisional, Abierta,
-Reemplazada). Every one of the 710 `Motivo de descarte` values classifies as intended with the table
+(Estado: Ganada, Perdida, Nula). Decisiones rows 2–125 (123 decisions in the feed; Estado: Vigente,
+Provisional, Abierta, Reemplazada). Pinnacle: 24 rows (columns A–Q; an earlier draft of the example
+above said 240). Every one of the 710 `Motivo de descarte` values classifies as intended with the table
 above; the prefixes found were the ones listed plus these filter-reject shapes: `F-gap…`, `F-sample…`,
 `razor…`, `rule 3 razor…`, `Regla 1…`, `regla 1; …`, `Filtro 4…`/`filtro 4…`/`filter 4…`, `filtro 5…`,
 `Muestra (…)`, `Brecha …`, `SKIP: …`, `SKIP (relleno): …`, `Salto: …`, and `CÓRNERS EQUIPO (SHADOW, pasó
@@ -359,6 +363,18 @@ with both sides, exactly as `milestone-reviewer` describes. A row without both s
   settlements); the app only recomputes it in the Simulator.
 - Never show a rate over fewer than 5 graded picks without its `n` next to it.
 
+### Deliberate differences from `review.py`
+
+- **Market breakdowns include VALOR PROP rows.** The app's breakdowns by market (Overview "Sombra por
+  mercado", Analysis and Simulator by market) group every row the filters let through, VALOR PROP and
+  VALOR PROP CASI included. `review.py`'s "BY MARKET" block leaves both out (`not (is_vprop(r) or
+  is_vprop_c(r))`), so the app's corners-total and cards-total rows can show a few more picks than the
+  review. Filter out the two tags to get the review's numbers.
+- **The real-bets yield counts a free bet's stake as staked.** `summarize(bets, { profit: 'sheet' })` takes
+  the profit from the sheet's `Ganancia (u)` (which knows the free bet returns no stake) but adds the row's
+  `Stake (u)` to the staked total like any other bet, so a free bet lowers the yield a little compared with
+  a yield that leaves free-bet stakes out.
+
 ## 8. Derived data used by the screens (added with the integration pass)
 
 - **Exact breakdown links** (`src/data/analysis.js`): `rowPatch(f, dim, key, ctx)` narrows a list field to
@@ -375,7 +391,8 @@ with both sides, exactly as `milestone-reviewer` describes. A row without both s
   catch-all); unit tests use synthetic topics of the same shapes. `THEME_IDS` is a fixed display order.
 - **Staking rules** (Reglas tab, numbered lines): `sheetRuleSlug(line, n)` links by rule number when the
   line still has that rule's keyword (`SHEET_RULE_BY_N`, from the real lines 2–11, read only from
-  `Reglas!A8:A40`; the text is not copied), else by keyword, else the "Reglas (pestaña)" entry.
+  `Reglas!A8:A40` by the polish pass; the text is not copied. Any later read starts at row 10,
+`Reglas!A10:A40`: rule 1, which states the unit value, sits above it), else by keyword, else the "Reglas (pestaña)" entry.
 - **Rules content** (`src/content/rules.*.json`): every rule has `short`, one plain sentence without
   jargon ("En corto"), shown first; a unit test keeps it one sentence and free of jargon and money.
 - **Inline term links** (`src/data/content.js` `buildTermIndex`, `linkTerms`): the glossary's terms and

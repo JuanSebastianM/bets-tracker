@@ -126,7 +126,9 @@ calibration(picks, (p) => p.probModel);          // [{ lo, hi, n, wins, meanProb
 ```
 
 Price bands are disjoint and each one is exactly the price preset of the same id: `lt170` (< 1.70),
-`170_200` (1.70–2.00, 1.70 included), `200_250`, `250_400`, `gt400`. To link a breakdown row to exactly
+`170_200` (1.70–2.00, both ends included), `200_250` (> 2.00, ≤ 2.50), `250_400` (> 2.50, ≤ 4.00), `gt400`.
+Preset labels are built from the bounds by `priceRangeLabel` (filters.js); the Simulator and Analysis
+label a band with the preset of the same id. To link a breakdown row to exactly
 its picks use `exactSlice(picks, filters, patch, ctx)` (filters.js): it adds the graded statuses and,
 only when they change the selection, leaves out PUBLICADA Y APOSTADA and unpriced rows (summarize and
 simulate skip those); `priceBandPatch(band)` is the patch of a band. Lines: `lineLabel(key, { scope })`,
