@@ -8,7 +8,7 @@ import { MARKET_SLUGS } from '../../lib/glossary-links.js';
 import { rowPatch } from '../../data/analysis.js';
 import { formatUnits, formatPct, formatPrice, formatDate, formatMonth, formatRecord, todayIn, signClass } from '../../lib/format.js';
 import { explorerHref } from '../../lib/links.js';
-import { exactSlice, priceBandPatch } from '../../data/filters.js';
+import { exactSlice, priceBandPatch, PRICE_PRESETS } from '../../data/filters.js';
 import { compareLineKeys, lineLabel } from '../../data/lines.js';
 import { APP_TIMEZONE } from '../../config.js';
 import { priceBand } from '../../data/stats.js';
@@ -122,7 +122,7 @@ export function BreakdownBlock({ sim, filters, picks, today }) {
   const rows = dim === 'line' ? [...raw].sort((x, y) => compareLineKeys(String(x.key), String(y.key))) : raw;
   const multiScope = dim === 'line' && new Set(rows.map((r) => String(r.key).split(':')[0])).size > 1;
   const labelOf = (/** @type {string} */ k) =>
-    dim === 'tag' ? tagLabel(/** @type {any} */ (k)) : dim === 'market' ? t(`markets.${k}`) : dim === 'line' ? lineLabel(k, { scope: multiScope }) : t(`simulator.bands.${k}`);
+    dim === 'tag' ? tagLabel(/** @type {any} */ (k)) : dim === 'market' ? t(`markets.${k}`) : dim === 'line' ? lineLabel(k, { scope: multiScope }) : (PRICE_PRESETS.find((p) => p.id === k)?.label || k);
   const patchOf = (/** @type {string} */ k) => {
     if (dim === 'tag') return { tags: [k] };
     if (dim === 'market') return { markets: [k] };

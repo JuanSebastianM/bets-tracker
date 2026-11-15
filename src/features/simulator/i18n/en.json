@@ -163,14 +163,6 @@
     "month": "Month",
     "record": "Record"
   },
-  "bands": {
-    "le170": "≤ 1.70",
-    "170_200": "1.70–2.00",
-    "200_250": "2.00–2.50",
-    "250_400": "2.50–4.00",
-    "gt400": "> 4.00",
-    "lt170": "< 1.70"
-  },
   "breakdown": {
     "title": "Breakdown",
     "summary": "by tag, market and price",

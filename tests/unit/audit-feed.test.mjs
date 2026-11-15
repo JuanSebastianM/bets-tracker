@@ -1,4 +1,4 @@
-// Audit of apps-script/Feed.gs (docs/build-log/audit.md): money shapes the first scrubber missed, money
+// Audit of apps-script/Feed.gs (docs/BUILD_LOG.md, "Independent audit"): money shapes the first scrubber missed, money
 // typed into number columns, duplicate whitelisted headers, and a doGet that ignores its parameters and
 // only reads. Money examples live in tests/fixtures/privacy-money.json (auditTexts), never here.
 import { test } from 'node:test';

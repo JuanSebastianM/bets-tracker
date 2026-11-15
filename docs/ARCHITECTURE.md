@@ -111,7 +111,8 @@ on the Overview and Settings (Settings lists the columns).
 ### Filters (shared by Explorer and Simulator)
 
 Source; tag (multi); market family and raw market; league; book; status; price range with presets
-(≤1.70, 1.70–2.0, ≤2.0, 2.0–2.5, ≤2.5, 2.5–4.0, >4.0) and custom min/max; date range with presets (last
+(`≤ 1.70`; `1.70–2.00`; `< 2.00`; `≤ 2.00`; `> 2.00, ≤ 2.50`; `≤ 2.50`; `> 2.50, ≤ 4.00`; `≤ 4.00`; `> 4.00`; each
+label is built from its bounds by `priceRangeLabel`, and "a–b" means both ends included) and custom min/max; date range with presets (last
 slate, 7 days, 30 days, this month, since a date) and single slate date; has closing price; has two-sided
 close; reference (`ref feed`, books, one book); sample (10+, 6–9); FUERZA (keeps, rejects); filter
 reason (for `filtro` rows); EV range; model probability range; free-text search (match, league, notes).

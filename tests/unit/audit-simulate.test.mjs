@@ -1,4 +1,4 @@
-// Audit (docs/build-log/audit.md): the Simulator's staking modes, drawdown and streaks on small
+// Audit (docs/BUILD_LOG.md, "Independent audit"): the Simulator's staking modes, drawdown and streaks on small
 // sequences computed by hand. Synthetic picks only.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

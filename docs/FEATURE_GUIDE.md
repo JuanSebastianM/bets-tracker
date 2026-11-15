@@ -29,7 +29,7 @@ On a `feat/<id>` branch, only:
 - `tests/unit/<id>*.test.mjs`, `tests/e2e/<id>*.spec.js`
 - `src/content/**` (Glossary only: `glossary.{es,en}.json`, `rules.{es,en}.json`)
 - `src/data/summaries.js` (Overview only, to add sentence builders) and their strings under `summaries`
-- `docs/build-log/<id>.md` (your entry; `docs/BUILD_LOG.md` is the orchestrator's)
+- `docs/build-log/<id>.md` (your entry, in a new file; the orchestrator folds it into `docs/BUILD_LOG.md`, the one log)
 
 Everything else is shared (`src/lib`, `src/data`, `src/styles`, `src/i18n`, `src/app.js`, `index.html`,
 `sw.js`, workflows, `tests/e2e/helpers.js`, `tests/unit/helpers/*`, the fixture generator). If you need a
@@ -126,7 +126,9 @@ calibration(picks, (p) => p.probModel);          // [{ lo, hi, n, wins, meanProb
 ```
 
 Price bands are disjoint and each one is exactly the price preset of the same id: `lt170` (< 1.70),
-`170_200` (1.70–2.00, 1.70 included), `200_250`, `250_400`, `gt400`. To link a breakdown row to exactly
+`170_200` (1.70–2.00, both ends included), `200_250` (> 2.00, ≤ 2.50), `250_400` (> 2.50, ≤ 4.00), `gt400`.
+Preset labels are built from the bounds by `priceRangeLabel` (filters.js); the Simulator and Analysis
+label a band with the preset of the same id. To link a breakdown row to exactly
 its picks use `exactSlice(picks, filters, patch, ctx)` (filters.js): it adds the graded statuses and,
 only when they change the selection, leaves out PUBLICADA Y APOSTADA and unpriced rows (summarize and
 simulate skip those); `priceBandPatch(band)` is the patch of a band. Lines: `lineLabel(key, { scope })`,
@@ -355,7 +357,7 @@ test('explorer filters by tag', async ({ page }) => {
 - Don't write to the sheet, call Google APIs, or add a CDN or a library (vendored libs go through the
   vendor workflow).
 - Don't use colour alone for meaning; won/lost also differ by icon or sign.
-- Do write your entry in `docs/build-log/<id>.md`: what you built, decisions and why, problems solved.
+- Do write your entry in `docs/build-log/<id>.md` (folded into `docs/BUILD_LOG.md` at merge): what you built, decisions and why, problems solved.
 
 ## 10. Linking to the Glossary and the Decisions
 

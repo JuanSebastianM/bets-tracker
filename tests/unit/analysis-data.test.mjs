@@ -383,7 +383,7 @@ test('grokByVerdict groups Grok picks by kind with the reason split', () => {
     g('Cotizado: modelo 50% vs mercado 40% → SKIP: F-gap', 'won'),
     g('Cotizado: modelo 50% vs mercado 40% → SHADOW', 'lost'),
     g('Cotizado (regla 29): VALOR Betano 2.1', 'won'),
-    g('No cotizado: mercado no modelado por el script', 'lost'),
+    g('No cotizado: mercado fuera del script', 'lost'),
     g('No cotizado: muestra corta', 'pending'),
     g('', 'won'),
     mkPick({ source: 'shadow' }),

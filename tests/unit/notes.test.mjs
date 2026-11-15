@@ -115,7 +115,7 @@ test('measures: own-book close first, then the bet365 feed; raw CLV same source 
   near(m2.openingFairEv, 1.833 * 0.5 - 1);
 
   // One-sided close: CLV yes, fair-close EV no.
-  const r3 = row('Precio feed Sofascore (bet365/RushBet). | cierre: Sofascore/bet365 7', { market: 'Empate no apuesta', price: 4.333 });
+  const r3 = row('Precio feed Sofascore (bet365). | cierre: Sofascore/bet365 7', { market: 'Empate no apuesta', price: 4.333 });
   const m3 = measure(r3, parseNotes(r3));
   assert.equal(m3.fairCloseEv, null);
   assert.equal(m3.hasTwoSidedClose, false);
@@ -128,7 +128,7 @@ test('measures: own-book close first, then the bet365 feed; raw CLV same source 
   assert.equal(m4.clv, null);
 
   // Sheet close column G used as the feed close when the note lacks it (raw CLV only).
-  const r5 = { ...row('Precio feed Sofascore (bet365/RushBet).', { price: 2.5 }), closePriceColumn: 2.7 };
+  const r5 = { ...row('Precio feed Sofascore (bet365).', { price: 2.5 }), closePriceColumn: 2.7 };
   near(measure(r5, parseNotes(r5)).clv, 2.5 / 2.7 - 1);
 
   // On every row fair-close EV never exceeds raw CLV at the same source (review.py's sanity check).
