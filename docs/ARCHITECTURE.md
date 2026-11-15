@@ -34,13 +34,16 @@ src/
   config.js             FEED_URL, schema version
   version.js            stamped by the deploy
   data/                 feed.js, normalize.js, tags.js, notes.js, filters.js, stats.js, simulate.js,
-                        summaries.js, store.js (signals/state), settings.js (localStorage)
-  lib/                  ui/ (kit: Card, Chip, Sheet, Table, Stat, Empty, Banner…), charts/, format.js, i18n.js
-  features/             one folder per section (see Sections)
+                        summaries.js, store.js (signals/state), settings.js (localStorage),
+                        tests-config.js (frozen tests, review schedule), types.d.ts
+  lib/                  ui/ (kit, see docs/FEATURE_GUIDE.md), charts/, format.js, i18n.js, router.js,
+                        store.js, storage.js, pwa.js, toast.js, theme-boot.js
+  features/             one folder per section (see Sections) + registry.js
   i18n/                 es.json, en.json (same keys; checked by scripts/check-i18n.mjs)
   content/              glossary.es.json, glossary.en.json, rules.es.json, rules.en.json
   styles/               tokens.css (light + dark), base.css, components.css
-scripts/                bin.mjs, serve.mjs, build-site.mjs, check-i18n.mjs, make-icons.mjs, vendor-build.mjs
+scripts/                bin.mjs, serve.mjs, build-site.mjs, check-i18n.mjs, make-icons.mjs, vendor-build.mjs,
+                        make-fixture.mjs (regenerates tests/fixtures/feed.json, deterministic)
 tests/
   fixtures/             synthetic feed JSON (never real sheet data)
   unit/                 *.test.mjs
@@ -51,7 +54,10 @@ docs/                   ARCHITECTURE.md, DATA_CONTRACT.md, FEATURE_GUIDE.md
 ## Data flow and state
 
 1. On start the app shows the cached feed (IndexedDB) at once, then fetches the live feed and swaps it in.
-   A "last synced" stamp and a refresh button are always visible. Offline: the cache, with a banner.
+   A "last synced" stamp, the feed's "sheet read at" time (`generatedAt`) and a refresh button are always
+   visible. Offline: the cache, with a banner. The script itself caches its answer for 5 minutes
+   (`meta.cacheTtlSeconds`, DATA_CONTRACT "Abuse and limits"), so a refresh can bring data up to 5 minutes
+   old; "sheet read at" says how old.
 2. `normalize.js` builds `Pick[]` once per feed; everything else derives from it with pure functions.
 3. Filter state is one plain object (`src/data/filters.js`), serialisable to the URL hash query, so a
    filtered view can be bookmarked or shared and the Explorer and the Simulator share the same filters.
@@ -72,6 +78,7 @@ docs/                   ARCHITECTURE.md, DATA_CONTRACT.md, FEATURE_GUIDE.md
 | `#/decisions` | `features/decisions` (Decisiones) | The decision log as a searchable timeline, with state chips, and the staking rules |
 | `#/glossary` | `features/glossary` (Glosario) | Betting terms, the sheet's own tags and abbreviations, and every betting-analyst rule in plain words; searchable, deep-linkable (`#/glossary/near-value`); terms elsewhere in the app link here |
 | `#/settings` | `features/settings` (Ajustes) | Language, theme, bankroll and unit, feed status (rows per tab, redactions, missing headers), about |
+| `#/more` | shell (`src/app.js`) | Phones only in practice: the list of the sections that are not in the bottom bar |
 
 Phones get a bottom bar (Resumen, Explorador, Simulador, Tests, Más); wide screens a side rail.
 
@@ -105,7 +112,7 @@ The sheet has no slate *run* date, so "slate date" is the match date.
 
 ## Checks and deploy
 
-`npm run check` = typecheck + unit tests + i18n parity + privacy test + e2e smoke. CI runs it on every
+`npm run check` = typecheck + unit tests (the privacy test is one of them) + i18n parity + e2e smoke. CI runs it on every
 push; on `main`, when it passes, CI assembles `_site`, stamps `sw.js` and `src/version.js` with the commit
 and deploys to GitHub Pages. Feature work happens on `feat/<name>` branches merged into `main` by the
 orchestrator after review.

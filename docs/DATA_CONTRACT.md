@@ -19,7 +19,7 @@ Spreadsheet "Bets Tracker with Claude". Tabs and what the app does with them:
 | `Sombra` | yes | shadow picks (nothing staked); the tag is the start of `Motivo de descarte` |
 | `Grok` | yes | Grok's picks and our verdict on each |
 | `Decisiones` | yes | decision log |
-| `Reglas` | partly | only the numbered rule lines, and never rule 1 (it states the unit value and the bank) |
+| `Reglas` | partly | only the numbered lines below the cell `Reglas` in column A, and never rule 1 (it states the unit value and the bank); nothing above that header (the money block `A1:B7`) is published |
 | `Pinnacle` | yes | columns A–Q only (Pinnacle 1X2 open and last price per match) |
 | `Bank`, `Resumen mensual`, `Por mercado`, `Por liga` | **never** | money tabs and summaries; the app recomputes every summary from `Apuestas` in units |
 
@@ -52,9 +52,12 @@ reads the live feed for that; the durable fix is to not write balances in notes.
 ```jsonc
 {
   "schema": 1,
-  "generatedAt": "2026-11-15T16:00:00Z",
-  "meta": { "rows": { "bets": 19, "shadow": 700, "grok": 160, "decisions": 124, "pinnacle": 240 },
-            "redactions": 0, "missingHeaders": [] },
+  "generatedAt": "2026-11-15T16:00:00Z",   // when the script read the sheet
+  "timeZone": "America/Los_Angeles",       // the spreadsheet's time zone (dates are formatted in it)
+  "meta": { "rows": { "bets": 19, "shadow": 700, "grok": 160, "decisions": 124, "pinnacle": 240, "rules": 10 },
+            "redactions": 0, "missingHeaders": [],
+            "cached": false,                // true when this JSON came from the script's response cache
+            "cacheTtlSeconds": 300 },       // how long a read of the sheet is reused
   "tabs": {
     "bets":      { "columns": ["row", "id", "date", ...], "rows": [[2, 1, "2026-10-02", ...], ...] },
     "shadow":    { "columns": [...], "rows": [...] },
@@ -99,8 +102,34 @@ evidencia→`evidence`, Cómo y cuándo se revisa→`review`, Estado→`status`.
 
 **Reglas** (`rules`): the numbered rule lines as an array of strings, without rule 1.
 
-A whitelisted header that is missing from the sheet is listed in `meta.missingHeaders` and its key is
-`null` in every row; the app shows a banner instead of failing.
+A whitelisted header that is missing from the sheet is listed in `meta.missingHeaders` (as
+`Tab!Header`; a missing tab as `Tab`) and its key is `null` in every row; the app shows a banner instead of
+failing. A script error is answered as `{ "schema": 1, "error": "…" }` and the app shows it.
+
+Value conversion details (Apps Script `getValues()` types): `Date` cells are formatted in the spreadsheet
+time zone; time-only cells (Grok `Hora`) arrive as 1899 dates and become `HH:mm`; date serials and
+`d/m/Y` text become `YYYY-MM-DD`; percentage cells arrive as fractions; numbers stored as text are parsed
+(`"+2.74"` → 2.74, `"59.70%"` → 0.597, `"1,91"` → 1.91); a probability written as `59.7` becomes 0.597; a
+numeric cell holding money text (`$…`, `COP`, `pesos`) becomes `null` and counts as a redaction.
+Pinnacle's `*_utc` cells stay ISO text (a `Date` becomes ISO UTC) and `kickoff_bogota` stays `YYYY-MM-DD HH:mm`.
+
+### Abuse and limits
+
+The web app URL is public ("anyone can access") and every call runs under the owner's Apps Script quota
+(about 30 simultaneous executions per user, plus a daily total runtime). To keep a burst of requests from
+reading the sheet over and over:
+
+- `doGet` answers from `CacheService` for `cacheTtlSeconds` (300 s) and reads the sheet only on a miss. The
+  JSON is stored in chunks (30,000 characters each, under the 100 KB value limit) with an index entry; a
+  missing chunk is a miss; the cache keys carry the schema number. On a miss a script lock (`tryLock`,
+  3 s) lets one call build while the others wait and re-check the cache; a caller without the lock builds
+  anyway. Any cache or lock failure falls through to a fresh build.
+- No request parameter bypasses the cache: `doGet` ignores them. So the app's refresh can return data up
+  to 5 minutes old; the shell shows "sheet read at" (`generatedAt`) next to "last synced". The owner can
+  force a fresh read by running `btFeedClearCache()` in the editor.
+- Kill switch: Deploy → Manage deployments → archive the deployment (the URL stops at once), create a new
+  deployment, put the new URL in `src/config.js`, push. The installed app keeps showing its cached copy
+  meanwhile.
 
 ## 4. The unified `Pick`
 
@@ -147,9 +176,41 @@ interface Pick {
 goles equipo), `corners_total`, `corners_team`, `cards_total`, `cards_team`, `shots` (tiros, tiros al
 arco, equipo o partido), `combo` (dobles, builders), `other`. The raw text is always kept and shown.
 
-Status mapping: `Ganada`→won, `Perdida`→lost, `Nula`/`Push`/`Devuelta`→void, `Media ganada`→half_won,
-`Media perdida`→half_lost, `Pendiente` or empty→pending, anything else→other (shown, never counted).
-The foundation task lists every distinct `Estado` in the three tabs and extends this table if needed.
+Status mapping: `Ganada`→won, `Perdida`→lost, `Nula`/`Push`/`Devuelta`/`Anulada`→void, `Medio ganada`
+(also `Media ganada`)→half_won, `Medio perdida` (also `Media perdida`)→half_lost, `Pendiente` or
+empty→pending, anything else→other (shown, never counted). The sheet writes **Medio** ganada/perdida
+(betting-analyst, Grading; review.py), not *Media*.
+
+Fields added to the Pick by the foundation (see `src/data/types.d.ts`): `reviewClass` (review.py's market
+groups: result, goals, corners, team_corners, cards, shots — the frozen tests use these, not
+`MarketFamily`), `side` (over / under / ''), `extra` (source-specific fields: Apuestas `type`, `confidence`,
+`result`, `freeBet`…; Grok `verdict`, `reason`, `minPrice`, `result`) and the measures `clvSource`,
+`openingFairEv`, `closeMargin`, `evVsFeed`, `need`, `hasTwoSidedClose` (section 6).
+
+Definitions that follow review.py rather than the first draft of this contract:
+
+- `fairCloseEv` is review.py's *price-vs-close EV* (`pvc`): `price × p − 1` with p the proportionally
+  de-vigged close at the row's own book when the notes have a two-sided clv-logger close there, otherwise
+  the two-sided bet365 feed close. This is the measure of the frozen tests.
+- `clv` is raw CLV at the **same source** (opening / close − 1): own book first, then the feed ("feed X" or
+  the price itself when it is the feed's, against G or the noted feed close), then the IA-WATCH book
+  opening. A book price is never compared with the bet365 close. Apuestas: only a close at the bet's book
+  counts; rows whose close is noted "cierre: Sofascore/bet365" are cross-source (`extra.clvCrossSource`)
+  and get `clv: null`.
+- `closePrice`: Sombra G, else the own-book close in the notes; Apuestas V; Grok the own-book close, else
+  the feed close.
+- Grok `books`: the book whose price equals `Cuota` in the notes (review.py's price_source).
+
+`MarketFamily` mapping of the raw `Mercado` values seen in the three tabs (15 Nov 2026): result = `1X2`,
+`1X2 1er tiempo`, `1X2 2.º tiempo` / `1X2 2º tiempo`, `1X2 (pago anticipado 2 goles)`, `Doble
+oportunidad`, `Empate no apuesta`, `Hándicap asiático`; goals = `Goles`, `Goles totales`, `Goles
+(asiático)`, `Goles equipo`, `Goles 1er tiempo`, `BTTS`, `Ambos marcan`, `Ambos anotan`; corners_total =
+`Córners totales`; corners_team = `Córners equipo`, `Córners 1X2`, `Más córners (equipo)`, `Más córners
+2.º tiempo`; cards_total = `Tarjetas totales`; cards_team = `Tarjetas equipo`, `Tarjetas 1X2`, `Más
+tarjetas (3 vías)`; shots = `Tiros (equipo)`, `Tiros al arco (equipo)`, `Tiros (total)`, `Tiros totales`,
+`Tiros equipo`, `Tiros al arco equipo`, `Tiros al arco (total)`, `Tiros al arco totales`; combo = Apuestas
+rows of type `Doble` or `Crear apuesta`, and markets joined with `+`/`×` (`Goles + córners`); other =
+`Marcador correcto`, `Primer goleador` and anything unknown.
 
 ## 5. Tags
 
@@ -171,14 +232,33 @@ in this order:
 | `team_corners` | `CÓRNERS EQUIPO` | team-corners test |
 | `corner_rejects` | `CÓRNERS RECHAZO` | corner rejects priced 1.70–2.0 |
 | `model_only_shots` | `MODELO SOLO` | model-only shots pick |
-| `shadow_rule30` | `SHADOW (pasó todos los filtros, regla 30)` | passed every filter, held by the rule 30 pause |
+| `shadow_rule30` | `SHADOW` and (`regla 30` or `pasó todos los filtros`) | passed every filter, held by the rule 30 pause (also the early forms `SHADOW: córners pausados (regla 30)`) |
 | `shadow` | `SHADOW` | other shadow picks (new market, short sample) |
 | `ai_watch` | `IA-WATCH` | Sofascore AI watch rows (stopped) |
-| `filter_reject` | anything else | rejected by a filter (Filtro 4/5, regla 23, brecha, ratio, muestra, razor…) |
+| `low_edge` | `Pasó todos los filtros` / `Stake <` | passed the filters but the stake fell under the 0.25u minimum (3 early rows, 9–10 Oct) |
+| `filter_reject` | anything else | rejected by a filter (Filtro 4/5, regla 23, brecha, ratio, muestra, razor, `SKIP`, `Salto`…) |
 
-`filter_reject` rows also get `parsed.filters: string[]` (`filter4`, `filter5`, `rule23`, `gap`, `ratio`,
-`sample`, `razor`, …) so the Explorer can filter by reason. `Apuestas` rows get tag `bet`; `Grok`
-rows get `grok_priced` / `grok_not_priced` from `Nuestro veredicto` (`Cotizado` / `No cotizado`).
+Matching is on the start of the text, upper-cased (as review.py does): a row whose reason starts with the
+filters and mentions `SHADOW` later (an early format) is `filter_reject`. `VALOR:` needs the colon so that
+`VALOR CASI` and `VALOR PROP` never land in `value`.
+
+Every model row (review.py's `is_model`: not IA-WATCH, not price-first, not published; MODELO SOLO
+excluded) gets `parsed.filters: string[]` from review.py's REASONS — `gap`, `ratio`, `sample`, `razor`,
+`filter4`, `filter5`, `rule1`, `rule18`, `rule23` — plus `low_stake`; the reason text is joined with the
+reason tags older rows kept in the notes (`también F-gap; filtro 5`). `Apuestas` rows get tag `bet`;
+`Grok` rows get `grok_priced` / `grok_not_priced` from `Nuestro veredicto` (`Cotizado…` / `No
+cotizado…`), and `grok_other` when it is empty.
+
+**Inventory of the real sheet (read only, 15 Nov 2026; counts, no data).** Sombra rows 2–711 (710 rows;
+Estado: Ganada, Perdida, Nula, Pendiente). Grok rows 2–154 (Estado: Ganada, Perdida, Nula, Medio perdida;
+the verdict column always starts `Cotizado`, `Cotizado (regla 29)` or `No cotizado`). Apuestas rows 2–20
+(Estado: Ganada, Perdida, Nula). Decisiones rows 2–125 (Estado: Vigente, Provisional, Abierta,
+Reemplazada). Every one of the 710 `Motivo de descarte` values classifies as intended with the table
+above; the prefixes found were the ones listed plus these filter-reject shapes: `F-gap…`, `F-sample…`,
+`razor…`, `rule 3 razor…`, `Regla 1…`, `regla 1; …`, `Filtro 4…`/`filtro 4…`/`filter 4…`, `filtro 5…`,
+`Muestra (…)`, `Brecha …`, `SKIP: …`, `SKIP (relleno): …`, `Salto: …`, and `CÓRNERS EQUIPO (SHADOW, pasó
+todos los filtros)` (team corners). One early filter-reject row notes in its reason that Juan also bet it
+(it is also in Apuestas); it is not tagged `published_bet`.
 
 The parser must classify every real row: the foundation task reads `Sombra!L:L` (read only) and checks
 that nothing unexpected lands in `filter_reject`. `betting-review`'s `review.py` is the reference for how reviews
@@ -198,8 +278,13 @@ betting-analyst skill:
 | `fuerza` (`keeps` / `rejects` / `na`; sheet words MANTIENE / RECHAZA), `fuerzaExpected`, `fuerzaProb` | `FUERZA: esperado 3.11, prob 37.1%, RECHAZA (…)` |
 | `pin` (`{home, draw, away, readUtc, id}`) or `pinMissing` | `pin 3.54/3.76/2.00 (2026-11-13T22:05:00Z) \| pin id 0380…`, `pin n/d (sin partido)` |
 | `open1x2` | `1X2 apertura feed 1.80/3.50/4.20` |
-| `close` (`{price, source, book, other}`) | `cierre: Sofascore/bet365 1.83`, plus the other side's close when logged |
-| `bookPrices` (`{book, price, other}[]`) | each book's price for the line, when written |
+| `close` (`{price, source, book, others, triple}`) | `cierre: Sofascore/bet365 1.80 (otro lado 1.91)`; three-way `… 1.68 (1 4.75 / X 3.70 / 2 1.68)`; double chance `… (1X2 a/b/c)`; one-sided `cierre: Sofascore/bet365 7` (no fair-close EV) |
+| `closeMissing` | `cierre feed: sin línea 4.5 (feed sin mercado de tarjetas)` |
+| `bookCloses` (`{[book]: {close, others, triple}}`), `loggerClv`, `loggerClvBook`, `loggerEv`, `loggerEvOtherBook` | clv-logger: `Cierre Betano 2.42 (X 3.2, 2 3.0); Betsson …; 13 nov 14:23 6 min antes \| CLV +2.07% vs Betano \| EV justa -3.63%` (Grok writes `CLV … vs Cuota (Betano)`; `EV justa … (otro lado de Betsson)` is the lower-quality other-book figure) |
+| `bookPrices` (`{book, price, other, unavailable}[]`) | `Betano 1.82 \| Betsson 1.78 (over 1.9) \| Stake sin línea`, before any close segment |
+| `priceSource` | where the price came from: `feed` (`Precio feed Sofascore…`, `bet365 feed`, IA-WATCH) or a book (`Precio Betano`, the VALOR book, the book whose noted price equals F) |
+| `modelMean`, `aiMean`, `singleSource` | `media modelo 9.83`, `IA media 9`, `una sola fuente` |
+| `passedAll` | `pasó todos los filtros` in the reason or the notes (review.py's passed_all) |
 
 `fairCloseEv` uses the same-book close when the row has one and the bet365 feed close otherwise, de-vigged
 with both sides, exactly as `milestone-reviewer` describes. A row without both sides has `null`.
@@ -209,8 +294,14 @@ with both sides, exactly as `milestone-reviewer` describes. A row without both s
 - Flat profit of a graded pick at stake `s`: won `s × (price − 1)`, lost `−s`, void `0`,
   half_won `s × (price − 1) / 2`, half_lost `−s / 2`.
 - Yield = total profit / total staked, over graded picks (won, lost, void, halves). Voids count as staked.
-- Hit rate = won / (won + lost); halves count 0.5.
-- Break-even hit rate at average price `p`: `1 / p`.
+  Graded picks without a price are left out (counted as `unpriced`); `PUBLICADA Y APOSTADA` rows are left
+  out of every Sombra figure (they are in Apuestas).
+- Hit rate = wins / (wins + losses) where a half win adds 0.5 to wins and a half loss 0.5 to losses.
+- Break-even hit rate: the mean of `1 / price` over the graded picks (review.py), which equals `1 / p` when
+  every price is the same.
+- Means of per-row measures (CLV, fair-close EV) are reported with `n`, the SE **clustered by match**
+  (rows with the same date + match form one cluster, milestone-reviewer's formula), ±2 SE and z. The flat
+  yield's SE is the plain SD of per-pick profit / √n (review.py's plain_se).
 - CLV = `price / closePrice − 1`. Fair-close EV as above. Means are reported with `n` and ± 2 standard errors.
 - Drawdown: peak-to-trough of the cumulative curve, in units and as % of the bankroll in Settings.
 - Real bets (`Apuestas`): profit is the sheet's `Ganancia (u)` (it knows about free bets and odd
