@@ -65,6 +65,10 @@ export function classifyGrok(verdict) {
   const v = String(verdict || '').trim().toLowerCase();
   if (v.startsWith('no cotizado')) return 'grok_not_priced';
   if (v.startsWith('cotizado')) return 'grok_priced';
+  // Early rows (Oct 2026, audit): "Mercado primero (regla 29): …" is a rule-29 pricing, and
+  // "Marcador exacto no cotizado; …" says the market was not priced.
+  if (v.startsWith('mercado primero')) return 'grok_priced';
+  if (/^[^:;→]*\bno cotizad[oa]/.test(v)) return 'grok_not_priced';
   return 'grok_other';
 }
 

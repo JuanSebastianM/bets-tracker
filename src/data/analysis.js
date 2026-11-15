@@ -549,13 +549,15 @@ export function grokVerdict(text) {
   const colon = raw.indexOf(':');
   out.detail = colon >= 0 ? raw.slice(colon + 1).trim() : '';
   const detail = fold(out.detail);
-  if (low.startsWith('no cotizado')) {
+  // Early rows (audit): "Marcador exacto no cotizado; …" is not priced; "Mercado primero …" is rule 29.
+  if (low.startsWith('no cotizado') || /^[^:;→]*\bno cotizad[oa]/.test(low)) {
     out.kind = 'not_priced';
     out.why = (NOT_PRICED_WHY.find(([, re]) => re.test(detail)) || ['other'])[0];
     return out;
   }
-  if (!low.startsWith('cotizado')) return out;
-  out.kind = /^cotizado\s*\(\s*(regla|rule)\s*29\s*\)/.test(low) ? 'priced_rule29' : 'priced';
+  const marketFirst = low.startsWith('mercado primero');
+  if (!low.startsWith('cotizado') && !marketFirst) return out;
+  out.kind = marketFirst || /^cotizado\s*\(\s*(regla|rule)\s*29\s*\)/.test(low) ? 'priced_rule29' : 'priced';
   const pm = low.match(/model[o]?\s+([\d.,]+)\s*%\s*vs\.?\s*(?:mercado|market)\s+([\d.,]+)\s*%/);
   if (pm) {
     out.model = Number(pm[1].replace(',', '.')) / 100;
@@ -568,7 +570,7 @@ export function grokVerdict(text) {
     out.why = 'skip';
     out.filters = FILTER_REASONS.filter(([, re]) => re.test(after)).map(([id]) => id);
   } else if (/shadow|pas[oó] todos/.test(a)) out.why = 'shadow';
-  else if (/sin valor|no value|bajo la justa|debajo de la justa|no hay valor/.test(a)) out.why = 'no_value';
+  else if (/sin valor|no value|bajo la justa|debajo de la justa|no hay valor|^valor\s*[-−]/.test(a)) out.why = 'no_value';
   else if (/valor casi|near value/.test(a)) out.why = 'near_value';
   else if (/\bvalor\b|\bvalue\b/.test(a)) out.why = 'value';
   else if (/apuesta|apostad|\bbet\b|stake\s+[\d.,]+\s*u/.test(a)) out.why = 'bet';
