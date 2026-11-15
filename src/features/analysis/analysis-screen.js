@@ -5,6 +5,7 @@
 // can link here with a filter (`#/analysis?tag=near_value&date=30d`).
 import { html, useMemo, useState } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
+import { SIDE_PANEL_QUERY } from '../../lib/links.js';
 import { navigate, href } from '../../lib/router.js';
 import {
   FeedGate, BottomSheet, Button, Disclosure, FilterPanel, ActiveFilters, FilterButton, SavedFilters, useMediaQuery,
@@ -22,7 +23,7 @@ import { GrokVsClaude } from './grok.js';
 /** @typedef {import('../../data/filters.js').FilterState} FilterState */
 /** @typedef {import('./view.js').View} View */
 
-const SIDE_QUERY = '(min-width: 1200px)';
+const SIDE_QUERY = SIDE_PANEL_QUERY;
 
 /** @param {{ data: import('../../data/types').Dataset, query: Record<string, string>, part: string, bare: boolean }} props */
 function Analysis({ data, query, part, bare }) {

@@ -132,3 +132,9 @@ export function formatScore(x, digits = 3) {
   if (bad(x)) return '–';
   return Number(x).toFixed(digits);
 }
+
+/**
+ * CSS class of a signed figure: 'pos', 'neg' or '' (null, zero, or within `eps` of zero).
+ * @param {number | null | undefined} v @param {number} [eps]
+ */
+export const signClass = (v, eps = 0) => (v == null || Math.abs(v) <= eps ? '' : v > 0 ? 'pos' : 'neg');

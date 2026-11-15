@@ -7,7 +7,7 @@ import {
   Disclosure, Button, IconButton, BottomSheet, DataTable, TextField, Icon, FilterPanel, ActiveFilters, FilterButton,
 } from '../../lib/ui/index.js';
 import { MultiLineChart } from '../../lib/charts/index.js';
-import { formatUnits, formatPct, formatPrice, formatDate } from '../../lib/format.js';
+import { formatUnits, formatPct, formatPrice, formatDate, signClass } from '../../lib/format.js';
 import { applyFilters, countActive, activeEntries, defaultFilters } from '../../data/filters.js';
 import { useSettings, savePreset, deletePreset } from '../../data/settings.js';
 import { simulate, alignDaily, compareTotals, scenarioQueryString, scenariosFromQuery, parseQueryString, hasStaking } from '../../data/simulate.js';
@@ -18,7 +18,8 @@ import { StakingControls, stakingLabel } from './staking-controls.js';
 /** @typedef {import('../../data/simulate.js').Staking} Staking */
 /** @typedef {import('../../data/simulate.js').SimResult} SimResult */
 
-const pos = (/** @type {number | null} */ v) => (v == null || Math.abs(v) < 0.005 ? '' : v > 0 ? 'pos' : 'neg');
+/** Sign class; figures that round to 0.00 get none. @param {number | null} v */
+const pos = (v) => signClass(v, 0.0049);
 
 /** A scenario in a few words: its active filters and its plan. @param {Scenario} sc */
 export function scenarioText(sc) {

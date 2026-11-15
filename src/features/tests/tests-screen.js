@@ -4,11 +4,11 @@
 import { html, useMemo, useEffect, useRef } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
 import { href, navigate } from '../../lib/router.js';
+import { explorerHref } from '../../lib/links.js';
 import { Card, FeedGate, DataTable, Disclosure, TagBadge, DecisionLink } from '../../lib/ui/index.js';
 import { formatDate, formatPct, formatRecord, todayIn } from '../../lib/format.js';
 import { formatNumber } from '../../lib/i18n.js';
 import { APP_TIMEZONE } from '../../config.js';
-import { defaultFilters, toQueryString } from '../../data/filters.js';
 import {
   FROZEN_RULE, FROZEN_TESTS, SHADOW_REVIEW, frozenProgress, nextShadowReview, frozenProjection, waitingFor,
   testsOverview, shadowReviewHistory, shadowReviewParts, PRICE_FIRST_TESTS, priceFirstProgress, VALUE_RULE, PROP_RULE,
@@ -20,8 +20,6 @@ import { Icon } from '../../lib/ui/index.js';
 /** @typedef {import('../../data/types').Dataset} Dataset */
 /** @typedef {ReturnType<typeof frozenProgress>} FrozenProgress */
 
-/** @param {Partial<import('../../data/filters.js').FilterState>} f */
-const explorerHref = (f) => href(`/explorer?${toQueryString({ ...defaultFilters(), ...f })}`);
 const z2 = (/** @type {number | null} */ z) => (z == null ? '–' : formatNumber(z, { minimumFractionDigits: 2, maximumFractionDigits: 2, signDisplay: 'exceptZero' }, 'en').replace('-', '−'));
 /** Link that opens one test in the list (`#/tests?open=<id>`). @param {string} id */
 export const testHref = (id) => href(`/tests?open=${encodeURIComponent(id)}`);

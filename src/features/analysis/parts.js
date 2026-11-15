@@ -1,9 +1,7 @@
 // Small pieces shared by the four parts of the Analysis section.
 import { html, useId } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
-import { href } from '../../lib/router.js';
-import { formatPct, formatRecord } from '../../lib/format.js';
-import { toQueryString } from '../../data/filters.js';
+import { formatPct, formatRecord, signClass } from '../../lib/format.js';
 
 /** @typedef {import('../../data/stats.js').Summary} Summary */
 /** @typedef {import('../../data/stats.js').MeanStat} MeanStat */
@@ -11,11 +9,9 @@ import { toQueryString } from '../../data/filters.js';
 /** The verdict word against the close: the shared chip (src/lib/ui), re-exported for this section's parts. */
 export { VerdictChip } from '../../lib/ui/index.js';
 
-/** Explorer href for a filter state. @param {import('../../data/filters.js').FilterState} f */
-export function explorerHref(f) {
-  const qs = toQueryString(f);
-  return href(`/explorer${qs ? `?${qs}` : ''}`);
-}
+// Shared helpers, re-exported for this section's parts.
+export { explorerHref } from '../../lib/links.js';
+export { signClass };
 
 /** "−1.2% (n 9)" or "sin cierres". @param {MeanStat} e */
 export function evText(e) {
@@ -33,8 +29,6 @@ export function hitText(s) {
   return `${formatPct(s.hitRate, { sign: false })} / ${formatPct(s.breakEven, { sign: false })}`;
 }
 
-/** Signed class for a figure. @param {number | null} v */
-export const signClass = (v) => (v == null ? '' : v > 0 ? 'pos' : v < 0 ? 'neg' : '');
 
 /**
  * One summary as a compact line of figures: n, record, yield, fair-close EV.

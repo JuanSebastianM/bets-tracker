@@ -6,6 +6,7 @@
 // Query: the filter keys of src/data/filters.js, then mode / stake / pct / bank / kf / kcap, then b.
 import { html, useMemo, useState, useEffect } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
+import { SIDE_PANEL_QUERY } from '../../lib/links.js';
 import { navigate } from '../../lib/router.js';
 import {
   FeedGate, Card, Stat, Scoreboard, Button, BottomSheet, Disclosure, EmptyState,
@@ -30,7 +31,7 @@ import { CompareBlock, ScenariosBlock } from './sim-compare.js';
 /** @typedef {import('../../data/simulate.js').SimResult} SimResult */
 
 /** Wide screens: the filter panel is a side column (same breakpoint as the Explorer). */
-const SIDE_QUERY = '(min-width: 1200px)';
+const SIDE_QUERY = SIDE_PANEL_QUERY;
 /** The expected-by-close line is drawn when at least this share of the picks has a two-sided close. */
 const EXPECTED_LINE_MIN_COVERAGE = 0.5;
 

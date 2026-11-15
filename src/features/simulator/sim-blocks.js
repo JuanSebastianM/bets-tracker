@@ -3,12 +3,12 @@
 // the breakdown by tag / market / price band, and the pending picks.
 import { html, useState } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
-import { href } from '../../lib/router.js';
 import { Disclosure, DataTable, SegmentedControl, TagGlossaryLinks } from '../../lib/ui/index.js';
 import { MARKET_SLUGS } from '../../lib/glossary-links.js';
 import { rowPatch } from '../../data/analysis.js';
-import { formatUnits, formatPct, formatPrice, formatDate, formatMonth, formatRecord, todayIn } from '../../lib/format.js';
-import { toQueryString, exactSlice, priceBandPatch } from '../../data/filters.js';
+import { formatUnits, formatPct, formatPrice, formatDate, formatMonth, formatRecord, todayIn, signClass } from '../../lib/format.js';
+import { explorerHref } from '../../lib/links.js';
+import { exactSlice, priceBandPatch } from '../../data/filters.js';
 import { compareLineKeys, lineLabel } from '../../data/lines.js';
 import { APP_TIMEZONE } from '../../config.js';
 import { priceBand } from '../../data/stats.js';
@@ -20,11 +20,8 @@ import { closeSentenceFor } from './sentences.js';
 /** @typedef {import('../../data/simulate.js').Staking} Staking */
 /** @typedef {import('../../data/filters.js').FilterState} FilterState */
 
-const pos = (/** @type {number | null} */ v) => (v == null || Math.abs(v) < 0.005 ? '' : v > 0 ? 'pos' : 'neg');
-const explorerHref = (/** @type {FilterState} */ f) => {
-  const qs = toQueryString(f);
-  return href(qs ? `/explorer?${qs}` : '/explorer');
-};
+/** Sign class; figures that round to 0.00 get none. @param {number | null} v */
+const pos = (v) => signClass(v, 0.0049);
 
 /** @param {{ testId: string, summary: any, children: any }} props */
 function Block({ testId, summary, children }) {
