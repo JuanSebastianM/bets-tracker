@@ -123,3 +123,12 @@ export function formatAgo(iso, now = Date.now()) {
 export function todayIn(tz, d = new Date()) {
   return new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 }
+
+/**
+ * A score with a fixed number of decimals and '.' as separator (Brier: 0.244). Added by Analysis.
+ * @param {number | null | undefined} x @param {number} [digits]
+ */
+export function formatScore(x, digits = 3) {
+  if (bad(x)) return '–';
+  return Number(x).toFixed(digits);
+}
