@@ -2,34 +2,34 @@
   "kellyFull": "completo",
   "label": {
     "flat": "{stake} fija",
-    "percent": "{pct}% de la banca",
+    "percent": "{pct}% del bank",
     "staked": "Stake registrado",
     "kelly": "Kelly {frac}, máx. {cap}"
   },
   "modeLabel": "Cómo apostar",
   "mode": {
     "flat": "Fija",
-    "percent": "% banca",
+    "percent": "% bank",
     "staked": "Registrado",
     "kelly": "Kelly"
   },
   "modeHelp": {
     "flat": "Las mismas unidades en cada pick, gane o pierda.",
-    "percent": "Un porcentaje de la banca, que sube y baja con los resultados. Los picks del mismo día se apuestan sobre la banca con que empezó ese día, porque se ponen antes de que se resuelva alguno.",
+    "percent": "Un porcentaje del bank, que sube y baja con los resultados. Los picks del mismo día se apuestan sobre el bank con que empezó ese día, porque se ponen antes de que se resuelva alguno.",
     "staked": "El stake con que se registró cada pick: en Apuestas, el stake y la ganancia de la hoja; en Grok, su stake sugerido. Los picks sin stake (Sombra) quedan fuera.",
-    "kelly": "Kelly fraccional con la probabilidad justa registrada y la cuota, sobre la banca al empezar el día y con un tope por pick. Si el pick no tiene ventaja, el stake es 0 y no se apuesta."
+    "kelly": "Kelly fraccional con la probabilidad justa registrada y la cuota, sobre el bank al empezar el día y con un tope por pick. Si el pick no tiene ventaja, el stake es 0 y no se apuesta."
   },
   "quickStakes": "Stakes rápidos",
   "stakeField": "Unidades por pick",
-  "percentField": "Porcentaje de la banca por pick",
+  "percentField": "Porcentaje del bank por pick",
   "kellyFraction": "Fracción de Kelly",
   "kellyCap": "Tope por pick",
-  "bankField": "Banca inicial",
-  "bankHintFlat": "Solo sirve para medir la peor caída como % de la banca.",
-  "bankHint": "Por defecto, tu banca de Ajustes en unidades (o 100u si no la has puesto).",
+  "bankField": "Bank inicial",
+  "bankHintFlat": "Solo sirve para medir la peor caída como % del bank.",
+  "bankHint": "Por defecto, tu bank de Ajustes en unidades (o 100u si no la has puesto).",
   "lead": {
     "flat": "Si hubieras apostado {stake} en cada uno",
-    "percent": "Si hubieras apostado el {pct}% de la banca en cada uno",
+    "percent": "Si hubieras apostado el {pct}% del bank en cada uno",
     "staked": "Con el stake con que se registró cada uno",
     "kelly": "Con {label}"
   },
@@ -95,9 +95,9 @@
   "picks": "Picks",
   "stakedSub": "{staked} apostadas",
   "avgPrice": "Cuota media",
-  "finalBank": "Banca final",
+  "finalBank": "Bank final",
   "fromBank": "empezó en {bank}",
-  "ofBank": "{pct} de la banca inicial",
+  "ofBank": "{pct} del bank inicial",
   "savedFilters": "Filtros guardados y para empezar",
   "picksTitle": "Los picks",
   "count": {

@@ -86,14 +86,14 @@ test('every dimension groups picks by its key', () => {
   assert.deepEqual(keys, {
     tag: 'value', market: 'goals', marketRaw: 'Goles', league: 'Liga Austral', book: ['Betano', 'Stake'], priceBand: '200_250',
     month: '2026-11', weekday: '3', probBand: '50_60', evBand: '3_6', ref: 'feed', sample: '10+', fuerza: 'keeps', reason: ['gap', 'ratio'],
-    source: 'shadow',
+    source: 'shadow', line: null,
   });
   const empty = mkPick({ books: [], price: null, probModel: null, ev: null, marketRaw: '', league: '' });
   for (const id of ['book', 'priceBand', 'probBand', 'evBand', 'sample', 'fuerza', 'reason', 'marketRaw', 'league']) {
     assert.equal(dimension(id).key(empty), null, id);
   }
   assert.equal(dimension('ref').key(empty), 'none');
-  assert.equal(DIMENSION_IDS.length, 15);
+  assert.equal(DIMENSION_IDS.length, 16); // 15 + line (polish)
   assert.equal(dimension('nope').id, 'tag');
 });
 

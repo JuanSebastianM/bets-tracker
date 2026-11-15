@@ -22,6 +22,7 @@ import { fold } from './decisions.js';
  * @property {number} n
  * @property {string} slug        'rule-<n>'
  * @property {string} title
+ * @property {string} [short]     one plain sentence a casual bettor understands ("En corto: …")
  * @property {string} says        two to four plain sentences
  * @property {string} [why]       the lesson behind it, when the skill gives one
  * @property {'in_force' | 'provisional' | 'paused' | 'stopped' | 'replaced'} state
@@ -38,6 +39,7 @@ import { fold } from './decisions.js';
  * @property {Map<string, GlossaryEntry>} bySlug
  * @property {RuleEntry[]} rules         sorted by number
  * @property {Map<number, RuleEntry>} ruleByN
+ * @property {GlossaryEntry[]} [fileOrder]  entries as written in the file (the inline-link index uses it)
  */
 
 /** Rule states in display order. */
@@ -58,6 +60,7 @@ export function buildContent(glossary, rules) {
     bySlug: new Map(entries.map((e) => [e.slug, e])),
     rules: list,
     ruleByN: new Map(list.map((r) => [r.n, r])),
+    fileOrder: [...(glossary.entries || [])],
   };
 }
 
@@ -152,7 +155,7 @@ export function filterRules(rules, opts = {}) {
     if (opts.state && r.state !== opts.state) return false;
     if (!q) return true;
     if (/^\d+$/.test(q)) return String(r.n) === q;
-    return fold(`${r.title}\n${r.says}\n${r.why || ''}`).includes(q);
+    return fold(`${r.title}\n${r.short || ''}\n${r.says}\n${r.why || ''}`).includes(q);
   });
 }
 
@@ -161,5 +164,154 @@ export function ruleStateCounts(rules) {
   /** @type {Record<string, number>} */
   const out = Object.fromEntries(RULE_STATES.map((s) => [s, 0]));
   for (const r of rules) out[r.state] = (out[r.state] || 0) + 1;
+  return out;
+}
+
+// ---------------------------------------------------------------------------------------------------
+// Inline term links: the glossary's own terms and aliases found in a text, first occurrence per
+// paragraph. Data only (tokens); the UI renders each token as text or a link, never as HTML.
+// ---------------------------------------------------------------------------------------------------
+
+/**
+ * Needles too common to link (folded, lower case): ordinary words that are also aliases.
+ */
+const TERM_SKIP = new Set([
+  'cuota', 'precio', 'odds', 'price', 'apuesta', 'apuestas', 'u', 'n', 'z', 'ic', 'ci', 'over', 'under', 'mas de', 'menos de',
+  'favorito', 'favourite', 'favorite', 'media', 'mean', 'tope', 'cap', 'minima', 'plano', 'flat', 'live', 'value', 'valor', 'suerte',
+  'azar', 'luck', 'noise', 'movimiento', 'movement', 'historial', 'ganador', 'resultado', 'winner', 'match result', 'doble',
+  'double', 'combo', 'feed', 'sample', 'muestra', 'ratio', 'gap', 'brecha', 'referencia', 'reference', 'rechazo', 'reject',
+  'rejected', 'apertura', 'opening', 'close', 'power', 'proporcional', 'proportional', 'sharp', 'soft', 'edge', 'ventaja',
+  'return', 'mix', 'mezcla', 'forma', 'form', 'escaneo', 'scan', 'salto', 'skip', 'omitir', 'candidato', 'candidate', 'publicable',
+  'publishable', 'filler', 'relleno', 'tiros', 'shots', 'tarjetas', 'cards', 'corners', 'esquinas', 'card', 'equilibrio', 'acierto',
+  'stake', 'monto apostado', 'bet size', 'amount staked', 'asiatico', 'asian', 'handicap', 'hit rate', 'otro lado', 'sin linea',
+  'solo over', 'won', 'win', 'lost', 'loss', 'void', 'push', 'refund', 'pending', 'open', 'replaced', 'in force', 'provisional',
+  'devuelta', 'anulada', 'calibrado', 'calibrated', 'milestone', 'gate', 'puerta', 'ia', 'ai', 'model mean', 'real bet', 'priced',
+  'not priced', 'no verdict', 'unidades', 'units', 'unidad', 'ganada', 'perdida', 'nula', 'pendiente', 'vigente', 'abierta',
+  'reemplazada', 'apuestas reales', 'real bets', 'decisiones', 'reglas', 'apuestas', 'sombra', 'formas', 'stake.com',
+  'casa', 'book', 'pestana', 'tab', 'concepto', 'concept', 'arbitro', 'referee', 'justa', 'tesis', 'thesis',
+]);
+
+/** Categories whose entries are linked only by their capitalised sheet words (FUERZA, VALOR CASI). */
+const CAPS_ONLY_CATEGORIES = new Set(['notes', 'statuses', 'tags']);
+
+/**
+ * @typedef {{ needle: string, slug: string, exact: boolean }} TermNeedle
+ * @typedef {{ needles: TermNeedle[], folded: RegExp | null, exact: RegExp | null, bySlugNeedle: Map<string, string> }} TermIndex
+ */
+
+/** Is a needle written in capitals (two or more letters, no lower-case letter)? @param {string} s */
+const isCaps = (s) => (s.match(/\p{L}/gu) || []).length >= 2 && s === s.toUpperCase();
+const escapeRe = (/** @type {string} */ s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * Build the inline-link index from the glossary entries: each entry's term (and the parts of a term
+ * written "Term (other name)") and its aliases. Capitalised needles (DNB, BTTS, ML, VALOR CASI) match
+ * only as written; the others match without case or accents. Common words (TERM_SKIP), needles of one
+ * letter, rule names ("regla 23": RefText links those) and pure numbers are left out. When two entries
+ * share a needle the first entry in the file wins.
+ * @param {GlossaryEntry[]} entries   in file order
+ * @returns {TermIndex}
+ */
+export function buildTermIndex(entries) {
+  /** @type {Map<string, TermNeedle>} */
+  const seen = new Map();
+  // Two passes: whole terms first, so "SHADOW" belongs to the SHADOW entry and "Sofascore" to the
+  // Sofascore entry rather than to "SHADOW (regla 30)" or "Favoritos (Sofascore)"; then the parts of
+  // "Term (other name)" and the aliases.
+  /** @type {Array<[GlossaryEntry, string[]]>} */
+  const passes = [];
+  for (const e of entries) {
+    const m = /^(.*?)\s*\((.+)\)\s*$/.exec(e.term);
+    passes.push([e, m ? [] : [e.term]]);
+  }
+  for (const e of entries) {
+    const m = /^(.*?)\s*\((.+)\)\s*$/.exec(e.term);
+    passes.push([e, [...(m ? [m[1], m[2]] : []), ...(e.aliases || [])]]);
+  }
+  for (const [e, raw] of passes) {
+    const capsOnly = CAPS_ONLY_CATEGORIES.has(e.category);
+    for (const r of raw) {
+      const s = String(r || '').trim();
+      if (!s || s.includes('/') && !/^O\/U$/.test(s) && !/^1\/4/.test(s)) continue; // "ref feed / ref N casas" shapes
+      if ((s.match(/[\p{L}]/gu) || []).length < 2) continue;
+      if (/^(?:reglas?|rules?)\s+\d/i.test(s) || /^[\d\s.,+−-]+$/.test(s)) continue;
+      const exact = isCaps(s);
+      if (capsOnly && !exact) continue;
+      const key = exact ? s : fold(s);
+      if (!exact && TERM_SKIP.has(key)) continue;
+      if (exact && s.length < 2) continue;
+      const id = (exact ? 'x:' : 'f:') + key;
+      if (!seen.has(id)) seen.set(id, { needle: key, slug: e.slug, exact });
+    }
+  }
+  const needles = [...seen.values()].sort((a, b) => b.needle.length - a.needle.length);
+  const alt = (/** @type {TermNeedle[]} */ list) => (list.length ? new RegExp(`(?<![\\p{L}\\p{N}])(?:${list.map((x) => escapeRe(x.needle)).join('|')})(?![\\p{L}\\p{N}])`, 'gu') : null);
+  const bySlugNeedle = new Map(needles.map((x) => [(x.exact ? 'x:' : 'f:') + x.needle, x.slug]));
+  return { needles, folded: alt(needles.filter((x) => !x.exact)), exact: alt(needles.filter((x) => x.exact)), bySlugNeedle };
+}
+
+/**
+ * Fold `text` char by char, remembering where each folded char came from (accents and case removed,
+ * offsets back into the original).
+ * @param {string} src
+ */
+function foldWithMap(src) {
+  let folded = '';
+  /** @type {number[]} */
+  const from = [];
+  for (let i = 0; i < src.length; ) {
+    const ch = String.fromCodePoint(/** @type {number} */ (src.codePointAt(i)));
+    const f = fold(ch);
+    for (let k = 0; k < f.length; k++) from.push(i);
+    folded += f;
+    i += ch.length;
+  }
+  from.push(src.length);
+  return { folded, from };
+}
+
+/**
+ * Split a text into plain text and glossary-term links. Only the first occurrence of each entry is
+ * linked (pass the same `seen` set to several calls to share it across the pieces of one paragraph);
+ * `exclude` slugs are never linked (an entry's own page). Longest match wins; matches never overlap.
+ * @param {string} text
+ * @param {TermIndex | null | undefined} index
+ * @param {{ seen?: Set<string>, exclude?: string[] }} [opts]
+ * @returns {Array<{ type: 'text', text: string } | { type: 'term', text: string, slug: string }>}
+ */
+export function linkTerms(text, index, opts = {}) {
+  const src = String(text ?? '');
+  if (!src || !index) return src ? [{ type: 'text', text: src }] : [];
+  const seen = opts.seen || new Set();
+  const exclude = new Set(opts.exclude || []);
+  /** @type {Array<{ start: number, end: number, slug: string }>} */
+  const hits = [];
+  if (index.exact) {
+    index.exact.lastIndex = 0;
+    for (let m = index.exact.exec(src); m; m = index.exact.exec(src)) {
+      hits.push({ start: m.index, end: m.index + m[0].length, slug: /** @type {string} */ (index.bySlugNeedle.get('x:' + m[0])) });
+    }
+  }
+  if (index.folded) {
+    const { folded, from } = foldWithMap(src);
+    index.folded.lastIndex = 0;
+    for (let m = index.folded.exec(folded); m; m = index.folded.exec(folded)) {
+      hits.push({ start: from[m.index], end: from[m.index + m[0].length] ?? src.length, slug: /** @type {string} */ (index.bySlugNeedle.get('f:' + m[0])) });
+    }
+  }
+  // Earliest first, longest first at the same start.
+  hits.sort((a, b) => a.start - b.start || b.end - a.end);
+  /** @type {Array<{ type: 'text', text: string } | { type: 'term', text: string, slug: string }>} */
+  const out = [];
+  let pos = 0;
+  for (const h of hits) {
+    if (!h.slug || h.start < pos || h.end <= h.start) continue;
+    if (seen.has(h.slug) || exclude.has(h.slug)) continue;
+    seen.add(h.slug);
+    if (h.start > pos) out.push({ type: 'text', text: src.slice(pos, h.start) });
+    out.push({ type: 'term', text: src.slice(h.start, h.end), slug: h.slug });
+    pos = h.end;
+  }
+  if (pos < src.length) out.push({ type: 'text', text: src.slice(pos) });
   return out;
 }

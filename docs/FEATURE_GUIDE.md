@@ -29,7 +29,7 @@ On a `feat/<id>` branch, only:
 - `tests/unit/<id>*.test.mjs`, `tests/e2e/<id>*.spec.js`
 - `src/content/**` (Glossary only: `glossary.{es,en}.json`, `rules.{es,en}.json`)
 - `src/data/summaries.js` (Overview only, to add sentence builders) and their strings under `summaries`
-- `docs/BUILD_LOG.md` (append your entry)
+- `docs/build-log/<id>.md` (your entry; `docs/BUILD_LOG.md` is the orchestrator's)
 
 Everything else is shared (`src/lib`, `src/data`, `src/styles`, `src/i18n`, `src/app.js`, `index.html`,
 `sw.js`, workflows, `tests/e2e/helpers.js`, `tests/unit/helpers/*`, the fixture generator). If you need a
@@ -355,7 +355,7 @@ test('explorer filters by tag', async ({ page }) => {
 - Don't write to the sheet, call Google APIs, or add a CDN or a library (vendored libs go through the
   vendor workflow).
 - Don't use colour alone for meaning; won/lost also differ by icon or sign.
-- Do append a dated entry to `docs/BUILD_LOG.md`: what you built, decisions and why, problems solved.
+- Do write your entry in `docs/build-log/<id>.md`: what you built, decisions and why, problems solved.
 
 ## 10. Linking to the Glossary and the Decisions
 
@@ -380,6 +380,20 @@ html`<${RefText} text=${p.notes} known=${{ decisionRows, ruleNumbers }} q=${quer
   says which). Useful slugs: `fair-close-ev`, `clv`, `de-vig`, `yield`, `hit-rate`, `break-even`,
   `standard-error`, `two-se`, `brier`, `calibration`, `frozen-tests`, `gate`, `unit`, `stake`, `kelly`,
   `drawdown`, `blend`, `consensus`, `shadow-tab`, `bets-tab`, `grok-tab`, `decisions-tab`.
+- More helpers in `glossary-links.js`: `tagHref(tag)`, `REASON_SLUGS` (filter reason → entry),
+  `MARKET_SLUGS` (market family → entry), `SHEET_RULE_BY_N`. `tagSlug` lives only there (`tags.js`
+  re-exports it). `tests/unit/polish-glossary-links.test.mjs` collects every slug written in `src/` (and
+  the maps) and fails if one is missing from the glossary in either language.
+- UI kit: `<DecisionLink row>` ("Decisiones fila 28 · <topic>", the topic from the feed),
+  `<TagGlossaryLinks tags items label>` (a line of glossary links under a table whose rows link
+  elsewhere: a link inside a row link is not allowed), `<VerdictChip v>` (the verdict word against the
+  close, one chip for every section), `useGlossaryLinks()` → `{ terms, ruleNumbers }` and
+  `termIndexOf(content)` for inline term links: `<RefText text terms=${terms} exclude=${[ownSlug]} />`.
+- Elsewhere: `explorerHref(partialFilters)` and `SIDE_PANEL_QUERY` (`src/lib/links.js`), `signClass(v, eps)`
+  (`format.js`).
+- Long tables on wide screens: add `table-sticky` to the `.table-wrap` (the header row sticks under the
+  app header; the wrapper clips instead of scrolling, so lay the table out to fit from 960 px). Tags in
+  tables wrap between words only.
 - `RefText` turns "fila N" / "Decisiones row N" into decision links and "regla N" / "rule N" into rule
   links, safely (tokens, never innerHTML), and highlights `q`. Pass the decision rows of the dataset
   (`data.decisions.map((d) => d.row)`) so rows of other tabs ("Sombra fila 412") stay plain text.

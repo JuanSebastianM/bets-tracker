@@ -34,7 +34,8 @@
     "sample": "Muestra",
     "fuerza": "FUERZA",
     "reason": "Motivo del rechazo",
-    "source": "Fuente"
+    "source": "Fuente",
+    "line": "Línea"
   },
   "sort": {
     "natural": "Orden propio",
@@ -75,6 +76,7 @@
     "hiddenNote": { "one": "{k} grupo con menos de {n} calificadas está oculto.", "other": "{k} grupos con menos de {n} calificadas están ocultos." },
     "leftNote": { "one": "{k} pick no tiene valor para «{dim}» y no aparece en ningún grupo.", "other": "{k} picks no tienen valor para «{dim}» y no aparecen en ningún grupo." },
     "multiNote": "Un pick puede estar en varios grupos (varias casas o varios motivos), así que los grupos no suman el total.",
+    "someNoLink": "Algunos grupos no abren el Explorador: ningún filtro elige exactamente sus picks (por ejemplo, una segunda casa de un pick filtrado por otra).",
     "noLinkNote": "No hay un filtro por día de la semana, así que estos grupos no abren el Explorador."
   },
   "tw": {

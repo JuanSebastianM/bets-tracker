@@ -1,10 +1,11 @@
 // Display components: Card, Stat, Scoreboard (the record), StatusBadge, TagBadge, Banner,
-// EmptyState, Skeleton, Disclosure.
+// EmptyState, Skeleton, Disclosure, VerdictChip.
 import { html } from '../../../vendor/preact.js';
 import { Icon } from './icons.js';
 import { t } from '../i18n.js';
 import { formatCount } from '../format.js';
 import { tagLabel } from '../../data/tags.js';
+import { verdictLabel } from '../../data/summaries.js';
 
 /**
  * A slab of content. `title` renders an h2 (or `level` 3); `action` sits at the right of the title.
@@ -135,4 +136,16 @@ export function Disclosure({ summary, children, open = false }) {
     <summary><span>${summary}</span><${Icon} name="chevron-down" size=${16} /></summary>
     <div class="disclosure-body">${children}</div>
   </details>`;
+}
+
+/** Chip tone of each verdict against the close (overview.js closeVerdict). */
+export const VERDICT_TONE = /** @type {Record<string, string>} */ ({ above: 'won', below: 'lost', lean_above: 'neutral', lean_below: 'neutral', too_early: 'pending', none: 'neutral' });
+
+/**
+ * The verdict word against the close ("por encima del cierre", "muy pronto"…), the same chip in every
+ * section. The word always carries the meaning; the tone only repeats it.
+ * @param {{ v: import('../../data/overview.js').Verdict, class?: string }} props
+ */
+export function VerdictChip({ v, class: cls = '' }) {
+  return html`<span class=${`chip chip-${VERDICT_TONE[v] || 'neutral'} verdict-chip ${cls}`.trim()}>${verdictLabel(v)}</span>`;
 }

@@ -3,6 +3,7 @@
   "rules": [
     {
       "n": 1, "slug": "rule-1", "title": "Nunca apostar contra el modelo",
+      "short": "Si nuestros números dicen que es más probable lo contrario, no se apuesta.",
       "says": "Si el modelo cree que la otra opción es la más probable, no hay apuesta. En cada pick se muestran juntas la probabilidad del modelo para esa línea exacta y la del mercado sin margen, para que veas si están de acuerdo.",
       "state": "in_force", "since": null,
       "stateNote": "En resultados y goles la reemplaza la regla 29 desde el 11 oct 2026; sigue en córners, tarjetas y tiros.",
@@ -10,6 +11,7 @@
     },
     {
       "n": 2, "slug": "rule-2", "title": "El blend decide el stake",
+      "short": "Cuanto más pequeña es la ventaja que vemos, más chica es la apuesta; si casi no hay ventaja, no se apuesta.",
       "says": "El blend es mitad modelo y mitad mercado sin margen. Si la ventaja del blend o la ventaja conservadora queda por debajo de 4%, el stake máximo es 0.5u o se omite. Una ventaja delgada es, por defecto, un no.",
       "state": "in_force", "since": null,
       "stateNote": "En resultados y goles la reemplaza la regla 29 desde el 11 oct 2026.",
@@ -17,84 +19,98 @@
     },
     {
       "n": 3, "slug": "rule-3", "title": "Navaja (razor)",
+      "short": "Si la línea está casi encima de lo que esperamos que pase, es una moneda al aire y no se juega.",
       "says": "No se juega una línea de goles, córners o tarjetas que esté a 0.5 o menos de la media del modelo: está demasiado cerca para que el modelo sepa de qué lado cae. En un builder se toma la línea más lejos de la media.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["razor", "model-mean", "totals", "builder"]
     },
     {
       "n": 4, "slug": "rule-4", "title": "Cómo se calcula el stake",
+      "short": "Nunca se apuesta mucho de una vez: hay un tope por apuesta y no se sube porque la cuota mejoró.",
       "says": "El stake es lo menor entre 2u y un cuarto de Kelly sobre la probabilidad del blend, contra el bank del momento. El mínimo es 0.25u. Nunca se sube un stake porque la cuota se movió a tu favor.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["stake", "kelly", "blend", "bankroll", "unit"]
     },
     {
       "n": 5, "slug": "rule-5", "title": "Cuota mínima 1.70 en sencillas",
+      "short": "Una apuesta suelta tiene que pagar al menos 1.70.",
       "says": "Una apuesta sencilla necesita cuota de al menos 1.70. Si una casa llega y otra no, se nombran las dos y se usa la que llega.",
       "state": "in_force", "since": null,
       "decisions": [13], "terms": ["minimum-price", "decimal-odds", "line-shopping"]
     },
     {
       "n": 6, "slug": "rule-6", "title": "Builders de máximo 2 selecciones",
+      "short": "Las combinadas llevan como mucho dos cosas; nada de combinadas largas.",
       "says": "Un builder lleva como mucho 2 selecciones y se cotiza como probabilidad conjunta de una sola simulación. Si va sobre la misma idea que una sencilla, es un extra opcional de máximo 0.5u. Una doble entre partidos distintos necesita cada selección con 80% o más (regla 4 de la pestaña Reglas). Nada de combinadas de 3 o más.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["builder", "double-bet", "parlay", "thesis", "sheet-rules"]
     },
     {
       "n": 7, "slug": "rule-7", "title": "Siempre cotizar ML, DNB y doble oportunidad",
+      "short": "Para cada equipo se comparan las distintas formas de apostarle y se elige la que mejor paga para lo que arriesga.",
       "says": "Para cualquier equipo se cotizan el ganador (ML), el empate no apuesta (DNB) y la doble oportunidad, más la línea asiática que corresponde, y se queda la de mejor EV del blend. Cuando el empate pesa mucho, suele ganar la doble oportunidad.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["1x2", "dnb", "double-chance", "asian-handicap", "ev"]
     },
     {
       "n": 8, "slug": "rule-8", "title": "Minutos de los goles",
+      "short": "Cuándo suele marcar cada equipo ayuda a escoger la apuesta: si el rival marca tarde, mejor una que te devuelva la plata si empatan.",
       "says": "Con las franjas de minutos de fstats: si el rival del favorito marca más del 30% de sus goles después del 75', mejor DNB que ML. Si un equipo concentra goles al final, para unders se prefiere el under del primer tiempo o el under asiático 3 antes que under 2.5. Equipos que marcan temprano: goles del primer tiempo o gol antes del minuto X. Si el no favorito recibe 60% o más en el segundo tiempo y el otro marca 25% o más después del 75', mejor doble oportunidad que DNB.",
       "state": "in_force", "since": null,
       "decisions": [19], "terms": ["fstats", "dnb", "double-chance", "first-half", "totals"]
     },
     {
       "n": 9, "slug": "rule-9", "title": "Unders de córners y tarjetas: mira al rival",
+      "short": "Para apostar a pocos córners o pocas tarjetas, mira también lo que permite el rival, no solo a un equipo.",
       "says": "Para un under de córners o tarjetas no basta el promedio del equipo: hay que ver lo que concede el rival. El promedio de la temporada pesa más que un pico de 3 partidos.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["corners", "cards", "totals"]
     },
     {
       "n": 10, "slug": "rule-10", "title": "Apuestas en vivo",
+      "short": "Con el partido en juego, mira cómo se está jugando y no solo el marcador, y nunca trates de recuperar lo que acabas de perder.",
       "says": "En vivo primero se entiende cómo va el partido antes de proyectar el ritmo: un favorito que gana y controla deja menos córners al final. Se confía más en los xG que en el marcador. Nunca se vuelve a entrar a un mercado que acabas de perder en el mismo partido.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["live-bet", "corners"]
     },
     {
       "n": 11, "slug": "rule-11", "title": "Favoritos cortos cerca de 1.85",
+      "short": "A un favorito que paga cerca de 1.85 y en el que vemos poca ventaja no se le apuesta.",
       "says": "Un favorito corto alrededor de 1.85 con poca ventaja en el blend es un no.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["favorite-underdog", "blend", "ev"]
     },
     {
       "n": 12, "slug": "rule-12", "title": "Cómo se liquidan los asiáticos",
+      "short": "Algunas apuestas se ganan o se pierden a medias, o te devuelven la plata, según el resultado exacto.",
       "says": "Con +0.25, el empate es medio ganada y perder por un gol es perdida completa. Under asiático 3: exactamente 3 goles devuelve la plata, 4 o más pierde. Las líneas de cuarto dividen el stake entre las dos líneas vecinas.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["asian-handicap", "quarter-line", "half-won", "half-lost", "void"]
     },
     {
       "n": 13, "slug": "rule-13", "title": "Un partido, una tesis",
+      "short": "En un mismo partido no se apuesta dos veces a la misma idea.",
       "says": "No se duplica la exposición al mismo equipo o al mismo total en un partido, salvo que tú lo pidas, y entonces el segundo stake se recorta.",
       "state": "in_force", "since": null,
       "decisions": [21], "terms": ["thesis", "stake"]
     },
     {
       "n": 14, "slug": "rule-14", "title": "El H2H es un chequeo, no una apuesta",
+      "short": "Lo que pasó en los partidos anteriores entre los dos equipos sirve para revisar, no para decidir.",
       "says": "Los enfrentamientos directos sirven para revisar, no para decidir solos. Siempre se dice de cuántos partidos es la muestra.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["h2h", "sample-size"]
     },
     {
       "n": 15, "slug": "rule-15", "title": "Verificar cada dato",
+      "short": "Lesiones, técnico, árbitro y fecha se confirman en una fuente actual; lo que no se confirma no cambia nada.",
       "says": "Técnico, lesiones, suspensiones, tabla, quién viajó, árbitro y fecha del partido se verifican en una fuente actual: ge.globo para Brasil; si no, la web del club o de la liga, Sofascore, FotMob o una previa con fecha. Si dos fuentes no coinciden, queda sin confirmar; si los promedios del árbitro difieren, se da el rango. Una baja sin confirmar nunca cambia una lambda.",
       "state": "in_force", "since": null,
       "decisions": [], "terms": ["sofascore", "lambda"]
     },
     {
       "n": 16, "slug": "rule-16", "title": "La IA de Sofascore es contraste, nunca filtro",
+      "short": "La predicción de la app Sofascore se mira como una opinión más, pero nunca decide una apuesta.",
       "says": "En cada slate se abre la IA de Sofascore para contexto y se anota su probabilidad, pero no entra al modelo, al blend, al stake ni a ningún filtro. Si un pick pasa todo, se publica aunque la IA no esté de acuerdo, con una línea cuando difieren 5 puntos o más. La única excepción es la regla 23, donde la IA solo puede ayudar a quitar un tope.",
       "why": "Sus números parecen seguir muy de cerca al mercado, así que aportan poca información propia.",
       "state": "in_force", "since": "2026-10-09",
@@ -102,12 +118,14 @@
     },
     {
       "n": 17, "slug": "rule-17", "title": "Solo se registra lo que confirmas",
+      "short": "Solo se anota como apuesta real lo que tú dices que apostaste.",
       "says": "En Apuestas solo va lo que tú confirmas que apostaste, con casa y cuota. Se edita la única hoja que existe, nunca una copia. La pestaña Sombra es la única excepción.",
       "state": "in_force", "since": null,
       "decisions": [10], "terms": ["bets-tab", "shadow-tab"]
     },
     {
       "n": 18, "slug": "rule-18", "title": "F-sample: muestra mínima",
+      "short": "Si los equipos no han jugado suficientes partidos para juzgarlos, no se apuesta.",
       "says": "Goles, resultados y tarjetas necesitan 10 partidos de liga de ambos equipos. Las estadísticas de conteo (córners, tiros, tiros al arco) se estabilizan antes: con 6–9 partidos un pick que pasa todo lo demás queda SHADOW (va a Sombra, sin stake); con menos de 6 se omite.",
       "state": "in_force", "since": "2026-10-09",
       "stateNote": "La parte de 6–9 partidos se anotó como Provisional en Decisiones.",
@@ -115,6 +133,7 @@
     },
     {
       "n": 19, "slug": "rule-19", "title": "F-gap: modelo y mercado muy lejos",
+      "short": "Si nuestros números y los de las casas están muy lejos, lo más probable es que el error sea nuestro, y no se apuesta.",
       "says": "Se omite si el modelo y el mercado sin margen difieren en más de 10 puntos porcentuales. En totales de córners, tarjetas y tiros el mercado es la referencia compartida de la línea (regla 36), nunca la casa que se está cotizando.",
       "state": "in_force", "since": null,
       "stateNote": "En resultados y goles la reemplaza la regla 29 desde el 11 oct 2026.",
@@ -122,6 +141,7 @@
     },
     {
       "n": 20, "slug": "rule-20", "title": "F-ratio: probabilidades infladas",
+      "short": "Si creemos que algo es mucho más probable de lo que dicen las casas, desconfiamos y no se apuesta.",
       "says": "Se omite si la probabilidad del modelo es más de 1.35 veces la del mercado (la referencia compartida, regla 36, en totales de córners, tarjetas y tiros).",
       "why": "A cuotas largas un error pequeño de probabilidad se vuelve un EV enorme y falso.",
       "state": "in_force", "since": null,
@@ -130,6 +150,7 @@
     },
     {
       "n": 21, "slug": "rule-21", "title": "Filtro 4: la forma",
+      "short": "Si con sus últimos partidos la ventaja desaparece, no se apuesta.",
       "says": "El modelo usa números de toda la temporada (Todos). Los últimos 5 son el chequeo: si al correrlo con los últimos 5 el EV del blend baja de 4%, la apuesta no califica. Los últimos 3 son solo contexto. Nunca se cambia la ventana de datos para encontrar un pick.",
       "state": "in_force", "since": null,
       "stateNote": "En resultados y goles la reemplaza la regla 29 desde el 11 oct 2026.",
@@ -137,12 +158,14 @@
     },
     {
       "n": 22, "slug": "rule-22", "title": "Solo precios de dos lados",
+      "short": "Si la casa ofrece un solo lado de la apuesta, no se puede saber su precio justo y no se apuesta.",
       "says": "Un mercado que solo se ofrece de un lado no se puede limpiar de margen, así que se omite.",
       "state": "in_force", "since": null,
       "decisions": [39], "terms": ["two-way-only", "de-vig", "margin"]
     },
     {
       "n": 23, "slug": "rule-23", "title": "Brecha modelo-mercado en totales",
+      "short": "Si nuestra cuenta de goles o córners está muy lejos de la de las casas, se apuesta poco o nada.",
       "says": "Si la media del modelo difiere de la del mercado en más de 0.5 goles (total del partido) o 1.5 córners, y ni el H2H ni la IA de Sofascore respaldan al modelo, el stake es de máximo 0.5u o se omite, aunque el EV sea positivo. Cuando topa o salta un pick, se registra en Sombra con el motivo «rule 23».",
       "why": "Salió de un solo resultado (HJK–VPS Under 3, que perdió 6-0; la propuso Grok), por eso es provisional. Está dormida desde las reglas 29 y 30: solo actúa sobre picks con stake y desde el 11–12 oct ninguno de goles o córners ha tenido stake.",
       "state": "provisional", "since": "2026-10-09",
@@ -151,12 +174,14 @@
     },
     {
       "n": 24, "slug": "rule-24", "title": "Filtro 5: el árbitro",
+      "short": "En apuestas de tarjetas cuenta cuántas saca el árbitro; si eso borra la ventaja, no se apuesta.",
       "says": "Cuando el árbitro tiene 20 partidos o más, una apuesta de tarjetas (o un builder con tarjetas) debe mantener 4% de EV del blend después de mover el total de tarjetas la mitad del camino hacia las tarjetas por partido del árbitro. Los picks que quita van a Sombra. Solo puede quitar apuestas, nunca agregarlas.",
       "state": "in_force", "since": "2026-10-09",
       "decisions": [6, 46, 47], "terms": ["filter-5", "cards", "blend"]
     },
     {
       "n": 25, "slug": "rule-25", "title": "Tiros y tiros al arco son SHADOW",
+      "short": "Las apuestas de tiros se anotan solo para seguirlas, nunca con plata.",
       "says": "El script cotiza tiros y tiros al arco de equipo y de partido, pero cualquier pick con tiros queda SHADOW: va a Sombra, nunca se publica ni se apuesta. Desde el 2 nov 2026 los tiros de equipo ya no se registran; solo los totales de partido con veredicto SHADOW y el pick MODELO SOLO de cada slate.",
       "why": "En la revisión del 24 oct iban 30 filas, 11-19, −23.4% plano; los conteos de tiros se revisaron y las fuentes coinciden, así que el problema no son los datos. En la de 500 filas los tiros de equipo iban 8-21, −44.3% plano.",
       "state": "in_force", "since": "2026-10-09",
@@ -164,6 +189,7 @@
     },
     {
       "n": 26, "slug": "rule-26", "title": "Las excepciones de precio son tu decisión",
+      "short": "Si quieres algo que paga un poco menos de lo mínimo, la decisión es tuya y se te dice claro.",
       "says": "Si quieres un pick con cuota un poco por debajo de la mínima, se te dice claro que es romper la regla, con el EV del blend y la cuota justa. Si sigue siendo EV positivo y se respeta una tesis por partido, se acepta con un stake no mayor que el del script. Un precio con EV negativo no es excepción. Nunca se sube el stake por ser excepción.",
       "why": "La primera fue NYCFC DNB a 3.00 contra una mínima de 3.03 (EV blend +2.9%). A las 30 filas calificadas se revisa si las excepciones rindieron peor.",
       "state": "in_force", "since": "2026-10-09",
@@ -171,6 +197,7 @@
     },
     {
       "n": 27, "slug": "rule-27", "title": "Mercados de pago anticipado",
+      "short": "La apuesta de Betano que gana si tu equipo llega a ir dos goles arriba se calcula aparte.",
       "says": "En el «2 goles de ventaja» de Betano la apuesta gana si el equipo gana o si en algún momento va dos goles arriba. Se cotiza como mercado propio, nunca desde el ML: se simulan los goles con las lambdas del modelo y con las del mercado, en minutos al azar, y se promedian las dos probabilidades; cuota mínima = 1.04 / blend. Gana sobre todo cuando el rival recibe temprano o el favorito deja ir goles al final.",
       "why": "El 9 oct Houston (blend 33.9%, mínima 3.07) y Brommapojkarna (33.1%, mínima 3.14) se tomaron a 3.20 y 3.25, ambas sobre su mínima.",
       "state": "in_force", "since": "2026-10-09",
@@ -178,6 +205,7 @@
     },
     {
       "n": 28, "slug": "rule-28", "title": "Tarjetas: amarilla 1, roja 2, máximo 3 por jugador",
+      "short": "Para contar tarjetas, la amarilla vale 1, la roja vale 2 y un jugador suma como mucho 3.",
       "says": "La primera amarilla cuenta 1 y una roja cuenta 2, sea directa o por doble amarilla. La segunda amarilla no se cuenta otra vez: se convierte en la roja, así que un jugador suma como mucho 3. Cuando hay roja se cuenta jugador por jugador; si no se puede saber, se califica solo si el resultado es el mismo con ambas lecturas.",
       "why": "fstats cuenta la roja como 1, así que los totales de tarjetas del modelo corren algo bajos frente a las líneas de las casas.",
       "state": "in_force", "since": "2026-10-10",
@@ -185,6 +213,7 @@
     },
     {
       "n": 29, "slug": "rule-29", "title": "Primero el mercado en resultados y goles",
+      "short": "En resultados y goles las casas saben más que nosotros, así que solo se busca una casa que pague claramente más que las otras.",
       "says": "En ML, resultado del primer tiempo, DNB, doble oportunidad, hándicap asiático, BTTS, gol antes de y cualquier total de goles, la probabilidad justa es la del consenso: el precio del feed de Sofascore/bet365 sin margen por el método de potencia. La única ventaja posible es de precio: que Betano, Betsson o Stake paguen al menos 3% sobre esa cuota justa. Esos picks son VALOR y van a Sombra sin stake hasta que 30–50 filas calificadas muestren valor contra el cierre y rendimiento plano positivos. El escaneo de valor cubre todos los partidos de Favoritos, copas incluidas.",
       "why": "Un backtest de 12.662 partidos mostró que el modelo no le agrega nada al mercado en 1X2 y goles, y que mezclarlo empeoraba el pronóstico. Desde la versión 4.6 no hay veredicto de valor si la referencia tiene más de 10% de margen, y desde la 4.7 tampoco si la cuota pasa de 4.0.",
       "state": "in_force", "since": "2026-10-11",
@@ -192,6 +221,7 @@
     },
     {
       "n": 30, "slug": "rule-30", "title": "Córners y tarjetas: encogidos y en pausa",
+      "short": "En córners y tarjetas confiamos menos en nuestros números, así que por ahora ahí no se apuesta plata: solo se anotan para seguirlos.",
       "says": "El script conserva solo el 36% de lo que el modelo se aparta del promedio de la liga en córners totales y el 17% en tarjetas. Un pick de córners o tarjetas que pasa todos los filtros queda SHADOW, nunca CANDIDATE: hoy el sistema no recomienda apuestas con dinero, y «No bet» es el resultado esperado del slate. El dinero real vuelve solo cuando 30+ filas calificadas de Sombra del modelo encogido (desde el 13 oct 2026) muestren valor contra el cierre y rendimiento plano positivos.",
       "why": "Un backtest de 13.853 partidos encontró el promedio del modelo bien, pero sus diferencias partido a partido demasiado grandes: cuando decía 60–65% ganaba 52–55% en córners y 49–53% en tarjetas.",
       "state": "paused", "since": "2026-10-12",
@@ -200,6 +230,7 @@
     },
     {
       "n": 31, "slug": "rule-31", "title": "Vigilancia de la IA en córners y tarjetas",
+      "short": "Se dejaron de anotar las apuestas que salían de la predicción de Sofascore en córners y tarjetas, porque perdían.",
       "says": "Se registraban picks IA-WATCH cuando la IA de Sofascore se apartaba 4 puntos o más de la línea del feed en córners o tarjetas, como filas de Sombra sin stake. Ya no se registran ni se muestran: córners se detuvo el 29 oct y tarjetas el 2 nov 2026. Los números de la IA se siguen leyendo para la regla 23 y la nota «IA media X».",
       "why": "Un backtest mostraba a la IA mejorando en córners, pero en Sombra los córners IA-WATCH iban 25-37 (−24.0% plano) y las tarjetas tenían EV justo −5.5%.",
       "state": "stopped", "since": "2026-10-12",
@@ -208,6 +239,7 @@
     },
     {
       "n": 32, "slug": "rule-32", "title": "Córners de equipo van aparte",
+      "short": "Los córners de un solo equipo se calculan aparte y por ahora solo se anotan para seguirlos.",
       "says": "Los córners de un solo equipo se cotizan con los números crudos del equipo (10+ partidos) o conservando el 47% de su desviación (6–9 partidos), mientras los totales siguen encogidos. Siguen SHADOW con su propia categoría en Sombra; dinero real solo con 50+ filas calificadas con valor contra el cierre y rendimiento plano positivos, y tu visto bueno. Desde el 2 nov 2026 solo se registran los que tienen veredicto SHADOW.",
       "why": "Un backtest de 27.844 predicciones mostró que con 10+ partidos el 96% de la desviación del modelo aparece en la cancha. En la revisión de 500 filas iban 22-40, −15.9% plano.",
       "state": "in_force", "since": "2026-10-15",
@@ -215,12 +247,14 @@
     },
     {
       "n": 33, "slug": "rule-33", "title": "Siempre las tres casas",
+      "short": "Siempre se miran las tres casas (Betano, Betsson y Stake), porque cualquiera puede pagar mejor.",
       "says": "Todo mercado que se lee en las casas se revisa en Betano, Betsson y Stake, nunca en una sola: una puede tener un mercado que las otras no, y el mejor precio puede estar en cualquiera. Si una casa ofrece solo un lado, se cotiza contra el otro lado de la misma línea en otra casa y la nota lo dice. Decir que un mercado «no existe» significa que se abrieron y nombraron las tres.",
       "state": "in_force", "since": "2026-10-15",
       "decisions": [39, 48], "terms": ["betano", "betsson", "stake-book", "line-shopping", "book-prices"]
     },
     {
       "n": 34, "slug": "rule-34", "title": "El CLV se mide dentro de una misma fuente",
+      "short": "Para saber si una cuota era buena, se compara con la última cuota de la misma casa, nunca con la de otra.",
       "says": "El CLV compara un precio con el cierre de la misma fuente, nunca el precio de una casa con el cierre de otra. Por eso las filas de Sombra anotan «feed X» y G es el cierre del feed. La medida principal es el EV contra el cierre sin margen: precio de apertura por probabilidad de cierre sin margen, menos 1. «CLV positivo» para pasar a dinero real significa ese EV medio sobre cero en 30+ filas, rendimiento plano positivo y tu visto bueno; el CLV bruto nunca pasa una puerta solo. En Apuestas el cierre solo vale si es de la casa de la apuesta.",
       "why": "Betano al registrar contra bet365 al cierre mostraba +19.7% de «CLV» en una línea que nunca se movió. En la auditoría del 22 oct el CLV bruto daba +2.5% pero el EV justo −5.0%.",
       "state": "in_force", "since": "2026-10-15",
@@ -229,6 +263,7 @@
     },
     {
       "n": 35, "slug": "rule-35", "title": "El escaneo de valor lee las tres casas",
+      "short": "Al buscar cuotas que paguen de más se miran las tres casas, no solo una.",
       "says": "Como la regla 29 deja el precio como única ventaja en resultados y goles, el escaneo cotiza cada partido en Betano, Betsson y Stake, no solo en Betano. Cada precio va como su propia apuesta con la misma referencia, el pick de valor nombra la casa que lo paga y se registra el mejor precio. Una casa que no lista el partido se anota así, nunca se adivina.",
       "why": "En el slate del 17 oct Betsson se leyó en 1 de 110 partidos y Stake en ninguno: dos tercios de los posibles valores nunca se miraron.",
       "state": "in_force", "since": "2026-10-16",
@@ -236,6 +271,7 @@
     },
     {
       "n": 36, "slug": "rule-36", "title": "Una sola referencia de mercado por línea",
+      "short": "Todas las casas se juzgan contra el mismo precio de referencia, así que la única diferencia entre ellas es cuánto pagan.",
       "says": "En totales de córners, tarjetas, córners de equipo y tiros, la probabilidad de mercado que usan la regla 1, el blend, F-gap y F-ratio sale de una referencia compartida por partido, línea y lado: el feed bet365 si cotiza esa línea; si no, el promedio sin margen de las casas que muestran los dos lados; con una sola casa, esa casa. Así todas las casas reciben el mismo veredicto y solo cambia el EV con el precio. Las filas anotan «ref feed», «ref N casas» o «ref 1 casa».",
       "why": "En el slate del 19 oct Tottenham U10.5 pasaba F-gap en Betano 1.75 y fallaba en Stake 1.80: el mejor precio sacaba el peor veredicto porque cada casa se juzgaba contra su propia opinión.",
       "state": "in_force", "since": "2026-10-19",

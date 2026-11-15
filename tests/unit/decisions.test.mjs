@@ -48,7 +48,7 @@ test('themes: first match on the topic in the documented order, then the decisio
   ];
   for (const [topic, theme] of cases) assert.equal(decisionTheme({ topic }), theme, topic);
   // Falls back to the decision text.
-  assert.equal(decisionTheme({ topic: 'Slate del 9 oct', decision: 'Cayó por el filtro 4.' }), 'filters');
+  assert.equal(decisionTheme({ topic: 'Partido del 9 oct', decision: 'Cayó por el filtro 4.' }), 'filters');
   assert.equal(decisionTheme({ topic: 'Varios', decision: 'Nada en particular.' }), 'workflow');
   assert.deepEqual(new Set(THEME_IDS).size, THEME_IDS.length);
 });

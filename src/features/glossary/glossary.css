@@ -77,3 +77,26 @@
   .glossary .gl-cats > * { flex: none; }
   .glossary .gl-az-btn { flex: none; min-width: 36px; min-height: var(--tap); }
 }
+
+/* "En corto": the one plain sentence, shown before the rule's full text. */
+.glossary .gl-inshort { font-weight: 700; color: var(--c-accent); }
+.glossary .gl-rule-short { padding: var(--sp-3); border-radius: var(--r-ctl); background: var(--c-accent-soft); }
+.glossary .gl-rule-says .gl-inshort { color: var(--c-ink); }
+
+/* All terms, no search: one collapsed group per category (the full list is very long on a phone).
+   Lists clamp each definition to two lines; the entry page has it whole. */
+.glossary .gl-group { background: var(--c-surface); border: var(--border); border-radius: var(--r-card); }
+.glossary .gl-group-sum {
+  list-style: none; display: flex; align-items: center; gap: var(--sp-2); min-height: var(--tap); padding: var(--sp-2) var(--sp-4); cursor: pointer;
+}
+.glossary .gl-group-sum::-webkit-details-marker { display: none; }
+.glossary .gl-group-title { font-weight: 700; flex: 1; min-width: 0; }
+.glossary .gl-group-n { color: var(--c-muted); font-size: var(--fs-sm); }
+.glossary .gl-group-sum .icon { color: var(--c-muted); transition: transform 0.15s ease; }
+.glossary .gl-group[open] .gl-group-sum .icon { transform: rotate(180deg); }
+.glossary .gl-group-sum:focus-visible { outline: 2px solid var(--c-focus); outline-offset: -2px; border-radius: var(--r-card); }
+.glossary .gl-group > .gl-items { padding: 0 var(--sp-3) var(--sp-3); }
+.glossary .gl-group .gl-item { background: var(--c-surface-2); }
+.glossary .gl-item-short { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.glossary .gl-item-cat:empty { display: none; }
+.glossary .gl-list:has(> .gl-group) { gap: var(--sp-2); }

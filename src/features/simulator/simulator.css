@@ -10,6 +10,7 @@
 @media (min-width: 1200px) {
   .simulator .sim-layout { grid-template-columns: 248px minmax(0, 1fr); align-items: start; }
   .simulator .sim-side {
+    grid-template-columns: minmax(0, 1fr);
     position: sticky; top: calc(var(--header-h) + var(--sp-4)); max-height: calc(100vh - var(--header-h) - var(--sp-6));
     overflow-y: auto; overscroll-behavior: contain; display: grid; gap: var(--sp-3); padding: var(--sp-4); background: var(--c-surface);
     border: var(--border); border-radius: var(--r-card);

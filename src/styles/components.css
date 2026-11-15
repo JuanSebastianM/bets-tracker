@@ -285,3 +285,31 @@ mark.hl { background: var(--c-accent-soft); color: inherit; border-radius: 3px; 
 .chart-svg .hist-bar { fill: var(--c-accent); fill-opacity: 0.8; }
 .chart-svg .hist-below { fill: var(--c-void); fill-opacity: 0.55; }
 .chart-svg .hist-zero { stroke: var(--c-ink-2); stroke-width: 1.5; stroke-dasharray: 3 3; }
+
+/* Decision links with their topic ("Decisiones fila 28 · Cuota de cierre"), and the line of glossary
+   links under a table of tags. */
+.dlink-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.dlink { display: inline; min-height: 0; }
+.dlink-list .dlink { display: inline-block; min-height: var(--tap); padding: 10px 0; line-height: 1.35; }
+.dlink-row { font-weight: 650; white-space: nowrap; }
+.dlink-topic { color: var(--c-muted); font-weight: 400; }
+.tag-gloss { font-size: var(--fs-sm); color: var(--c-muted); line-height: 2; margin: 0; }
+.tag-gloss-label { margin-right: var(--sp-1); }
+.tag-gloss .term { display: inline-block; padding: 2px 0; font-weight: 650; white-space: nowrap; }
+.verdict-chip { white-space: nowrap; }
+
+/* Long tables on wide screens: the header row stays under the app header while the page scrolls.
+   `overflow: clip` (not auto) keeps the rounded box without making it a scroll container, which
+   would trap the sticky header; these tables are laid out to fit from 960 px. */
+@media (min-width: 960px) {
+  .table-wrap.table-sticky { overflow: clip; }
+  .table-wrap.table-sticky .table th { top: calc(var(--header-h) + var(--safe-t)); z-index: 3; box-shadow: 0 1px 0 var(--c-line); }
+}
+/* A tag inside a table wraps between words only, never inside one. */
+.table .tag { white-space: normal; overflow-wrap: normal; word-break: normal; hyphens: none; text-overflow: clip; }
+
+/* Shell: on wide screens the side rail's column is painted on the page itself, so its background
+   runs the whole height of a long page (and of a full-page capture), not just the first screen. */
+@media (min-width: 960px) {
+  .app { background: linear-gradient(to right, var(--c-surface) calc(var(--rail-w) - 1px), var(--c-line) calc(var(--rail-w) - 1px), var(--c-line) var(--rail-w), transparent var(--rail-w)); }
+}

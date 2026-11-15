@@ -8,6 +8,7 @@
 @media (min-width: 1200px) {
   .explorer .ex-layout { grid-template-columns: 248px minmax(0, 1fr); align-items: start; }
   .explorer .ex-side {
+    grid-template-columns: minmax(0, 1fr);
     position: sticky; top: calc(var(--header-h) + var(--sp-4)); max-height: calc(100vh - var(--header-h) - var(--sp-6));
     overflow-y: auto; overscroll-behavior: contain; display: grid; gap: var(--sp-3); padding: var(--sp-4); background: var(--c-surface);
     border: var(--border); border-radius: var(--r-card);
@@ -62,7 +63,8 @@
 .explorer .ex-match-link { color: var(--c-ink); font-weight: 650; text-decoration: none; }
 .explorer .ex-match-link:hover { color: var(--c-accent); text-decoration: underline; }
 .explorer .th-sort-on { color: var(--c-ink); }
-.explorer .ex-table .tag { max-width: 10em; white-space: normal; overflow-wrap: normal; text-overflow: clip; }
+.explorer .ex-table .tag { max-width: none; white-space: normal; overflow-wrap: normal; word-break: normal; hyphens: none; text-overflow: clip; }
+.explorer .ex-td-tag { min-width: 7.5em; width: 7.5em; }
 .explorer .ex-table .badge { white-space: nowrap; }
 
 /* Detail */

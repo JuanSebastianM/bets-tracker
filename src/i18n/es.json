@@ -68,7 +68,7 @@
     "fairCloseEv": "EV vs cierre",
     "nClose": "n {n} con cierre",
     "pending": "Pendientes",
-    "maxDrawdown": "Peor racha (drawdown)"
+    "maxDrawdown": "Peor caída"
   },
   "filters": {
     "source": "Fuente",
@@ -94,8 +94,8 @@
     "date": "Fecha del slate",
     "datePresets": "Periodo",
     "dateRange": "Rango de fechas",
-    "from": "Desde",
-    "to": "Hasta",
+    "from": "Desde el día",
+    "to": "Hasta el día",
     "slate": "Un slate (fecha del partido)",
     "anySlate": "Cualquier fecha",
     "since": "Desde el",
@@ -124,7 +124,7 @@
     "noMatches": "sin picks",
     "showAll": "Ver todas ({n})",
     "showLess": "Ver menos",
-    "tagGroup": { "price_first": "Tests de precio (VALOR)", "model_tests": "Tests del modelo", "published": "Publicadas", "rejects": "Rechazos y vigilancia", "bets": "Apuestas reales", "grok": "Grok" },
+    "tagGroup": { "price_first": "Pruebas de precio (VALOR)", "model_tests": "Pruebas del modelo", "published": "Publicadas", "rejects": "Rechazos y vigilancia", "bets": "Apuestas reales", "grok": "Grok" },
     "saved": "Filtros guardados",
     "savedEmpty": "Todavía no guardas ninguno. Arma un filtro y guárdalo con un nombre.",
     "saveName": "Nombre del filtro",
@@ -212,13 +212,13 @@
     "worstTag": "Peor: {label} ({ev}, n {n}).",
     "onlyOneQualified": "Es la única con {min} cierres o más.",
     "sourceRecord": "{source} {record}, {profit}",
-    "lastSlate": "Última jornada calificada ({date}): {parts}.",
+    "lastSlate": "Último slate calificado ({date}): {parts}.",
     "lastSlatePending": { "one": "Queda {n} pendiente de ese día.", "other": "Quedan {n} pendientes de ese día." },
-    "lastSlateNone": "Todavía no hay una jornada calificada.",
+    "lastSlateNone": "Todavía no hay un slate calificado.",
     "today": "hoy",
     "pendingNone": "No hay picks pendientes desde hoy.",
     "pendingFirst": { "one": "{n} pick pendiente para {when} ({split}).", "other": "{n} picks pendientes para {when} ({split})." },
-    "pendingMore": { "one": "Y {n} más en las jornadas siguientes.", "other": "Y {n} más en las jornadas siguientes." },
+    "pendingMore": { "one": "Y {n} más en los slates siguientes.", "other": "Y {n} más en los slates siguientes." },
     "sinceNothing": "Desde tu última visita no se calificó ningún pick.",
     "sinceGraded": { "one": "Desde tu última visita se calificó {n} pick: {parts}.", "other": "Desde tu última visita se calificaron {n} picks: {parts}." },
     "sinceAdded": { "one": "Hay {n} fila nueva en la hoja.", "other": "Hay {n} filas nuevas en la hoja." },
@@ -273,5 +273,13 @@
     },
     "byLine": "Por línea",
     "pickLine": "Línea"
+  },
+  "links": {
+    "decisionRow": "Decisiones fila {row}",
+    "decisionTopic": "{label} · {topic}",
+    "inGlossary": "En el glosario",
+    "tagMeanings": "Qué significa cada etiqueta",
+    "whatIs": "Qué es {term}",
+    "dateHint": "Día del partido; toca el campo para elegirlo en el calendario."
   }
 }

@@ -12,7 +12,7 @@
 // Option counts are "how many picks this option would show with the other filters as they are"
 // (facetCounts); options that would show nothing are disabled, or hidden in the long lists.
 import { html, useMemo, useState, useEffect, useId } from '../../../vendor/preact.js';
-import { t } from '../i18n.js';
+import { t, getLocale } from '../i18n.js';
 import { formatDate, formatPct, todayIn } from '../format.js';
 import { toast } from '../toast.js';
 import { APP_TIMEZONE } from '../../config.js';
@@ -189,11 +189,15 @@ function ChipGroup({ field, options, selected, counts, onToggle, long = false, l
 /** Native date input. @param {{ label: string, value: string | null, onValue: (v: string | null) => void, testId?: string }} props */
 function DateField({ label, value, onValue, testId }) {
   const id = useId();
+  // The browser draws its own placeholder (dd/mm/aaaa, mm/dd/yyyy…): the label and a hint say what
+  // the date is, and `lang` asks for the app's language.
   return html`<div class="field">
     <label class="field-label" for=${id}>${label}</label>
     <div class="input-wrap">
-      <input id=${id} type="date" value=${value || ''} data-testid=${testId} onChange=${(/** @type {any} */ e) => onValue(e.currentTarget.value || null)} />
+      <input id=${id} type="date" lang=${getLocale()} value=${value || ''} data-testid=${testId} aria-describedby=${`${id}-hint`}
+        onChange=${(/** @type {any} */ e) => onValue(e.currentTarget.value || null)} />
     </div>
+    <span class="sr-only" id=${`${id}-hint`}>${t('links.dateHint')}</span>
   </div>`;
 }
 

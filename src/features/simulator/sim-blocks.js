@@ -3,10 +3,12 @@
 // the breakdown by tag / market / price band, and the pending picks.
 import { html, useState } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
-import { href } from '../../lib/router.js';
-import { Disclosure, DataTable, SegmentedControl } from '../../lib/ui/index.js';
-import { formatUnits, formatPct, formatPrice, formatDate, formatMonth, formatRecord, todayIn } from '../../lib/format.js';
-import { toQueryString, exactSlice, priceBandPatch } from '../../data/filters.js';
+import { Disclosure, DataTable, SegmentedControl, TagGlossaryLinks } from '../../lib/ui/index.js';
+import { MARKET_SLUGS } from '../../lib/glossary-links.js';
+import { rowPatch } from '../../data/analysis.js';
+import { formatUnits, formatPct, formatPrice, formatDate, formatMonth, formatRecord, todayIn, signClass } from '../../lib/format.js';
+import { explorerHref } from '../../lib/links.js';
+import { exactSlice, priceBandPatch } from '../../data/filters.js';
 import { compareLineKeys, lineLabel } from '../../data/lines.js';
 import { APP_TIMEZONE } from '../../config.js';
 import { priceBand } from '../../data/stats.js';
@@ -18,11 +20,8 @@ import { closeSentenceFor } from './sentences.js';
 /** @typedef {import('../../data/simulate.js').Staking} Staking */
 /** @typedef {import('../../data/filters.js').FilterState} FilterState */
 
-const pos = (/** @type {number | null} */ v) => (v == null || Math.abs(v) < 0.005 ? '' : v > 0 ? 'pos' : 'neg');
-const explorerHref = (/** @type {FilterState} */ f) => {
-  const qs = toQueryString(f);
-  return href(qs ? `/explorer?${qs}` : '/explorer');
-};
+/** Sign class; figures that round to 0.00 get none. @param {number | null} v */
+const pos = (v) => signClass(v, 0.0049);
 
 /** @param {{ testId: string, summary: any, children: any }} props */
 function Block({ testId, summary, children }) {
@@ -128,7 +127,8 @@ export function BreakdownBlock({ sim, filters, picks, today }) {
     if (dim === 'tag') return { tags: [k] };
     if (dim === 'market') return { markets: [k] };
     if (dim === 'line') return { lines: [k] };
-    return priceBandPatch(k);
+    // A band inside a price filter that is already on: the overlap of the two (analysis.js rowPatch).
+    return rowPatch(filters, 'priceBand', k, { today: today || todayIn(APP_TIMEZONE) }) || priceBandPatch(k);
   };
   // Every row links to exactly its picks (graded, countable, priced; see filters.js exactSlice).
   const slice = (/** @type {string} */ k) => (picks ? exactSlice(picks, filters, patchOf(k), { today: today || todayIn(APP_TIMEZONE) }) : { ...filters, ...patchOf(k) });
@@ -152,6 +152,10 @@ export function BreakdownBlock({ sim, filters, picks, today }) {
         </li>`,
       )}
     </ul>
+    ${dim === 'tag' ? html`<${TagGlossaryLinks} tags=${rows.map((r) => String(r.key))} testId="sim-tag-glossary" />` : null}
+    ${dim === 'market'
+      ? html`<${TagGlossaryLinks} items=${rows.filter((r) => MARKET_SLUGS[r.key]).map((r) => ({ slug: MARKET_SLUGS[r.key], label: t(`markets.${r.key}`) }))} label=${t('links.inGlossary')} testId="sim-market-glossary" />`
+      : null}
     <p class="muted xs">${t('simulator.breakdown.note')}</p>
   </${Block}>`;
 }

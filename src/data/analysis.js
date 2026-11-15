@@ -6,7 +6,8 @@
 
 import { summarize, groupBy, measureStat, calibration, brier, priceBand, monthOf, weekdayOf, isGraded, isCountable, PRICE_BANDS } from './stats.js';
 import { closeVerdict } from './overview.js';
-import { refOf, defaultFilters } from './filters.js';
+import { refOf, defaultFilters, applyFilters, exactSlice, resolveDates, lastSlate, PRICE_PRESETS, priceBandPatch } from './filters.js';
+import { compareLineKeys } from './lines.js';
 import { TAGS, MARKET_FAMILIES, PRICE_FIRST_TAGS, FILTER_REASONS } from './tags.js';
 
 /** @typedef {import('./types').Pick} Pick */
@@ -122,6 +123,8 @@ export const DIMENSIONS = [
   { id: 'fuerza', key: (p) => p.parsed.fuerza || null, order: ['keeps', 'rejects', 'na'], slice: (k) => ({ fuerza: [k] }) },
   { id: 'reason', key: (p) => (p.parsed.filters.length ? p.parsed.filters : null), order: FILTER_REASONS.map(([id]) => id), slice: (k) => ({ reasons: [k] }) },
   { id: 'source', key: (p) => p.source, order: ['bets', 'shadow', 'grok'], slice: (k) => ({ sources: [k] }) },
+  // The line of the selection (lines.js lineKey: 'cards:under:4.5'), in line order.
+  { id: 'line', key: (p) => p.lineKey || null, order: null, slice: (k) => ({ lines: [k] }) },
 ];
 
 export const DIMENSION_IDS = DIMENSIONS.map((d) => d.id);
@@ -221,6 +224,7 @@ export function sortRows(rows, sort, dir, dimId, labelOf = (k) => k) {
   const dim = dimension(dimId);
   if (sort === 'natural') {
     if (dimId === 'month') return [...rows].sort((a, b) => (a.key < b.key ? -k : a.key > b.key ? k : 0));
+    if (dimId === 'line') return [...rows].sort((a, b) => k * compareLineKeys(a.key, b.key));
     if (dim.order && ORDERED_DIMENSIONS.includes(dimId)) {
       const o = dim.order;
       return [...rows].sort((a, b) => k * (o.indexOf(a.key) - o.indexOf(b.key)));
@@ -705,4 +709,110 @@ export function grokPricedSplit(picks) {
     priced: summarize(grok.filter((p) => kind(p) === 'priced' || kind(p) === 'priced_rule29')),
     notPriced: summarize(grok.filter((p) => kind(p) === 'not_priced')),
   };
+}
+
+// ---------------------------------------------------------------- exact links
+
+/** Dimensions whose picks can carry several keys (a pick is in each of its groups). */
+const MULTI_KEY = new Set(['book', 'reason']);
+/** The list field of the filter state each list dimension patches. */
+const LIST_FIELD = /** @type {Record<string, keyof FilterState>} */ ({
+  tag: 'tags', market: 'markets', marketRaw: 'marketsRaw', league: 'leagues', book: 'books', ref: 'refs', sample: 'samples',
+  fuerza: 'fuerza', reason: 'reasons', source: 'sources', line: 'lines',
+});
+
+/** Is a pick counted by a breakdown row (summarize: countable, graded, priced)? @param {Pick} p */
+const counted = (p) => isCountable(p) && isGraded(p) && p.price != null;
+
+/** @param {{ min: number | null, max: number | null }} a @param {{ min: number | null, max: number | null }} b */
+function intersect(a, b) {
+  const min = a.min == null ? b.min : b.min == null ? a.min : Math.max(a.min, b.min);
+  const max = a.max == null ? b.max : b.max == null ? a.max : Math.min(a.max, b.max);
+  return { min, max };
+}
+
+/**
+ * The patch that selects one group *within* the current filters: list fields narrow to the key,
+ * ranges (dates, model probability, logged EV, price) are intersected with the current range. null
+ * when no filter can express it (weekday; a second book or reason of a pick filtered by another one).
+ * @param {FilterState} f @param {string} dimId @param {string} key @param {{ today: string, lastSlate?: string | null }} ctx
+ * @returns {Partial<FilterState> | null}
+ */
+export function rowPatch(f, dimId, key, ctx) {
+  const dim = dimension(dimId);
+  const field = LIST_FIELD[dimId];
+  if (field) {
+    const cur = /** @type {string[]} */ (f[field] || []);
+    if (MULTI_KEY.has(dimId) && cur.length && !(cur.length === 1 && cur[0] === key)) return null;
+    return /** @type {any} */ ({ [field]: [key] });
+  }
+  if (dimId === 'month') {
+    const [from, to] = resolveDates(f, ctx);
+    const start = `${key}-01`;
+    const end = monthEnd(key);
+    return { datePreset: null, slate: null, dateFrom: from && from > start ? from : start, dateTo: to && to < end ? to : end };
+  }
+  if (dimId === 'probBand' || dimId === 'evBand') {
+    const r = bandRange(dimId === 'probBand' ? PROB_BANDS : EV_BANDS, key);
+    if (!r) return null;
+    const fieldR = dimId === 'probBand' ? 'prob' : 'ev';
+    return /** @type {any} */ ({ [fieldR]: intersect(f[fieldR], r) });
+  }
+  if (dimId === 'priceBand') {
+    const noPrice = f.pricePreset == null && f.price.min == null && f.price.max == null;
+    if (noPrice || f.pricePreset === key) return priceBandPatch(key);
+    // A band inside the current price filter is the band itself; otherwise the inclusive overlap.
+    const band = PRICE_PRESETS.find((x) => x.id === key);
+    const cur = f.pricePreset ? PRICE_PRESETS.find((x) => x.id === f.pricePreset) : { min: f.price.min, max: f.price.max };
+    if (!band || !cur) return null;
+    const inside = (cur.min == null || (band.min != null && band.min >= cur.min)) && (cur.max == null || (band.max != null && band.max <= cur.max));
+    if (inside) return priceBandPatch(key);
+    const lo = band.min != null && band.minInc ? band.min : band.min != null ? Math.round((band.min + 0.0001) * 10000) / 10000 : null;
+    const hi = band.max != null && band.maxExc ? Math.round((band.max - 0.0001) * 10000) / 10000 : band.max;
+    const curLo = cur.min != null && f.pricePreset && !('minInc' in cur && cur.minInc) ? Math.round((cur.min + 0.0001) * 10000) / 10000 : cur.min;
+    const curHi = cur.max != null && f.pricePreset && 'maxExc' in cur && cur.maxExc ? Math.round((cur.max - 0.0001) * 10000) / 10000 : cur.max;
+    return { pricePreset: null, price: intersect({ min: lo, max: hi }, { min: curLo, max: curHi }) };
+  }
+  const p = dim.slice(key);
+  return p || null;
+}
+
+/**
+ * The Explorer filter that shows exactly the picks a breakdown row counts, or null when no filter can.
+ * Built from rowPatch + exactSlice and then checked: the link's picks must be the row's counted picks
+ * (same uids), so a link can never show more or fewer picks than the row says.
+ * @param {Pick[]} all every pick (the Explorer filters these)
+ * @param {Pick[]} filtered the picks the breakdown was computed on (applyFilters(all, f))
+ * @param {FilterState} f @param {string} dimId @param {string} key
+ * @param {{ today: string, lastSlate?: string | null }} ctx
+ * @returns {FilterState | null}
+ */
+export function exactRowFilter(all, filtered, f, dimId, key, ctx) {
+  return exactCellFilter(all, filtered, f, [[dimId, key]], ctx);
+}
+
+/**
+ * exactRowFilter for a cell of the two-way table (several dimension / key pairs at once).
+ * @param {Pick[]} all @param {Pick[]} filtered @param {FilterState} f
+ * @param {Array<[string, string]>} slices @param {{ today: string, lastSlate?: string | null }} ctx
+ * @returns {FilterState | null}
+ */
+export function exactCellFilter(all, filtered, f, slices, ctx) {
+  const c = { lastSlate: lastSlate(all), ...ctx };
+  let cur = f;
+  for (const [dimId, key] of slices) {
+    const patch = rowPatch(cur, dimId, key, c);
+    if (!patch) return null;
+    cur = { ...cur, ...patch };
+  }
+  const next = exactSlice(all, f, { ...cur }, c);
+  const has = (/** @type {Pick} */ p) =>
+    slices.every(([dimId, key]) => {
+      const k = dimension(dimId).key(p);
+      return Array.isArray(k) ? k.includes(key) : k === key;
+    });
+  const want = new Set(filtered.filter((p) => has(p) && counted(p)).map((p) => p.uid));
+  const got = applyFilters(all, next, c);
+  if (got.length !== want.size || got.some((p) => !want.has(p.uid))) return null;
+  return next;
 }

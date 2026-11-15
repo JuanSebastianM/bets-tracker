@@ -11,7 +11,7 @@
 .analysis .an-notes:empty { display: none; }
 .analysis .an-dim { color: var(--c-muted); font-weight: 400; }
 .analysis .an-link { justify-self: start; min-height: var(--tap); display: inline-flex; align-items: center; text-decoration: none; }
-.analysis .an-verdict { white-space: nowrap; }
+
 
 /* Part switch: one row of links (the part is in the path), scrolls inside itself if it must. */
 .analysis .an-tabs {
@@ -124,6 +124,7 @@ a.an-row-name { color: var(--c-accent); text-decoration: none; }
 @media (min-width: 1200px) {
   .analysis .an-layout { grid-template-columns: 248px minmax(0, 1fr); align-items: start; }
   .analysis .an-side-panel {
+    grid-template-columns: minmax(0, 1fr);
     position: sticky; top: calc(var(--header-h) + var(--sp-4)); max-height: calc(100vh - var(--header-h) - var(--sp-6));
     overflow-y: auto; overscroll-behavior: contain; display: grid; gap: var(--sp-3); padding: var(--sp-4); background: var(--c-surface);
     border: var(--border); border-radius: var(--r-card);

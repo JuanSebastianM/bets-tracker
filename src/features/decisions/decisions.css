@@ -79,3 +79,13 @@
 .decisions .dstaking-body { display: grid; gap: 0; min-width: 0; font-size: var(--fs-sm); overflow-wrap: anywhere; }
 .decisions .dstaking-body .link-btn { justify-self: start; }
 .decisions .dmonth-h::first-letter { text-transform: uppercase; }
+
+/* Phones: compact cards (decision text clamped to four lines, one disclosure for evidence and review)
+   and a row of month buttons to jump within the page. */
+.decisions .dtext-clamp { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.decisions .dsub { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.04em; color: var(--c-muted); margin-top: var(--sp-2); }
+.decisions .dsub:first-child { margin-top: 0; }
+.decisions .djump { display: flex; gap: var(--sp-2); overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.decisions .djump::-webkit-scrollbar { display: none; }
+.decisions .djump-btn { flex: none; min-height: 36px; padding: 0 var(--sp-3); border: 1px solid var(--c-line-strong); background: var(--c-surface); color: var(--c-ink-2); cursor: pointer; font: inherit; font-size: var(--fs-sm); font-weight: 600; }
+.decisions .dmonth { scroll-margin-top: var(--header-h); }

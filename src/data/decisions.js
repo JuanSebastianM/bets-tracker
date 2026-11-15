@@ -46,6 +46,16 @@ export const IN_FORCE_KINDS = /** @type {DecisionStatusKind[]} */ (['in_force', 
  * @type {Array<{ id: string, re: RegExp }>}
  */
 export const DECISION_THEMES = [
+  // Narrow topic shapes first (checked on the real topics, 15 Nov 2026): a topic that names a script,
+  // an audit, a run or a closing-price task is about how the work is done even when it mentions Grok, the
+  // model or a filter; an audit of CLV or a topic that starts with the close is a measure; a topic that
+  // starts with the Sofascore AI or a backtest is about the model; the value scan and data endpoints are
+  // data; rule 25 (shots are SHADOW) and a topic that starts with "Prueba" are shadow tests.
+  { id: 'workflow', re: /^tareas|clv-scheduler|^script\b|^auditoria del\b|^los comandos|^slate\.json|^mensaje del slate|^ventana del slate/ },
+  { id: 'measures', re: /^auditoria de clv|^cuota de cierre|^cierres? del feed|^clv\b/ },
+  { id: 'model', re: /^ia de sofascore|^backtest|^reconstruccion del modelo|^datos y modelo/ },
+  { id: 'data', re: /^escaneo de valor|endpoint|^arbitros:|^rutas de datos|^formato del feed|^apertura del feed|^recibo del paso|^oddalerts/ },
+  { id: 'shadow', re: /^regla 25\b|^pruebas?\b/ },
   // Milestone reviews and how reviews report ("Revisión Sombra 150 filas", "Revisiones: …").
   { id: 'reviews', re: /^revision|^revisiones|\breview\b|review\.py/ },
   // The Grok tab and Grok's picks.
@@ -64,12 +74,14 @@ export const DECISION_THEMES = [
   { id: 'model', re: /modelo|model\.py|backtest|calibracion|fuerza|encogid|regla (?:29|30|32|36)\b|\bia de sofascore\b/ },
   // Where the data comes from: books, feeds, fstats, Sofascore, card counts.
   { id: 'data', re: /fstats|sofascore|oddspedia|oddalerts|\bfeed\b|casas|betano|betsson|\bstake\b|datos|rutas|tarjetas|favoritos/ },
-  // How runs work: tasks, skills, writing to the sheet, messages, the slate window.
+  // How runs work: tasks, skills, grading, writing to and reading the sheet, messages, the slate window.
+  { id: 'workflow', re: /tareas|flujo de trabajo|\bslates?\b|\bskills?\b|calificacion|registro|escritura|lecturas? de la hoja|subagente|script|mensaje|comandos|auditoria|correccion|navegador/ },
+  // Catch-all (only when neither the topic nor the decision text matches anything above).
   { id: 'workflow', re: /./ },
 ];
 
-/** Theme ids in display order. */
-export const THEME_IDS = [...new Set(DECISION_THEMES.map((x) => x.id))];
+/** Theme ids in display order (the order of the filter chips and of the "in force" view). */
+export const THEME_IDS = ['reviews', 'grok', 'staking', 'filters', 'measures', 'data', 'shadow', 'model', 'workflow'];
 
 /**
  * Theme of a decision (see DECISION_THEMES for the rule).
@@ -77,11 +89,21 @@ export const THEME_IDS = [...new Set(DECISION_THEMES.map((x) => x.id))];
  * @returns {string}
  */
 export function decisionTheme(d) {
+  return decisionThemeMatch(d).theme;
+}
+
+/**
+ * Theme of a decision and what decided it: the topic, the decision text, or the catch-all (neither
+ * matched). Used by the tests that keep the catch-all small.
+ * @param {{ topic?: string, decision?: string }} d
+ * @returns {{ theme: string, by: 'topic' | 'decision' | 'fallback' }}
+ */
+export function decisionThemeMatch(d) {
   const topic = fold(d.topic || '');
-  for (const th of DECISION_THEMES.slice(0, -1)) if (th.re.test(topic)) return th.id;
+  for (const th of DECISION_THEMES.slice(0, -1)) if (th.re.test(topic)) return { theme: th.id, by: 'topic' };
   const text = fold(d.decision || '');
-  for (const th of DECISION_THEMES.slice(0, -1)) if (th.re.test(text)) return th.id;
-  return 'workflow';
+  for (const th of DECISION_THEMES.slice(0, -1)) if (th.re.test(text)) return { theme: th.id, by: 'decision' };
+  return { theme: 'workflow', by: 'fallback' };
 }
 
 // ---------------------------------------------------------------------------------------------------

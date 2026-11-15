@@ -20,7 +20,7 @@ export function fractionLabel(f) {
 /** Units without the sign ('1u', '0.25u'). @param {number} v */
 export const plainUnits = (v) => `${Number(v.toFixed(2))}u`;
 
-/** Short name of a plan: '1u fija', '2% de la banca', 'Stake registrado', 'Kelly 1/4, máx. 2u'. @param {Staking} s */
+/** Short name of a plan: '1u fija', '2% del bank', 'Stake registrado', 'Kelly 1/4, máx. 2u'. @param {Staking} s */
 export function stakingLabel(s) {
   switch (s.mode) {
     case 'percent':

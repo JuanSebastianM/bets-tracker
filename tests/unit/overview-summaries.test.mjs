@@ -91,12 +91,12 @@ test('last slate and pending', () => {
   ];
   const r = slateReport(ps, '2026-11-14');
   const s = both(() => describeLastSlate(r));
-  assert.equal(s.es, 'Última jornada calificada (14 nov): Sombra 1-1, 0.00u; Grok 1-0, +2.00u. Queda 1 pendiente de ese día.');
+  assert.equal(s.es, 'Último slate calificado (14 nov): Sombra 1-1, 0.00u; Grok 1-0, +2.00u. Queda 1 pendiente de ese día.');
   assert.equal(s.en, 'Last graded slate (Nov 14): Shadow 1-1, 0.00u; Grok 1-0, +2.00u. 1 pick from that day is still pending.');
-  assert.equal(describeLastSlate({ date: null, sources: [] }), 'Todavía no hay una jornada calificada.');
+  assert.equal(describeLastSlate({ date: null, sources: [] }), 'Todavía no hay un slate calificado.');
   const g = upcomingPending(ps, '2026-11-15');
   const p = both(() => describePending(g, '2026-11-15'));
-  assert.equal(p.es, '3 picks pendientes para hoy (Sombra 2, Grok 1). Y 1 más en las jornadas siguientes.');
+  assert.equal(p.es, '3 picks pendientes para hoy (Sombra 2, Grok 1). Y 1 más en los slates siguientes.');
   assert.equal(p.en, '3 picks pending for today (Shadow 2, Grok 1). And 1 more on later slates.');
   assert.equal(describePending(g.slice(1), '2026-11-15'), '1 pick pendiente para 16 nov (Sombra 1).');
   assert.equal(describePending([], '2026-11-15'), 'No hay picks pendientes desde hoy.');

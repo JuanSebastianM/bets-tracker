@@ -53,8 +53,37 @@ function otherSides(/** @type {string} */ inner, /** @type {number} */ need) {
 
 /** '1X2 1.62/3.90/5.40' inside a close note -> [home, draw, away]. */
 function triple(/** @type {string} */ text) {
-  const m = new RegExp(String.raw`1X2\s+(${NUM})\s*/\s*(${NUM})\s*/\s*(${NUM})`).exec(text || '');
+  const m = TRIPLE_RE.exec(text || '');
   return m ? [fnum(m[1]), fnum(m[2]), fnum(m[3])] : null;
+}
+
+// Patterns compiled once (they used to be rebuilt on every call: the main cost of normalize at a few
+// thousand rows). Same sources and flags as before; none is global except FEED_PRICE_RE, which is only
+// used with matchAll (which works on a copy).
+const TRIPLE_RE = new RegExp(String.raw`1X2\s+(${NUM})\s*/\s*(${NUM})\s*/\s*(${NUM})`);
+const CLV_RE = new RegExp(String.raw`^CLV\s+([+\-−]?${NUM})\s*%(?:\s+vs\s+(?:Cuota\s*\(\s*)?(Betano|Betsson|Stake))?`);
+const EV_JUSTA_RE = new RegExp(String.raw`^EV justa\s+([+\-−]?${NUM})\s*%(?:\s+\(otro lado de (\w+)\))?`);
+const FEED_PRICE_RE = new RegExp(String.raw`(?<![\w])feed\s+(${NUM})(?![\d.,:/])`, 'g');
+const FEED_CLOSE_RE = new RegExp(String.raw`cierre:\s*Sofascore/bet365\s+(?:(?:1X|X2|12)\s+)?(${NUM})(?:\s*\(([^)]*)\))?`);
+const THREE_WAY_RE = new RegExp(String.raw`^\s*1\s+(${NUM})\s*/\s*X\s+(${NUM})\s*/\s*2\s+(${NUM})`);
+const FEED_OPEN_RE = new RegExp(String.raw`(?<!1X2 )apertura feed\s+(${NUM})\s*\(otro lado\s+(${NUM})(;\s*invertida\?)?`);
+const FEED_SOURCE_RE = new RegExp(String.raw`Precio feed Sofascore|(?:^|\|\s*)bet365 feed(?:\s*\||\s*$|\.|\s+${NUM})`);
+const PIN_RE = new RegExp(String.raw`\bpin (${NUM})/(${NUM})/(${NUM}) \(([^)]+)\)(?:\s*\|\s*pin id ([0-9a-f]+))?`);
+const OPEN_1X2_RE = new RegExp(String.raw`1X2 apertura feed (${NUM})/(${NUM})/(${NUM})`);
+const BOOK_PRICE_SEG_RE = new RegExp(String.raw`^(Betano|Betsson|Stake)\s+@?(?:[OUou]\s?\d+(?:[.,]\d+)?\s+@?)?(${NUM})(?!\d|[.,]\d)\s*(?:\((.*)\))?`);
+/** @type {Map<string, RegExp>} */
+const BOOK_RES = new Map();
+/** A book's "price/other" ('pair') or single price ('one') pattern, cached per book. @param {string} book @param {'pair' | 'one'} kind */
+function bookRe(book, kind) {
+  const key = `${kind}:${book}`;
+  let re = BOOK_RES.get(key);
+  if (!re) {
+    re = kind === 'pair'
+      ? new RegExp(book + String.raw`\s+(?:\d+(?:[.,]\d+)?\s+)?(${NUM})\s*/\s*(${NUM})(?!\d|[.,]\d)`)
+      : new RegExp(book + String.raw`\s+@?(?:[OUou]\s?\d+(?:[.,]\d+)?\s+@?)?(${NUM})(?!\d|[.,]\d)`);
+    BOOK_RES.set(key, re);
+  }
+  return re;
 }
 
 /** Split on `sep` outside parentheses. */
@@ -103,12 +132,12 @@ export function parseLogger(n, need = 1) {
         if (close && !out.books[book]) out.books[book] = { close, others: otherSides(inner, k), triple: triple(inner) };
       }
     }
-    let m = new RegExp(String.raw`^CLV\s+([+\-−]?${NUM})\s*%(?:\s+vs\s+(?:Cuota\s*\(\s*)?(Betano|Betsson|Stake))?`).exec(s);
+    let m = CLV_RE.exec(s);
     if (m) {
       out.clvText = fnum(m[1].replace('−', '-')) / 100;
       out.clvBook = m[2] || null;
     }
-    m = new RegExp(String.raw`^EV justa\s+([+\-−]?${NUM})\s*%(?:\s+\(otro lado de (\w+)\))?`).exec(s);
+    m = EV_JUSTA_RE.exec(s);
     if (m) {
       out.evText = fnum(m[1].replace('−', '-')) / 100;
       out.evOtherBook = m[2] || null;
@@ -133,18 +162,18 @@ export function parseFeed(n, need = 1) {
     inverted: false,
   };
   const k = need === 1 || need === 2 ? need : 1;
-  for (const m of n.matchAll(new RegExp(String.raw`(?<![\w])feed\s+(${NUM})(?![\d.,:/])`, 'g'))) {
+  for (const m of n.matchAll(FEED_PRICE_RE)) {
     const before = n.slice(Math.max(0, m.index - 12), m.index).toLowerCase().trimEnd();
     if (['apertura', '1x2', 'ref', 'el', 'sin'].some((w) => before.endsWith(w))) continue;
     out.feedOpen = fnum(m[1]);
     break;
   }
-  let m = new RegExp(String.raw`cierre:\s*Sofascore/bet365\s+(?:(?:1X|X2|12)\s+)?(${NUM})(?:\s*\(([^)]*)\))?`).exec(n);
+  let m = FEED_CLOSE_RE.exec(n);
   if (m) {
     out.feedClose = fnum(m[1]);
     const inner = m[2] || '';
     out.feedTriple = triple(inner);
-    const three = new RegExp(String.raw`^\s*1\s+(${NUM})\s*/\s*X\s+(${NUM})\s*/\s*2\s+(${NUM})`).exec(inner);
+    const three = THREE_WAY_RE.exec(inner);
     if (three) {
       const rest = [fnum(three[1]), fnum(three[2]), fnum(three[3])];
       const i = rest.findIndex((v) => Math.abs(v - out.feedClose) < 0.006);
@@ -154,7 +183,7 @@ export function parseFeed(n, need = 1) {
       out.feedOthers = otherSides(inner.replace(/^\s*otro lado\s*/, ''), k);
     }
   }
-  m = new RegExp(String.raw`(?<!1X2 )apertura feed\s+(${NUM})\s*\(otro lado\s+(${NUM})(;\s*invertida\?)?`).exec(n);
+  m = FEED_OPEN_RE.exec(n);
   if (m) {
     out.openInit = fnum(m[1]);
     out.openInitOther = fnum(m[2]);
@@ -171,7 +200,7 @@ const BOOK_PRICE = new RegExp(String.raw`(Betano|Betsson|Stake)\s+@?(?:[OUou](?:
  * @param {{ clvBook: string | null }} lg
  */
 export function priceSource(reason, n, price, lg) {
-  if (/^\s*IA-WATCH/i.test(reason) || new RegExp(String.raw`Precio feed Sofascore|(?:^|\|\s*)bet365 feed(?:\s*\||\s*$|\.|\s+${NUM})`).test(n)) return 'feed';
+  if (/^\s*IA-WATCH/i.test(reason) || FEED_SOURCE_RE.test(n)) return 'feed';
   let m = /Precio (Betano|Betsson|Stake)\b/.exec(n);
   if (m) return m[1];
   m = /^\s*VALOR(?: PROP)?(?: CASI)?:\s*(Betano|Betsson|Stake)\b/.exec(reason);
@@ -193,14 +222,14 @@ export function priceSource(reason, n, price, lg) {
 /** A book's price for the row's line written when the row was logged (review.py's book_open_in_note). */
 function bookOpenInNote(/** @type {string} */ n, /** @type {string} */ book, sel = '') {
   const pre = n.split(/\|\s*[Cc]ierr[ea]:?\s+(?:Betano|Betsson|Stake)/)[0];
-  let m = new RegExp(book + String.raw`\s+(?:\d+(?:[.,]\d+)?\s+)?(${NUM})\s*/\s*(${NUM})(?!\d|[.,]\d)`).exec(pre);
+  let m = bookRe(book, 'pair').exec(pre);
   if (m) {
     const s = sel.toLowerCase();
     if (s.includes('under') || s.includes('menos')) return fnum(m[2]);
     if (s.includes('over') || s.includes('más') || s.includes('mas ')) return fnum(m[1]);
     return null;
   }
-  m = new RegExp(book + String.raw`\s+@?(?:[OUou]\s?\d+(?:[.,]\d+)?\s+@?)?(${NUM})(?!\d|[.,]\d)`).exec(pre);
+  m = bookRe(book, 'one').exec(pre);
   return m ? fnum(m[1]) : null;
 }
 
@@ -310,12 +339,12 @@ export function parseNotes(row) {
 
   let pin = null;
   let pinMissing = null;
-  if ((m = new RegExp(String.raw`\bpin (${NUM})/(${NUM})/(${NUM}) \(([^)]+)\)(?:\s*\|\s*pin id ([0-9a-f]+))?`).exec(n))) {
+  if ((m = PIN_RE.exec(n))) {
     pin = { home: fnum(m[1]), draw: fnum(m[2]), away: fnum(m[3]), readUtc: m[4], id: m[5] || null };
   } else if ((m = /\bpin n\/d \(([^)]+)\)/.exec(n))) pinMissing = m[1];
 
   let open1x2 = /** @type {ParsedNotes['open1x2']} */ (null);
-  if ((m = new RegExp(String.raw`1X2 apertura feed (${NUM})/(${NUM})/(${NUM})`).exec(n))) {
+  if ((m = OPEN_1X2_RE.exec(n))) {
     open1x2 = { home: fnum(m[1]), draw: fnum(m[2]), away: fnum(m[3]) };
   } else if (/1X2 apertura feed n\/a/.test(n)) open1x2 = 'n/a';
 
@@ -327,7 +356,7 @@ export function parseNotes(row) {
   const bookPrices = [];
   for (const seg of pre.split(' | ')) {
     const s = seg.trim();
-    const bp = new RegExp(String.raw`^(Betano|Betsson|Stake)\s+@?(?:[OUou]\s?\d+(?:[.,]\d+)?\s+@?)?(${NUM})(?!\d|[.,]\d)\s*(?:\((.*)\))?`).exec(s);
+    const bp = BOOK_PRICE_SEG_RE.exec(s);
     if (bp) {
       if (!bookPrices.some((b) => b.book === bp[1])) bookPrices.push({ book: bp[1], price: fnum(bp[2]), other: bp[3] ? bp[3].trim() : null, unavailable: null });
       continue;

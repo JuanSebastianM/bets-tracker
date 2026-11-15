@@ -222,5 +222,6 @@ export const TAG_GROUPS = [
   { id: 'grok', tags: ['grok_priced', 'grok_not_priced', 'grok_other'] },
 ];
 
-/** Glossary slug of a tag ('near_value' -> 'near-value', the `#/glossary/:term` form). @param {TagId} id */
-export const tagSlug = (id) => String(id).replace(/_/g, '-');
+// Glossary slug of a tag ('near_value' -> 'near-value', the `#/glossary/:term` form): one
+// implementation, in src/lib/glossary-links.js, re-exported here for the callers that import it from tags.
+export { tagSlug } from '../lib/glossary-links.js';

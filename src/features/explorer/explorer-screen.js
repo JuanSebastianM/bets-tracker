@@ -5,6 +5,7 @@
 // Query: the filter keys of src/data/filters.js plus `sort`, `dir` and `page`.
 import { html, useMemo, useState, useEffect } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
+import { SIDE_PANEL_QUERY } from '../../lib/links.js';
 import { navigate, goBack } from '../../lib/router.js';
 import {
   FeedGate, PickCard, Pagination, pageOf, BottomSheet, EmptyState, Button, IconButton, SearchInput, Select, Disclosure,
@@ -24,7 +25,7 @@ import { PickDetail } from './pick-detail.js';
 /** @typedef {import('../../data/filters.js').FilterState} FilterState */
 
 /** Wide screens: the panel is a side column. */
-const SIDE_QUERY = '(min-width: 1200px)';
+const SIDE_QUERY = SIDE_PANEL_QUERY;
 /** From the side rail up: the list is a table. */
 const TABLE_QUERY = '(min-width: 960px)';
 
