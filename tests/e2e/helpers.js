@@ -12,6 +12,9 @@ export const ROUTES = [
   { path: '/decisions', title: 'Decisiones', ready: 'decisions-count' },
   { path: '/glossary', title: 'Glosario', ready: 'glossary-tags' },
   { path: '/settings', title: 'Ajustes', ready: 'settings-feed' },
+  { path: '/decisions/14', title: 'Decisión', ready: 'decision-related' },
+  { path: '/glossary/rule-29', title: 'Glosario', ready: 'glossary-term' },
+  { path: '/glossary/near-value', title: 'Glosario', ready: 'glossary-term' },
 ];
 
 /**
