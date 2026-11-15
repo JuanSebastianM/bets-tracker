@@ -1,4 +1,4 @@
-// Audit (docs/build-log/audit.md): what the section agents could not verify. Synthetic feeds only:
+// Audit (docs/BUILD_LOG.md, "Independent audit"): what the section agents could not verify. Synthetic feeds only:
 // the fixture, the fixture with whitelisted headers missing, an empty feed, and the fixture blown up to
 // 5,000 picks. Both languages, both themes, 390 px and 1280 px.
 import { test, expect } from 'playwright/test';
