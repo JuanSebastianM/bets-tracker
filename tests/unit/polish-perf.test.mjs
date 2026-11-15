@@ -103,7 +103,10 @@ test('5,000 picks: normalize, one filter change, summaries, Overview, Analysis a
     simulate(data.picks, { mode: 'kelly', kellyFraction: 0.25, kellyCap: 2, bankroll: 100 });
   }).ms;
 
-  const BUDGET_MS = { normalize: 1500, filterAndFacets: 600, summarize: 150, overview: 600, analysis: 1500, simulate: 600 };
+  // Roughly ten times what an idle machine needs: the test failed once at the earlier, tighter budgets
+  // while several agents were running on the same machine. It guards against a regression in kind
+  // (a pass per row turning into a pass per row per option), not against a slow runner.
+  const BUDGET_MS = { normalize: 4000, filterAndFacets: 1800, summarize: 500, overview: 1800, analysis: 4000, simulate: 1800 };
   console.log(`# 5,000 picks (ms): ${Object.entries(report).map(([k, v]) => `${k} ${v.toFixed(0)}`).join(', ')}`);
   for (const [k, budget] of Object.entries(BUDGET_MS)) assert.ok(report[k] < budget, `${k}: ${report[k].toFixed(0)} ms (budget ${budget} ms)`);
 });

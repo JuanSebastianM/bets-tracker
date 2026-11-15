@@ -505,7 +505,16 @@ shared setup and rules block every brief ends with). Each agent's own account is
    full-height rail and sticky table heads, the 5,000-pick speed test (note parsing compiled its regular
    expressions once instead of per row: normalize roughly 360 → 110–250 ms), the Glossary (≈16,000 →
    ≈920 px) and Decisions made comfortable on a phone, offline e2e on the built site, manifest shortcuts
-   and the update flow, and the docs brought in line with the code.
+   and the update flow, and the docs brought in line with the code. **After the merges** the orchestrator
+   pasted the hardened `Feed.gs` into the sheet (same pinned-commit and hash check as the first install),
+   ran the self-test on the real sheet, redeployed it as version 3 at the same URL and checked the live
+   feed from the app's origin for every money shape. The polish merge then failed CI twice over
+   (`549fae9`) while passing locally: the runner's wider fallback font made the 248 px filter column
+   overflow, and the runner's Chromium ignored the launch flags the offline test used to get a service
+   worker on a made-up host. Both were fixed in `1aa0c3c` (every grid in the panel got a shrinkable
+   column, and the test now also runs with a wider font; the offline test uses the app's own `?sw=on`
+   override on 127.0.0.1), and the next run deployed. The live site was then smoke-tested on the real
+   data from Juan's browser: every route, no errors, no horizontal scroll, no money on screen.
 8. **Docs** ([docs](docs/briefs/docs.md)): the last audit findings (invented text instead of real reason
    and rule strings, price labels derived from their bounds, the documented `review.py` differences),
    this README, the published briefs and one build log.
@@ -541,6 +550,12 @@ shared setup and rules block every brief ends with). Each agent's own account is
   rule lines, money written in words). Short, targeted read-only checks on the real sheet and an
   independent audit caught them; the fixture must still never hold real text, which is why the docs
   pass rewrote the reason strings an earlier agent had copied.
+- **Green locally is not green.** Two tests passed in the workspace and failed on the CI runner (fonts,
+  browser flags), and a deploy was skipped each time. The orchestrator now reads the CI result after every
+  push to `main` instead of assuming the local check was enough.
+- **An allowed range can be too wide.** Two briefs let agents read the staking rules from a row that
+  includes the rule stating the unit value. Nothing was copied (the audit scanned the repository and its
+  history), but the briefs should have started two rows lower; they do now.
 - **Agents report what they did not verify.** Every hand-off listed it (screen readers, real-volume
   speed), and those lists became the audit's and the polish pass's work lists.
 
