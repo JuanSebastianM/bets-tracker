@@ -139,6 +139,16 @@ r.totals;   // n, skipped, pending, staked, profit, yield, finalBank, roiOnBank,
 r.perMonth; // [{ month: 'YYYY-MM', n, won, lost, void, staked, profit, yield }]
 ```
 
+Modes (added with the Simulator section): `mode: 'flat' | 'percent' | 'staked' | 'kelly'` with
+`kellyFraction` (0.25) and `kellyCap` (2u). Percent and Kelly stake same-day picks on the bankroll at the
+start of that day. `r.totals` also has `noStake`, `noProb`, `zeroStake`, `pendingStake`, `profitSe`,
+`chanceLo/Hi` (± 2 SE of the summed profit), `maxDrawdownPctStart`, `bestDay`, `worstDay`, `underwater`
+and `closeCheck` (`{ n, coverage, expected, se, lo, hi, actual }`: stake × fair-close EV over the picks with
+a two-sided close); each point has `pick`, `dayBank`, `expected`, `expectedCum`. Helpers: `fairProbOf`,
+`kellyFraction`, `kellyStake`, `dailySeries`, `alignDaily`, `breakdown`, `underwater`, `closeVerdictOf`,
+`compareTotals`, and the URL state `stakingFromQuery` / `stakingToQuery`, `scenariosFromQuery`,
+`simulatorQueryString` (scenario B lives in the `b` key as its own query string).
+
 The Simulator works in units. Money only through `formatMoney(units, settings)`, and only when the user
 typed a unit value in Settings (`bankrollUnits(settings)` gives the bankroll in units).
 
