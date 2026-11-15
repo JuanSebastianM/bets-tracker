@@ -1,0 +1,34 @@
+{
+  "comment": "Made-up money in every shape the scrubber must remove (docs/DATA_CONTRACT.md section 2). None of these figures is real. This file and docs/DATA_CONTRACT.md are the only places the repo grep allows money patterns.",
+  "headers": ["Stake (COP)", "Ganancia (COP)", "Bank acumulado (COP)", "Saldo $", "bank inicial"],
+  "texts": [
+    "freebet de $12.345 en Stake",
+    "pagó $ 31.500 al cierre",
+    "un boost de $77k",
+    "saldo $1.234.567",
+    "freebet 12.345 COP, cuota mín. 3.00",
+    "gana +31.500 COP (2.625u)",
+    "77k COP en la cuenta",
+    "99 mil pesos de bono",
+    "1,5 millones de pesos",
+    "COP 12.345 depositados",
+    "pesos 8.500 de saldo",
+    "1u = 12.345 COP",
+    "bank 1.234.567",
+    "retiro de 9,876,543",
+    "total 2.500.000,50",
+    "gané 5000 pesos",
+    "−12.345 COP de pérdida"
+  ],
+  "safe": [
+    "feed 4.333",
+    "apertura feed 1.833 (otro lado 1.950)",
+    "Betano 1.909 (U9.5 1.909)",
+    "el script trae las 3,359 apuestas",
+    "Stake 1.25u (free bet)",
+    "pin 3.54/3.76/2.00 (2026-11-13T22:05:00Z) | pin id 0380db9fc7de24aed0c27138c02467e5",
+    "CLV +2.07% vs Betano | EV justa -3.63%",
+    "Copa Meridiano",
+    "árbitro 5.83/p (200 p)"
+  ]
+}
