@@ -8,6 +8,7 @@ import { formatDate, formatPct, formatPrice, formatProb, formatUnits } from '../
 import { formatDateTime } from '../../lib/i18n.js';
 import { href } from '../../lib/router.js';
 import { tagSlug } from '../../data/tags.js';
+import { lineAddsInfo, lineLabel } from '../../data/lines.js';
 import { pinnacleFor } from '../../data/explore.js';
 import { sheetProfit } from '../../data/stats.js';
 import { APP_TIMEZONE } from '../../config.js';
@@ -95,6 +96,7 @@ export function PickDetail({ pick: p, pinnacle, position, onPrev, onNext, onClos
           <div class="ex-d-what">
             <span class="ex-d-market">${p.marketRaw}</span>
             <span class="ex-d-sel">${p.selection}</span>
+            ${lineAddsInfo(p) ? html`<span class="ex-d-line muted small" data-testid="pick-line">${t('lines.pickLine')}: ${lineLabel(p.lineKey)}</span>` : null}
           </div>
           <span class="ex-d-price num">${formatPrice(p.price)}</span>
         </div>

@@ -232,5 +232,46 @@
     "reload": "Actualizar",
     "updateAfterWork": "Se actualizará al terminar.",
     "updated": "App actualizada."
+  },
+  "lines": {
+    "over": "Over {line}",
+    "under": "Under {line}",
+    "ah": "Hándicap {line}",
+    "withScope": "{scope}: {line}",
+    "side": {
+      "over": "Over",
+      "under": "Under"
+    },
+    "scope": {
+      "cards": "Tarjetas",
+      "cards_team": "Tarjetas de equipo",
+      "corners": "Córners",
+      "corners_team": "Córners de equipo",
+      "goals": "Goles",
+      "goals_team": "Goles de equipo",
+      "goals_1h": "Goles 1er tiempo",
+      "shots": "Tiros",
+      "shots_team": "Tiros de equipo",
+      "sot": "Tiros al arco",
+      "sot_team": "Tiros al arco de equipo",
+      "ah": "Hándicap asiático"
+    },
+    "filter": {
+      "title": "Línea",
+      "side": "Lado",
+      "lines": "Líneas",
+      "none": "Con estos filtros ningún pick tiene una línea.",
+      "hint": "La línea sale del texto de la selección (Under 4.5, Over 9.5, hándicap +0.25). Los dobles y los mercados de resultado no tienen una sola línea.",
+      "passedAll": "Pasó todos los filtros",
+      "entrySide": "Lado: {v}",
+      "entryPassedAll": "Pasó todos los filtros: {v}"
+    },
+    "builtin": {
+      "cards_under_45": "Tarjetas Under 4.5",
+      "cards_under_55": "Tarjetas Under 5.5",
+      "corners_under_95": "Córners totales Under 9.5"
+    },
+    "byLine": "Por línea",
+    "pickLine": "Línea"
   }
 }

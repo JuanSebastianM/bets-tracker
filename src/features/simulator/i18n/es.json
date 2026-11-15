@@ -168,7 +168,8 @@
     "170_200": "1.70–2.00",
     "200_250": "2.00–2.50",
     "250_400": "2.50–4.00",
-    "gt400": "> 4.00"
+    "gt400": "> 4.00",
+    "lt170": "< 1.70"
   },
   "breakdown": {
     "title": "Desglose",
@@ -177,6 +178,7 @@
     "tag": "Etiqueta",
     "market": "Mercado",
     "price": "Cuota",
+    "line": "Línea",
     "avg": "cuota {price}",
     "note": "Con los stakes de este plan. Toca una fila para ver esos picks en el Explorador."
   },

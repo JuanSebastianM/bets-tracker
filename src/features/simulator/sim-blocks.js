@@ -5,8 +5,10 @@ import { html, useState } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
 import { href } from '../../lib/router.js';
 import { Disclosure, DataTable, SegmentedControl } from '../../lib/ui/index.js';
-import { formatUnits, formatPct, formatPrice, formatDate, formatMonth, formatRecord } from '../../lib/format.js';
-import { toQueryString, defaultFilters } from '../../data/filters.js';
+import { formatUnits, formatPct, formatPrice, formatDate, formatMonth, formatRecord, todayIn } from '../../lib/format.js';
+import { toQueryString, exactSlice, priceBandPatch } from '../../data/filters.js';
+import { compareLineKeys, lineLabel } from '../../data/lines.js';
+import { APP_TIMEZONE } from '../../config.js';
 import { priceBand } from '../../data/stats.js';
 import { tagLabel } from '../../data/tags.js';
 import { breakdown, closeVerdictOf } from '../../data/simulate.js';
@@ -106,23 +108,30 @@ export function MonthsBlock({ sim }) {
   </${Block}>`;
 }
 
-const DIMENSIONS = /** @type {const} */ (['tag', 'market', 'price']);
+const DIMENSIONS = /** @type {const} */ (['tag', 'market', 'price', 'line']);
 
-/** @param {{ sim: SimResult, filters: FilterState }} props */
-export function BreakdownBlock({ sim, filters }) {
-  const [dim, setDim] = useState(/** @type {'tag' | 'market' | 'price'} */ ('tag'));
+/** @param {{ sim: SimResult, filters: FilterState, picks?: import('../../data/types').Pick[], today?: string }} props */
+export function BreakdownBlock({ sim, filters, picks, today }) {
+  const [dim, setDim] = useState(/** @type {'tag' | 'market' | 'price' | 'line'} */ ('tag'));
   const keyOf = {
     tag: (/** @type {any} */ p) => p.tag,
     market: (/** @type {any} */ p) => p.market,
     price: (/** @type {any} */ p) => priceBand(p.price),
+    line: (/** @type {any} */ p) => p.lineKey,
   }[dim];
-  const rows = breakdown(sim.points, keyOf);
-  const labelOf = (/** @type {string} */ k) => (dim === 'tag' ? tagLabel(/** @type {any} */ (k)) : dim === 'market' ? t(`markets.${k}`) : t(`simulator.bands.${k}`));
-  const slice = (/** @type {string} */ k) => {
-    if (dim === 'tag') return { ...filters, tags: [k] };
-    if (dim === 'market') return { ...filters, markets: [k] };
-    return { ...filters, pricePreset: k, price: defaultFilters().price };
+  const raw = breakdown(sim.points, keyOf);
+  const rows = dim === 'line' ? [...raw].sort((x, y) => compareLineKeys(String(x.key), String(y.key))) : raw;
+  const multiScope = dim === 'line' && new Set(rows.map((r) => String(r.key).split(':')[0])).size > 1;
+  const labelOf = (/** @type {string} */ k) =>
+    dim === 'tag' ? tagLabel(/** @type {any} */ (k)) : dim === 'market' ? t(`markets.${k}`) : dim === 'line' ? lineLabel(k, { scope: multiScope }) : t(`simulator.bands.${k}`);
+  const patchOf = (/** @type {string} */ k) => {
+    if (dim === 'tag') return { tags: [k] };
+    if (dim === 'market') return { markets: [k] };
+    if (dim === 'line') return { lines: [k] };
+    return priceBandPatch(k);
   };
+  // Every row links to exactly its picks (graded, countable, priced; see filters.js exactSlice).
+  const slice = (/** @type {string} */ k) => (picks ? exactSlice(picks, filters, patchOf(k), { today: today || todayIn(APP_TIMEZONE) }) : { ...filters, ...patchOf(k) });
   return html`<${Block} testId="sim-breakdown" summary=${html`<span class="sim-sum"><span>${t('simulator.breakdown.title')}</span><span class="sim-sum-fig">${t('simulator.breakdown.summary')}</span></span>`}>
     <${SegmentedControl}
       label=${t('simulator.breakdown.by')}
@@ -131,9 +140,10 @@ export function BreakdownBlock({ sim, filters }) {
       onValue=${(/** @type {any} */ v) => setDim(v)}
     />
     <ul class="sim-rows" data-testid="sim-breakdown-rows">
-      ${rows.map(
+      ${dim === 'line' && !rows.length ? html`<p class="muted small">${t('lines.filter.none')}</p>` : null}
+    ${rows.map(
         (r) => html`<li>
-          <a class="sim-row" href=${explorerHref(slice(r.key))}>
+          <a class="sim-row" href=${explorerHref(slice(r.key))} data-key=${r.key} data-n=${r.n}>
             <span class="sim-row-name">${labelOf(r.key)}</span>
             <span class=${`sim-row-pl num ${pos(r.profit)}`}>${formatUnits(r.profit)}</span>
             <span class="sim-row-rec num">${formatRecord(r)} · ${t('simulator.breakdown.avg', { price: formatPrice(r.avgPrice, { average: true }) })}</span>

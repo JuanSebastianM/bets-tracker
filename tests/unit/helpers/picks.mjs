@@ -14,6 +14,6 @@ export function mkPick(over = {}) {
     price: 2, closePrice: null, status: 'won', statusRaw: 'Ganada', tag: 'shadow_rule30', tagRaw: '', books: [], stakeU: null,
     profitU: null, probModel: null, probBlend: null, probAI: null, ev: null, fairOdds: null, notes: '', fairCloseEv: null,
     closeSource: null, clv: null, clvSource: null, openingFairEv: null, closeMargin: null, evVsFeed: null, need: 1,
-    hasTwoSidedClose: false, extra: {}, ...over, parsed,
+    hasTwoSidedClose: false, extra: {}, line: null, lineKey: null, ...over, parsed,
   };
 }

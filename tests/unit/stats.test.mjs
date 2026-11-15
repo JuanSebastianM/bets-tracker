@@ -91,7 +91,7 @@ test('drawdown in units and as % of the bankroll; streaks', () => {
 test('groupBy, price bands, weekday', () => {
   const g = groupBy([mkPick({ tag: 'value' }), mkPick({ tag: 'value' }), mkPick({ tag: 'shadow' })], (p) => p.tag);
   assert.deepEqual(g.map((x) => [x.key, x.summary.n]), [['value', 2], ['shadow', 1]]);
-  assert.deepEqual([1.5, 1.7, 1.71, 2.0, 2.3, 2.5, 4, 4.01, null].map(priceBand), ['le170', 'le170', '170_200', '170_200', '200_250', '200_250', '250_400', 'gt400', null]);
+  assert.deepEqual([1.5, 1.7, 1.71, 2.0, 2.3, 2.5, 4, 4.01, null].map(priceBand), ['lt170', '170_200', '170_200', '170_200', '200_250', '200_250', '250_400', 'gt400', null]);
   assert.equal(weekdayOf(mkPick({ date: '2026-11-15' })), 7);
 });
 

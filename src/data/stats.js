@@ -320,20 +320,24 @@ export function groupBy(picks, key, opts) {
     .sort((a, b) => b.summary.n - a.summary.n || b.picks.length - a.picks.length);
 }
 
-/** Price bands used by breakdowns (same edges as the filter presets). */
+/**
+ * Price bands used by breakdowns: disjoint, and each one is exactly the filter preset of the same id
+ * (filters.js PRICE_PRESETS; 'lt170' is a hidden preset). 1.70 belongs to 1.70–2.00, as in the
+ * betting-analyst bands (1.70–4.0, corner rejects 1.70–2.0); 2.00, 2.50 and 4.00 close their band.
+ */
 export const PRICE_BANDS = [
-  { id: 'le170', max: 1.7 },
+  { id: 'lt170', max: 1.7, maxExc: true },
   { id: '170_200', max: 2.0 },
   { id: '200_250', max: 2.5 },
   { id: '250_400', max: 4.0 },
   { id: 'gt400', max: Infinity },
 ];
 
-/** Band id of a price ('le170', '170_200', …) or null. @param {number | null} price */
+/** Band id of a price ('lt170', '170_200', …) or null. @param {number | null} price */
 export function priceBand(price) {
   if (price == null) return null;
-  if (price < 1.7) return 'le170';
-  return PRICE_BANDS.find((b) => price <= b.max).id;
+  const b = PRICE_BANDS.find((x) => (x.maxExc ? price < x.max : price <= x.max));
+  return b ? b.id : null;
 }
 
 /** 'YYYY-MM' of a pick. @param {Pick} p */

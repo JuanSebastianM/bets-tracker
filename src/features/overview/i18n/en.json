@@ -73,5 +73,15 @@
     "picks": "See all picks",
     "simulate": "Simulate",
     "tests": "Tests"
+  },
+  "lines": {
+    "summary": {
+      "one": "By line · {n} line",
+      "other": "By line · {n} lines"
+    },
+    "title": "By line in {label}",
+    "evN": "EV {ev} (n {n})",
+    "noClose": "no close",
+    "rowLabel": "{line}: n {n}, {record}, yield {yield}, {ev}, {verdict}"
   }
 }

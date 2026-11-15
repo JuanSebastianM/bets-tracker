@@ -5,6 +5,7 @@ import { StatusBadge, TagBadge } from './display.js';
 import { t } from '../i18n.js';
 import { formatDate, formatPct, formatPrice, formatUnits } from '../format.js';
 import { flatProfit, sheetProfit } from '../../data/stats.js';
+import { lineAddsInfo, lineLabel } from '../../data/lines.js';
 
 /**
  * @typedef {object} Column
@@ -110,7 +111,7 @@ export function PickCard({ pick: p, onOpen, tagHref }) {
     <div class="pc-main">
       <div class="pc-what">
         <div class="pc-match">${p.match}</div>
-        <div class="pc-sel"><span class="pc-market">${p.marketRaw}</span> ${p.selection}</div>
+        <div class="pc-sel"><span class="pc-market">${p.marketRaw}</span> ${p.selection}${lineAddsInfo(p) ? html` <span class="pc-line" data-testid="pick-line">· ${lineLabel(p.lineKey)}</span>` : null}</div>
         <div class="pc-league">${p.league}</div>
       </div>
       <div class="pc-price">

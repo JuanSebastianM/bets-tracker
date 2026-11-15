@@ -48,6 +48,30 @@
 .overview .ov-gdot { position: absolute; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--c-accent); border: 2px solid var(--c-surface); }
 .overview .ov-groups-compact .ov-grow { padding-top: var(--sp-2); padding-bottom: var(--sp-2); }
 
+/* By line, under a tag row (collapsed by default) */
+.overview .ov-lines { margin: 0 0 var(--sp-2) var(--sp-3); }
+.overview .ov-lines-sum {
+  display: inline-flex; align-items: center; gap: 4px; min-height: var(--tap); padding: 0 var(--sp-2);
+  font-size: var(--fs-xs); font-weight: 650; color: var(--c-accent); cursor: pointer; list-style: none; border-radius: 6px;
+}
+.overview .ov-lines-sum::-webkit-details-marker { display: none; }
+.overview .ov-lines-sum .icon { transform: rotate(-90deg); transition: transform 0.12s; }
+.overview .ov-lines[open] .ov-lines-sum .icon { transform: none; }
+.overview .ov-lines-sum:focus-visible { outline: 2px solid var(--c-focus); outline-offset: -2px; }
+.overview .ov-llist { list-style: none; margin: 0; padding: 0 0 0 var(--sp-3); border-left: 2px solid var(--c-line); display: grid; }
+.overview .ov-llist li { border-bottom: none; }
+.overview .ov-llist li + li { border-top: 1px dashed var(--c-line); }
+.overview .ov-lrow {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'name verdict' 'meta meta' 'ev ev';
+  gap: 0 var(--sp-2); align-items: center; padding: 6px var(--sp-1); min-height: var(--tap); color: inherit; text-decoration: none;
+}
+.overview .ov-lrow:hover { background: var(--c-surface-2); }
+.overview .ov-lrow:focus-visible { outline: 2px solid var(--c-focus); outline-offset: -2px; border-radius: 4px; }
+.overview .ov-lname { grid-area: name; font-weight: 650; font-size: var(--fs-sm); }
+.overview .ov-lmeta { grid-area: meta; font-size: var(--fs-xs); color: var(--c-muted); }
+.overview .ov-lev { grid-area: ev; font-size: var(--fs-xs); color: var(--c-muted); }
+.overview .ov-lverdict { grid-area: verdict; justify-self: end; }
+
 /* Pending */
 .overview .ov-pgroup { display: grid; gap: var(--sp-2); }
 .overview .ov-pgroup + .ov-pgroup { border-top: var(--border); padding-top: var(--sp-3); }
@@ -84,6 +108,8 @@
     grid-template-areas: 'name meta bar ev verdict chev';
   }
   .overview .ov-gverdict { justify-self: start; }
+  .overview .ov-lrow { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) 9rem 9.5rem; grid-template-areas: 'name meta ev verdict'; }
+  .overview .ov-lverdict { justify-self: start; }
 }
 
 @media (min-width: 1100px) {

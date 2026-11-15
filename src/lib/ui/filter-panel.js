@@ -21,6 +21,7 @@ import {
   PRICE_PRESETS, DATE_PRESETS, BUILTIN_PRESETS, builtinPreset,
 } from '../../data/filters.js';
 import { TAG_GROUPS, tagLabel } from '../../data/tags.js';
+import { LINE_SCOPES, lineLabel, lineScopeLabel, parseLineKey } from '../../data/lines.js';
 import { useSettings, savePreset, deletePreset } from '../../data/settings.js';
 import { Icon } from './icons.js';
 import { Button, IconButton, FilterChip, SegmentedControl, RangeInput, SearchInput, TextField } from './controls.js';
@@ -30,8 +31,8 @@ import { Button, IconButton, FilterChip, SegmentedControl, RangeInput, SearchInp
 /** @typedef {import('../../data/types').Pick} Pick */
 
 /** Section ids in display order (the most used first). Pass some in `hide` to leave them out. */
-export const FILTER_SECTIONS = ['q', 'source', 'tag', 'price', 'date', 'market', 'status', 'league', 'book', 'close', 'ref', 'sample', 'fuerza', 'reason', 'numbers'];
-const OPEN_BY_DEFAULT = ['q', 'source', 'tag', 'price', 'date'];
+export const FILTER_SECTIONS = ['q', 'source', 'tag', 'price', 'date', 'market', 'line', 'status', 'league', 'book', 'close', 'ref', 'sample', 'fuerza', 'reason', 'numbers'];
+const OPEN_BY_DEFAULT = ['q', 'source', 'tag', 'price', 'date', 'line'];
 /** Long lists show this many options until "show all". */
 const SHORT_LIST = 12;
 
@@ -82,6 +83,10 @@ export function optionLabel(field, v) {
       return t(`filters.fuerzaValue.${v}`);
     case 'reasons':
       return t(`filters.reasons.${v}`);
+    case 'sides':
+      return t(`lines.side.${v}`);
+    case 'lines':
+      return lineLabel(v);
     default:
       return v;
   }
@@ -120,6 +125,15 @@ export function entryLabel(e, f) {
       return t('filters.entry.prob', { range: rangeText(f.prob, pct) });
     case 'q':
       return t('filters.entry.q', { q: v });
+    case 'sides':
+      return t('lines.filter.entrySide', { v: optionLabel('sides', v) });
+    case 'lines': {
+      // "Under 4.5" when every chosen line is of one kind of market, "Tarjetas: Under 4.5" otherwise.
+      const scopes = new Set(f.lines.map((k) => (parseLineKey(k) || { scope: '' }).scope));
+      return lineLabel(v, { scope: scopes.size > 1 });
+    }
+    case 'passedAll':
+      return t('lines.filter.entryPassedAll', { v: t(`filters.${v}`) });
     default:
       return optionLabel(e.field, v);
   }
@@ -275,7 +289,7 @@ export function FilterPanel({ picks, filters: f, onChange, hide = [], today, tes
 
     ${sec('price', t('filters.price'), priceActive, html`
       <div class="fp-chips" role="group" aria-label=${t('filters.price')}>
-        ${PRICE_PRESETS.map((p) => {
+        ${PRICE_PRESETS.filter((p) => !p.hidden || f.pricePreset === p.id).map((p) => {
           const on = f.pricePreset === p.id;
           const n = counts.pricePresets[p.id] || 0;
           return html`<${FilterChip} label=${p.label} count=${n} selected=${on} disabled=${!on && n === 0} testId=${`fchip-price-${p.id}`}
@@ -319,6 +333,11 @@ export function FilterPanel({ picks, filters: f, onChange, hide = [], today, tes
       <${ChipGroup} field="marketsRaw" long label=${t('filters.marketRaw')} options=${rawMarkets} selected=${f.marketsRaw} counts=${counts.marketsRaw}
         onToggle=${(/** @type {string} */ v) => toggleIn('marketsRaw', v)} />`)}
 
+    ${options.lines.length
+      ? sec('line', t('lines.filter.title'), f.sides.length + f.lines.length, html`<${LineSection} options=${options} counts=${counts} filters=${f}
+          onToggle=${toggleIn} />`)
+      : null}
+
     ${sec('status', t('filters.status'), f.statuses.length, html`<${ChipGroup}
       field="statuses" label=${t('filters.status')} options=${options.statuses} selected=${f.statuses} counts=${counts.statuses}
       onToggle=${(/** @type {string} */ v) => toggleIn('statuses', v)} />`)}
@@ -352,13 +371,54 @@ export function FilterPanel({ picks, filters: f, onChange, hide = [], today, tes
       field="fuerza" label=${t('filters.fuerza')} options=${options.fuerza} selected=${f.fuerza} counts=${counts.fuerza}
       onToggle=${(/** @type {string} */ v) => toggleIn('fuerza', v)} />`)}
 
-    ${sec('reason', t('filters.reason'), f.reasons.length, html`<${ChipGroup}
+    ${sec('reason', t('filters.reason'), f.reasons.length + (f.passedAll != null ? 1 : 0), html`<${ChipGroup}
       field="reasons" label=${t('filters.reason')} options=${options.reasons} selected=${f.reasons} counts=${counts.reasons}
-      onToggle=${(/** @type {string} */ v) => toggleIn('reasons', v)} />`)}
+      onToggle=${(/** @type {string} */ v) => toggleIn('reasons', v)} />
+      <${TriState} label=${t('lines.filter.passedAll')} value=${f.passedAll} counts=${counts.passedAll}
+        onValue=${(/** @type {boolean | null} */ passedAll) => set({ passedAll })} />`)}
 
     ${sec('numbers', t('filters.numbers'), rangeOn(f.ev) + rangeOn(f.prob), html`
       <${PercentRange} label=${t('filters.ev')} value=${f.ev} onValue=${(/** @type {any} */ ev) => set({ ev })} />
       <${PercentRange} label=${t('filters.prob')} value=${f.prob} onValue=${(/** @type {any} */ prob) => set({ prob })} />`)}
+  </div>`;
+}
+
+/**
+ * The "Línea" section: side chips (Over, Under) and the lines that exist under the other filters,
+ * grouped by kind of market (cards, corners…) when they span several, each group sorted by line.
+ * @param {{ options: Record<string, Array<{ value: string, count: number }>>, counts: Record<string, any>, filters: FilterState,
+ *   onToggle: (field: keyof FilterState, v: string) => void }} props
+ */
+function LineSection({ options, counts, filters: f, onToggle }) {
+  const visible = options.lines.filter((o) => (counts.lines[o.value] || 0) > 0 || f.lines.includes(o.value));
+  /** @type {Map<string, Array<{ value: string, count: number }>>} */
+  const byScope = new Map();
+  for (const o of visible) {
+    const scope = (parseLineKey(o.value) || { scope: 'other' }).scope;
+    if (!byScope.has(scope)) byScope.set(scope, []);
+    /** @type {any[]} */ (byScope.get(scope)).push(o);
+  }
+  const groups = [...byScope.entries()].sort((a, b) => LINE_SCOPES.indexOf(a[0]) - LINE_SCOPES.indexOf(b[0]));
+  const toggle = (/** @type {string} */ v) => onToggle('lines', v);
+  return html`<div class="fp-lines" data-testid="fp-lines">
+    ${options.sides.length
+      ? html`<h4 class="fp-group-title">${t('lines.filter.side')}</h4>
+          <${ChipGroup} field="sides" label=${t('lines.filter.side')} options=${options.sides} selected=${f.sides} counts=${counts.sides}
+            onToggle=${(/** @type {string} */ v) => onToggle('sides', v)} />`
+      : null}
+    ${!groups.length ? html`<p class="muted small">${t('lines.filter.none')}</p>` : null}
+    ${groups.length === 1
+      ? html`<h4 class="fp-group-title">${t('lines.filter.lines')} · ${lineScopeLabel(groups[0][0])}</h4>
+          <${ChipGroup} field="lines" long label=${t('lines.filter.lines')} options=${groups[0][1]} selected=${f.lines} counts=${counts.lines} onToggle=${toggle} />`
+      : html`<div class="fp-groups">
+          ${groups.map(
+            ([scope, opts]) => html`<div class="fp-group" data-scope=${scope}>
+              <h4 class="fp-group-title">${lineScopeLabel(scope)}</h4>
+              <${ChipGroup} field="lines" long label=${lineScopeLabel(scope)} options=${opts} selected=${f.lines} counts=${counts.lines} onToggle=${toggle} />
+            </div>`,
+          )}
+        </div>`}
+    <p class="muted xs">${t('lines.filter.hint')}</p>
   </div>`;
 }
 
@@ -466,7 +526,7 @@ export function SavedFilters({ filters: f, onApply, testId = 'saved-filters' }) 
         ${BUILTIN_PRESETS.map((b) => {
           const state = /** @type {FilterState} */ (builtinPreset(b.id));
           const on = toQueryString(state) === current;
-          return html`<${FilterChip} label=${t(`filters.builtin.${b.id}`)} selected=${on} testId=${`builtin-${b.id}`}
+          return html`<${FilterChip} label=${t(b.labelKey || `filters.builtin.${b.id}`)} selected=${on} testId=${`builtin-${b.id}`}
             onToggle=${() => onApply(on ? defaultFilters() : state)} />`;
         })}
       </div>

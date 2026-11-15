@@ -30,6 +30,8 @@ export const FROZEN_RULE = {
  * @property {number} [decisionRow] the Decisiones row that defines the test (all are decided by row 111)
  * @property {Partial<import('./filters.js').FilterState>} [explorer] closest Explorer filter (a superset
  *   when the membership has conditions the filters cannot express)
+ * @property {boolean} [explorerExact] true when `explorer` selects exactly the rows `match` accepts
+ *   (unit-tested); false means the link is an approximation and the screen says so
  */
 
 /** Tolerance for "z of 2 or more": a mean exactly 2 SE above zero passes despite floating-point error. */
@@ -39,6 +41,20 @@ const shadowModel = (/** @type {Pick} */ p) =>
   p.source === 'shadow' && !['ai_watch', 'published', 'published_bet', 'value', 'near_value', 'prop_value', 'prop_near_value'].includes(p.tag);
 const inBand = (/** @type {Pick} */ p) => p.price != null && p.price >= 1.7 && p.price <= 4.0;
 
+/**
+ * The Sombra tags of model rows (shadowModel above, as a list the Explorer's tag filter can use):
+ * every Sombra tag but IA-WATCH, the published rows and the price-first tags.
+ * @type {import('./types').TagId[]}
+ */
+export const MODEL_SHADOW_TAGS = ['cards_under', 'team_corners', 'corner_rejects', 'model_only_shots', 'shadow_rule30', 'shadow', 'low_edge', 'filter_reject'];
+const MODEL_NO_SOLO = MODEL_SHADOW_TAGS.filter((x) => x !== 'model_only_shots');
+// review.py's classes as market families. Exact for every raw market Sombra has used (15 Nov 2026);
+// 'Córners 1X2' (class corners) and 'Más tarjetas' (family cards_team, class result) appear only in Grok.
+const CORNERS_CLASS = ['corners_total'];
+const CARDS_CLASS = ['cards_total', 'cards_team'];
+const MATCH_SHOTS_RAW = ['Tiros (total)', 'Tiros totales', 'Tiros al arco (total)', 'Tiros al arco totales'];
+const TEAM_SHOTS_RAW = ['Tiros (equipo)', 'Tiros equipo', 'Tiros al arco (equipo)', 'Tiros al arco equipo'];
+
 /** @type {FrozenTest[]} */
 export const FROZEN_TESTS = [
   {
@@ -47,7 +63,8 @@ export const FROZEN_TESTS = [
     startDate: '2026-10-13',
     since: 'Decisiones 70',
     decisionRow: 70,
-    explorer: { sources: ['shadow'], tags: ['shadow_rule30'], markets: ['corners_total', 'cards_total'], dateFrom: '2026-10-13' },
+    explorer: { sources: ['shadow'], tags: MODEL_SHADOW_TAGS, markets: [...CORNERS_CLASS, ...CARDS_CLASS], dateFrom: '2026-10-13', passedAll: true },
+    explorerExact: true,
     match: (p) => shadowModel(p) && (p.reviewClass === 'corners' || p.reviewClass === 'cards') && p.date >= '2026-10-13' && p.parsed.passedAll,
   },
   {
@@ -56,7 +73,8 @@ export const FROZEN_TESTS = [
     startDate: '2026-11-01',
     since: 'Decisiones 84',
     decisionRow: 84,
-    explorer: { sources: ['shadow'], tags: ['cards_under', 'shadow_rule30'], markets: ['cards_total'], dateFrom: '2026-11-01', price: { min: 1.7, max: 4 }, q: 'under' },
+    explorer: { sources: ['shadow'], tags: MODEL_SHADOW_TAGS, markets: CARDS_CLASS, sides: ['under'], dateFrom: '2026-11-01', price: { min: 1.7, max: 4 } },
+    explorerExact: true,
     match: (p) => shadowModel(p) && p.reviewClass === 'cards' && p.side === 'under' && p.date >= '2026-11-01' && inBand(p),
   },
   {
@@ -65,7 +83,11 @@ export const FROZEN_TESTS = [
     startDate: '2026-11-01',
     since: 'Decisiones 84',
     decisionRow: 85,
-    explorer: { sources: ['shadow'], tags: ['cards_under', 'shadow_rule30'], markets: ['cards_total'], dateFrom: '2026-11-01', price: { min: 1.7, max: 4 }, q: 'under 4.5' },
+    explorer: {
+      sources: ['shadow'], tags: MODEL_SHADOW_TAGS, markets: CARDS_CLASS, sides: ['under'], lines: ['cards:under:4.5', 'cards_team:under:4.5'],
+      dateFrom: '2026-11-01', price: { min: 1.7, max: 4 },
+    },
+    explorerExact: true,
     match: (p) =>
       shadowModel(p) && p.reviewClass === 'cards' && p.side === 'under' && p.date >= '2026-11-01' && inBand(p) && /under\s*4[.,]5/i.test(p.selection),
   },
@@ -76,6 +98,7 @@ export const FROZEN_TESTS = [
     since: 'Decisiones 106',
     decisionRow: 106,
     explorer: { sources: ['shadow'], tags: ['corner_rejects'], dateFrom: '2026-11-09' },
+    explorerExact: true,
     match: (p) => p.source === 'shadow' && p.tag === 'corner_rejects' && p.date >= '2026-11-09',
   },
   {
@@ -84,7 +107,9 @@ export const FROZEN_TESTS = [
     startDate: null,
     since: 'Regla 32, Decisiones 88',
     decisionRow: 88,
-    explorer: { sources: ['shadow'], tags: ['team_corners'], markets: ['corners_team'] },
+    // "passed every filter OR dated 3 Nov or later" is an OR the filters cannot express: a superset.
+    explorer: { sources: ['shadow'], tags: MODEL_SHADOW_TAGS, markets: ['corners_team'] },
+    explorerExact: false,
     match: (p) => shadowModel(p) && p.reviewClass === 'team_corners' && (p.parsed.passedAll || p.date >= '2026-11-03'),
   },
   {
@@ -94,6 +119,7 @@ export const FROZEN_TESTS = [
     since: 'Decisiones 66, 91',
     decisionRow: 91,
     explorer: { sources: ['shadow'], tags: ['model_only_shots'], price: { min: 1.7, max: 4 } },
+    explorerExact: true,
     match: (p) => p.source === 'shadow' && p.tag === 'model_only_shots' && inBand(p),
   },
   {
@@ -102,7 +128,8 @@ export const FROZEN_TESTS = [
     startDate: null,
     since: 'Regla 25',
     decisionRow: 64,
-    explorer: { sources: ['shadow'], markets: ['shots'], marketsRaw: ['Tiros (total)', 'Tiros totales', 'Tiros al arco (total)', 'Tiros al arco totales'] },
+    explorer: { sources: ['shadow'], tags: MODEL_NO_SOLO, markets: ['shots'], marketsRaw: MATCH_SHOTS_RAW },
+    explorerExact: true,
     match: (p) => shadowModel(p) && p.reviewClass === 'shots' && !isTeamShots(p.marketRaw) && p.tag !== 'model_only_shots',
   },
   {
@@ -111,7 +138,8 @@ export const FROZEN_TESTS = [
     startDate: null,
     since: 'Regla 18',
     decisionRow: 5,
-    explorer: { sources: ['shadow'], markets: ['corners_total'], reasons: ['rule18'] },
+    explorer: { sources: ['shadow'], tags: MODEL_SHADOW_TAGS, markets: CORNERS_CLASS, reasons: ['rule18'] },
+    explorerExact: true,
     match: (p) => shadowModel(p) && p.reviewClass === 'corners' && p.parsed.filters.includes('rule18'),
   },
 ];
@@ -430,6 +458,7 @@ export function priceFirstProgress(test, picks) {
  * @property {number} decisionRow
  * @property {(p: Pick) => boolean} match
  * @property {Partial<import('./filters.js').FilterState>} explorer
+ * @property {boolean} [explorerExact] as in FrozenTest
  */
 
 /** @type {StoppedCategory[]} */
@@ -437,37 +466,44 @@ export const STOPPED_CATEGORIES = [
   {
     id: 'ai_watch_corners', sheetLabel: 'IA-WATCH (córners)', stoppedOn: '2026-10-29', decisionRow: 76,
     match: (p) => p.source === 'shadow' && p.tag === 'ai_watch' && p.reviewClass === 'corners',
-    explorer: { sources: ['shadow'], tags: ['ai_watch'], markets: ['corners_total'] },
+    explorer: { sources: ['shadow'], tags: ['ai_watch'], markets: CORNERS_CLASS },
+    explorerExact: true,
   },
   {
     id: 'ai_watch_cards', sheetLabel: 'IA-WATCH (tarjetas)', stoppedOn: '2026-11-02', decisionRow: 88,
     match: (p) => p.source === 'shadow' && p.tag === 'ai_watch' && p.reviewClass === 'cards',
-    explorer: { sources: ['shadow'], tags: ['ai_watch'], markets: ['cards_total'] },
+    explorer: { sources: ['shadow'], tags: ['ai_watch'], markets: CARDS_CLASS },
+    explorerExact: true,
   },
   {
     id: 'team_corner_rejects', sheetLabel: 'CÓRNERS EQUIPO (rechazos)', stoppedOn: '2026-11-02', decisionRow: 88,
     match: (p) => shadowModel(p) && p.reviewClass === 'team_corners' && !p.parsed.passedAll && p.date < '2026-11-03',
-    explorer: { sources: ['shadow'], markets: ['corners_team'], dateTo: '2026-11-02' },
+    explorer: { sources: ['shadow'], tags: MODEL_SHADOW_TAGS, markets: ['corners_team'], dateTo: '2026-11-02', passedAll: false },
+    explorerExact: true,
   },
   {
     id: 'team_shots', sheetLabel: 'Tiros y tiros al arco de equipo', stoppedOn: '2026-11-02', decisionRow: 88,
     match: (p) => shadowModel(p) && p.reviewClass === 'shots' && isTeamShots(p.marketRaw) && p.tag !== 'model_only_shots',
-    explorer: { sources: ['shadow'], markets: ['shots'], q: 'equipo' },
+    explorer: { sources: ['shadow'], tags: MODEL_NO_SOLO, markets: ['shots'], marketsRaw: TEAM_SHOTS_RAW },
+    explorerExact: true,
   },
   {
     id: 'corner_card_fillers', sheetLabel: 'Rellenos de córners y tarjetas (rechazos)', stoppedOn: '2026-11-08', decisionRow: 103,
     match: (p) => p.source === 'shadow' && p.tag === 'filter_reject' && (p.reviewClass === 'corners' || p.reviewClass === 'cards') && p.date <= '2026-11-08',
-    explorer: { sources: ['shadow'], tags: ['filter_reject'], markets: ['corners_total', 'cards_total'], dateTo: '2026-11-08' },
+    explorer: { sources: ['shadow'], tags: ['filter_reject'], markets: [...CORNERS_CLASS, ...CARDS_CLASS], dateTo: '2026-11-08' },
+    explorerExact: true,
   },
   {
     id: 'shots_fillers', sheetLabel: 'Rellenos de tiros (rechazos)', stoppedOn: '2026-10-24', decisionRow: 64,
     match: (p) => p.source === 'shadow' && p.tag === 'filter_reject' && p.reviewClass === 'shots' && p.date <= '2026-10-24',
     explorer: { sources: ['shadow'], tags: ['filter_reject'], markets: ['shots'], dateTo: '2026-10-24' },
+    explorerExact: true,
   },
   {
     id: 'model_only_shots_low', sheetLabel: 'MODELO SOLO bajo 1.70', stoppedOn: '2026-11-03', decisionRow: 91,
     match: (p) => p.source === 'shadow' && p.tag === 'model_only_shots' && p.price != null && p.price < 1.7,
-    explorer: { sources: ['shadow'], tags: ['model_only_shots'], price: { min: null, max: 1.69 } },
+    explorer: { sources: ['shadow'], tags: ['model_only_shots'], pricePreset: 'lt170' },
+    explorerExact: true,
   },
 ];
 
