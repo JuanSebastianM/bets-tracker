@@ -82,3 +82,15 @@
 .filter-panel { grid-template-columns: minmax(0, 1fr); }
 .fp-section-body { grid-template-columns: minmax(0, 1fr); }
 .saved-filters { min-width: 0; }
+
+/* Nothing inside a narrow side column may set its width: every grid in the panel has one shrinkable
+   column and chips cut their label instead of pushing the column wider. Without this a wider fallback
+   font (the CI runner's, or a phone without the UI font) made the 248 px column overflow. */
+.filter-panel :where(.fp-groups, .fp-group, .fp-lines, .fp-range, .fp-section-body, .stack, .stack-sm),
+.saved-filters, .saved-filters :where(.stack, .stack-sm, .sf-save, .field, .sf-list) {
+  grid-template-columns: minmax(0, 1fr); min-width: 0;
+}
+.filter-panel :where(.fp-chips, .fchip, .field, .input-wrap, .select-wrap), .saved-filters :where(.input-wrap, .select-wrap, .sf-row) { min-width: 0; max-width: 100%; }
+.filter-panel :where(input, select), .saved-filters :where(input, select) { min-width: 0; max-width: 100%; }
+.filter-panel :where(.fp-group-title, .field-label, .muted), .saved-filters :where(.fp-group-title, .field-label, .muted) { overflow-wrap: anywhere; }
+.saved-filters .btn { max-width: 100%; white-space: normal; text-align: left; }

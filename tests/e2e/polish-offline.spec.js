@@ -1,7 +1,9 @@
 // The installed app offline: the deployable site (scripts/build-site.mjs output, service worker
-// stamped) is served on a second port under a made-up host name, because the app turns its service
-// worker off on localhost and 127.0.0.1. After one online load the network is cut and every route
-// must open from the service worker's shell and the feed copy in IndexedDB.
+// stamped) is served on a second port. The app keeps its service worker off on 127.0.0.1 so tests see
+// fresh files; '?sw=on' turns it on for this spec (src/lib/pwa.js). 127.0.0.1 is a secure context in
+// every Chromium, so no launch flags are needed (the first version mapped a made-up host with flags
+// that the CI runner's Chromium ignored, leaving navigator.serviceWorker undefined). After one online
+// load the network is cut and every route must open from the shell cache and the feed copy in IndexedDB.
 import { test, expect } from 'playwright/test';
 import { execFileSync, spawn } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
@@ -11,16 +13,11 @@ import { ROUTES } from './helpers.js';
 
 const ROOT = resolve(import.meta.dirname, '../..');
 const PORT = Number(process.env.E2E_PORT || 4173) + 50;
-const HOST = 'bt-offline.test';
-const ORIGIN = `http://${HOST}:${PORT}`;
+const ORIGIN = `http://127.0.0.1:${PORT}`;
 
 test.describe.configure({ mode: 'serial' });
 test.use({
   serviceWorkers: 'allow',
-  launchOptions: {
-    args: [`--host-resolver-rules=MAP ${HOST} 127.0.0.1`, `--unsafely-treat-insecure-origin-as-secure=${ORIGIN}`],
-    executablePath: !process.env.CI ? '/usr/bin/google-chrome' : undefined,
-  },
 });
 
 /** @type {import('node:child_process').ChildProcess | null} */
@@ -50,7 +47,7 @@ test('every route opens offline from the shell and the saved feed', async ({ pag
   test.setTimeout(90_000);
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e)));
-  await page.goto(`${ORIGIN}/?feed=fixture#/`);
+  await page.goto(`${ORIGIN}/?sw=on&feed=fixture#/`);
   await expect(page.getByTestId('source-shadow')).toBeVisible();
   // The worker installed the whole shell and controls the page; the feed copy is in IndexedDB.
   await expect.poll(() => page.evaluate(async () => {

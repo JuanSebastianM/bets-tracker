@@ -85,8 +85,12 @@ test('wide screen: rail paints the whole page, side panel never overflows, table
   await page.setViewportSize({ width: 1280, height: 800 });
   await openApp(page, '/analysis');
   await expect(page.getByTestId('analysis-bars')).toBeVisible();
-  const overflow = await page.locator('.an-side-panel').evaluate((el) => el.scrollWidth - el.clientWidth);
-  expect(overflow).toBeLessThanOrEqual(0);
+  const panelOverflow = () => page.locator('.an-side-panel').evaluate((el) => el.scrollWidth - el.clientWidth);
+  expect(await panelOverflow()).toBeLessThanOrEqual(0);
+  // The column must also hold with a wider font than ours (a runner or phone without the UI font):
+  // this is what failed on CI while passing locally.
+  await page.addStyleTag({ content: '* { font-family: "DejaVu Sans", Verdana, sans-serif !important; letter-spacing: 0.6px !important; }' });
+  await expect.poll(panelOverflow).toBeLessThanOrEqual(0);
   const bg = await page.locator('.app').evaluate((el) => getComputedStyle(el).backgroundImage);
   expect(bg).toContain('linear-gradient');
   await page.goto('/?feed=fixture#/explorer');
