@@ -1,0 +1,4 @@
+{
+  "stubTitle": { "one": "{n} decision logged", "other": "{n} decisions logged" },
+  "none": "The sheet has no decisions yet."
+}

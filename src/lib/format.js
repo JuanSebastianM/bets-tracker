@@ -21,12 +21,15 @@ function fixed(/** @type {number} */ n, /** @type {number} */ d) {
 }
 
 /**
- * Decimal odds: 2 decimals, or 3 when the value has a third (4.333, 1.909).
+ * Decimal odds: 2 decimals, or 3 when the value has a third (4.333, 1.909). Averages and other
+ * computed prices pass { average: true } and always get 2.
  * @param {number | null | undefined} n
+ * @param {{ average?: boolean }} [opts]
  */
-export function formatPrice(n) {
+export function formatPrice(n, opts = {}) {
   if (bad(n)) return '–';
   const v = Number(n);
+  if (opts.average) return v.toFixed(2);
   const three = Math.abs(Math.round(v * 1000) - Math.round(v * 100) * 10) > 0;
   return v.toFixed(three ? 3 : 2);
 }

@@ -1,0 +1,135 @@
+{
+  "app": {
+    "name": "Bets Tracker",
+    "readOnly": "Solo lectura",
+    "skipToContent": "Saltar al contenido"
+  },
+  "nav": {
+    "main": "Secciones",
+    "overview": "Resumen",
+    "explorer": "Explorador",
+    "simulator": "Simulador",
+    "tests": "Tests",
+    "more": "Más",
+    "analysis": "Análisis",
+    "decisions": "Decisiones",
+    "glossary": "Glosario",
+    "settings": "Ajustes",
+    "desc": {
+      "simulator": "Qué habría pasado apostando una cantidad fija",
+      "tests": "Las pruebas congeladas y la próxima revisión",
+      "analysis": "Por mercado, liga, casa, cuota y mes; calibración",
+      "decisions": "El registro de decisiones de la hoja",
+      "glossary": "Términos de apuestas, etiquetas y reglas",
+      "settings": "Idioma, tema, bank, estado de los datos"
+    }
+  },
+  "common": {
+    "close": "Cerrar",
+    "dismiss": "Descartar",
+    "delete": "Borrar",
+    "yes": "Sí",
+    "no": "No",
+    "picks": { "one": "{n} pick", "other": "{n} picks" }
+  },
+  "record": {
+    "sr": "{won} ganadas, {lost} perdidas, {void} nulas, {halves} medias"
+  },
+  "status": {
+    "won": "Ganada",
+    "lost": "Perdida",
+    "void": "Nula",
+    "half_won": "Medio ganada",
+    "half_lost": "Medio perdida",
+    "pending": "Pendiente",
+    "other": "Otro"
+  },
+  "sources": {
+    "bets": "Apuestas",
+    "shadow": "Sombra",
+    "grok": "Grok"
+  },
+  "markets": {
+    "result": "Resultado",
+    "goals": "Goles",
+    "corners_total": "Córners totales",
+    "corners_team": "Córners de equipo",
+    "cards_total": "Tarjetas totales",
+    "cards_team": "Tarjetas de equipo",
+    "shots": "Tiros",
+    "combo": "Combinadas",
+    "other": "Otros"
+  },
+  "stats": {
+    "units": "Unidades",
+    "yield": "Yield",
+    "graded": "Calificadas",
+    "nGraded": "n {n}",
+    "fairCloseEv": "EV vs cierre",
+    "nClose": "n {n} con cierre",
+    "pending": "Pendientes",
+    "maxDrawdown": "Peor racha (drawdown)"
+  },
+  "filters": {
+    "source": "Fuente",
+    "market": "Mercado"
+  },
+  "feed": {
+    "synced": "Sincronizado {ago}",
+    "sheetRead": "Hoja leída {time}",
+    "refresh": "Actualizar datos",
+    "retry": "Reintentar",
+    "fixtureBanner": "Datos de ejemplo (inventados). Quita ?feed=fixture de la dirección para ver la hoja.",
+    "offlineTitle": "Sin conexión",
+    "staleTitle": "No se pudo actualizar",
+    "showingCached": "Mostrando la copia guardada, sincronizada {ago}.",
+    "missingHeaders": "Faltan columnas en la hoja: {list}. Esos datos aparecen vacíos.",
+    "unconfiguredTitle": "Falta conectar la hoja",
+    "unconfiguredBody": "La dirección del script de la hoja (FEED_URL en src/config.js) todavía está vacía. Mientras tanto puedes ver la app con datos de ejemplo.",
+    "openFixture": "Ver con datos de ejemplo",
+    "errorTitle": "No se pudieron cargar los datos",
+    "error": {
+      "offline": "No hay conexión y todavía no hay una copia guardada.",
+      "http": "El script de la hoja respondió con un error ({detail}).",
+      "parse": "La respuesta del script no es JSON válido.",
+      "invalid": "La respuesta no tiene la forma esperada ({detail}).",
+      "schema_newer": "Los datos usan un formato más nuevo que esta versión de la app ({detail}). Recarga la app para actualizarla.",
+      "schema_older": "Los datos usan un formato viejo ({detail}). Vuelve a implementar el script Feed.gs.",
+      "feed_error": "El script de la hoja falló: {detail}"
+    }
+  },
+  "pager": {
+    "label": "Páginas",
+    "prev": "Página anterior",
+    "next": "Página siguiente",
+    "info": "Página {page} de {pages}"
+  },
+  "pick": {
+    "close": "Cuota de cierre",
+    "closeShort": "cierre",
+    "fairCloseEv": "Valor esperado contra la cuota de cierre sin margen",
+    "evShort": "EV"
+  },
+  "chart": {
+    "showTable": "Ver como tabla",
+    "showChart": "Ver gráfico",
+    "noData": "Todavía no hay datos para este gráfico."
+  },
+  "summaries": {
+    "record": "{label}: {record} a cuota media {price}, {profit} ({yield}) en {n} calificadas.",
+    "noGraded": "{label}: todavía sin picks calificados.",
+    "pending": { "one": "{pending} pendiente.", "other": "{pending} pendientes." },
+    "hitAbove": "Acierta {hit}, por encima del {be} que necesita para no perder.",
+    "hitBelow": "Acierta {hit}, por debajo del {be} que necesita para no perder.",
+    "closeEv": "Contra el cierre sin margen: {ev} de media (n {n}).",
+    "closeEvRange": "Rango probable: {lo} a {hi}.",
+    "closeEvNone": "Sin cierres con los dos lados para medir contra el cierre.",
+    "smallSample": "Muestra pequeña (n {n}): todavía no dice mucho."
+  },
+  "pwa": {
+    "updateReady": "Hay una versión nueva de la app.",
+    "reload": "Actualizar",
+    "updateAfterWork": "Se actualizará al terminar.",
+    "updated": "App actualizada."
+  }
+}

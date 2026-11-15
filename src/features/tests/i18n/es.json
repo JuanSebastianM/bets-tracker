@@ -1,0 +1,16 @@
+{
+  "reviewTitle": "Próxima revisión de Sombra",
+  "reviewDue": "Toca desde el {date} y con {rows} filas calificadas (hoy {graded}): faltan {days} días y {left} filas.",
+  "reviewUnknown": "No hay una fila \"Revisión Sombra\" en Decisiones para contar desde ahí.",
+  "frozenTitle": "Pruebas congeladas",
+  "frozenRule": "Una decisión por prueba con {graded} calificadas y {close} con cierre de dos lados; pasa si el EV contra el cierre está {z} errores estándar sobre cero.",
+  "test": "Prueba",
+  "graded": "Calificadas",
+  "withClose": "Con cierre",
+  "state": "Estado",
+  "states": {
+    "collecting": "Juntando filas",
+    "pass": "Pasa: proponer 0.25u",
+    "stop": "No pasa: proponer parar"
+  }
+}

@@ -1,0 +1,3 @@
+/* glossary section. Scope every rule under .glossary. Tokens only (src/styles/tokens.css). */
+.glossary .glossary-tags { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); }
+.glossary .glossary-rules { margin: 0; padding-left: 0; list-style: none; display: grid; gap: var(--sp-2); }

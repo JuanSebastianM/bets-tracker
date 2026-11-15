@@ -21,7 +21,7 @@ export function describeRecord(label, s) {
   let out = t('summaries.record', {
     label,
     record: formatRecord(s),
-    price: formatPrice(s.avgPrice),
+    price: formatPrice(s.avgPrice, { average: true }),
     profit: formatUnits(s.profit),
     yield: formatPct(s.yield),
     n: s.n,

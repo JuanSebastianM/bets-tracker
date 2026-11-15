@@ -1,0 +1,6 @@
+{
+  "tagsTitle": "The sheet's tags",
+  "stubBody": "Placeholder view: the categories the sheet uses and how many rows each has.",
+  "rulesTitle": { "one": "{n} rule", "other": "{n} rules" },
+  "deepLink": "Direct link to “{term}”: the full glossary comes with its section."
+}

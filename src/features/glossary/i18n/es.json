@@ -1,0 +1,6 @@
+{
+  "tagsTitle": "Etiquetas de la hoja",
+  "stubBody": "Vista provisional: las categorías que usa la hoja y cuántas filas tiene cada una.",
+  "rulesTitle": { "one": "{n} regla", "other": "{n} reglas" },
+  "deepLink": "Enlace directo a «{term}»: el glosario completo llega con su sección."
+}

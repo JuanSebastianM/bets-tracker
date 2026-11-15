@@ -1,0 +1,2 @@
+/* overview section. Scope every rule under .overview. Tokens only (src/styles/tokens.css). */
+.overview .overview-summary { color: var(--c-ink-2); font-size: var(--fs-sm); max-width: 68ch; }

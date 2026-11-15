@@ -86,8 +86,11 @@ const SHADOW_TEMPLATES = [
 function feedClose(price, sel, threeWay) {
   const close = r2(price * between(0.9, 1.08));
   if (threeWay) {
-    const a = r2(between(2.6, 4.2));
-    const b = r2(between(3.0, 4.0));
+    // the other two outcomes share what is left of a ~106% book
+    const rest = Math.max(0.2, between(1.05, 1.08) - 1 / close);
+    const share = between(0.35, 0.6);
+    const b = r2(1 / (rest * share));
+    const a = r2(1 / (rest * (1 - share)));
     return { close, text: `cierre: Sofascore/bet365 ${close.toFixed(2)} (1 ${close.toFixed(2)} / X ${b.toFixed(2)} / 2 ${a.toFixed(2)})` };
   }
   return { close, text: `cierre: Sofascore/bet365 ${close.toFixed(2)} (otro lado ${other(close).toFixed(2)})` };
@@ -317,7 +320,10 @@ function shadowRow(kind, date) {
       const c = feedClose(price, selection, threeWay);
       closePrice = c.close;
       if (closeKind === 'dc') {
-        notes.push(`cierre: Sofascore/bet365 ${c.close.toFixed(2)} (1X2 ${r2(between(1.6, 2.6))}/${r2(between(3, 4))}/${r2(between(2.5, 5))})`);
+        // a 1X2 consistent with the double chance close (1X = home + draw), ~106% book
+        const q = Math.min(0.9, 1 / c.close);
+        const h = q * between(0.55, 0.7);
+        notes.push(`cierre: Sofascore/bet365 ${c.close.toFixed(2)} (1X2 ${r2(1 / h)}/${r2(1 / (q - h))}/${r2(1 / Math.max(0.1, 1.06 - q))})`);
       } else notes.push(c.text);
     } else if (closeKind === 'logger') {
       const lt = `${sideOU === 'Over' ? 'U' : 'O'}${line}`;
@@ -428,7 +434,7 @@ for (let i = 0; i < 40; i++) {
     date, time: `${pick(['9', '14', '17', '19'])}:${pick(['00', '30'])}`, league: pick(LEAGUES), match: m.name, market, selection, price,
     minPrice: i === 3 ? null : price ? r2(price * 0.93) : null, stakeU: pick([0.25, 0.5, 1]),
     reason: `${pick(['Automático', 'Manual'])}: Prob ${(between(0.3, 0.7) * 100).toFixed(1)}%, EV +${(between(2, 20)).toFixed(1)}%; razón inventada`,
-    verdict: priced ? `Cotizado: modelo ${(between(0.4, 0.7) * 100).toFixed(1)}% vs mercado ${(between(0.3, 0.55) * 100).toFixed(1)}% → SKIP: F-gap` : i === 7 ? '' : 'No cotizado: mercado no modelado por el script',
+    verdict: i === 7 ? '' : priced ? `Cotizado: modelo ${(between(0.4, 0.7) * 100).toFixed(1)}% vs mercado ${(between(0.3, 0.55) * 100).toFixed(1)}% → SKIP: F-gap` : i === 7 ? '' : 'No cotizado: mercado no modelado por el script',
     status: st, result: st === 'Pendiente' ? null : `${m.home} ${Math.floor(rand() * 4)}-${Math.floor(rand() * 4)} ${m.away}. Sofascore`,
     notes: notes.join(' | '),
   });

@@ -1,0 +1,26 @@
+{
+  "name": "bets-tracker",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Read-only PWA for the Bets Tracker Google Sheet",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "typecheck": "node scripts/bin.mjs tsc -p tsconfig.json",
+    "test": "node --test \"tests/unit/**/*.test.mjs\"",
+    "test:e2e": "node scripts/bin.mjs playwright test",
+    "check:i18n": "node scripts/check-i18n.mjs",
+    "check": "npm run typecheck && npm test && npm run check:i18n && npm run test:e2e",
+    "build": "node scripts/build-site.mjs",
+    "fixture": "node scripts/make-fixture.mjs",
+    "icons": "node scripts/make-icons.mjs",
+    "screenshots": "SCREENSHOT_DIR=${SCREENSHOT_DIR:-/home/claude/review/foundation} node scripts/bin.mjs playwright test --config playwright.screenshots.config.js"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

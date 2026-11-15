@@ -1,0 +1,135 @@
+{
+  "app": {
+    "name": "Bets Tracker",
+    "readOnly": "Read only",
+    "skipToContent": "Skip to content"
+  },
+  "nav": {
+    "main": "Sections",
+    "overview": "Overview",
+    "explorer": "Explorer",
+    "simulator": "Simulator",
+    "tests": "Tests",
+    "more": "More",
+    "analysis": "Analysis",
+    "decisions": "Decisions",
+    "glossary": "Glossary",
+    "settings": "Settings",
+    "desc": {
+      "simulator": "What a fixed stake would have done",
+      "tests": "The frozen tests and the next review",
+      "analysis": "By market, league, book, price and month; calibration",
+      "decisions": "The sheet's decision log",
+      "glossary": "Betting terms, tags and rules",
+      "settings": "Language, theme, bankroll, data status"
+    }
+  },
+  "common": {
+    "close": "Close",
+    "dismiss": "Dismiss",
+    "delete": "Delete",
+    "yes": "Yes",
+    "no": "No",
+    "picks": { "one": "{n} pick", "other": "{n} picks" }
+  },
+  "record": {
+    "sr": "{won} won, {lost} lost, {void} void, {halves} half results"
+  },
+  "status": {
+    "won": "Won",
+    "lost": "Lost",
+    "void": "Void",
+    "half_won": "Half won",
+    "half_lost": "Half lost",
+    "pending": "Pending",
+    "other": "Other"
+  },
+  "sources": {
+    "bets": "Bets",
+    "shadow": "Shadow",
+    "grok": "Grok"
+  },
+  "markets": {
+    "result": "Result",
+    "goals": "Goals",
+    "corners_total": "Total corners",
+    "corners_team": "Team corners",
+    "cards_total": "Total cards",
+    "cards_team": "Team cards",
+    "shots": "Shots",
+    "combo": "Combos",
+    "other": "Other"
+  },
+  "stats": {
+    "units": "Units",
+    "yield": "Yield",
+    "graded": "Graded",
+    "nGraded": "n {n}",
+    "fairCloseEv": "EV vs close",
+    "nClose": "n {n} with a close",
+    "pending": "Pending",
+    "maxDrawdown": "Worst drawdown"
+  },
+  "filters": {
+    "source": "Source",
+    "market": "Market"
+  },
+  "feed": {
+    "synced": "Synced {ago}",
+    "sheetRead": "Sheet read {time}",
+    "refresh": "Refresh data",
+    "retry": "Retry",
+    "fixtureBanner": "Example data (made up). Remove ?feed=fixture from the address to see the sheet.",
+    "offlineTitle": "Offline",
+    "staleTitle": "Could not refresh",
+    "showingCached": "Showing the saved copy, synced {ago}.",
+    "missingHeaders": "Columns missing in the sheet: {list}. That data shows as empty.",
+    "unconfiguredTitle": "The sheet is not connected yet",
+    "unconfiguredBody": "The address of the sheet's script (FEED_URL in src/config.js) is still empty. Meanwhile you can see the app with example data.",
+    "openFixture": "See it with example data",
+    "errorTitle": "The data could not be loaded",
+    "error": {
+      "offline": "There is no connection and no saved copy yet.",
+      "http": "The sheet's script answered with an error ({detail}).",
+      "parse": "The script's answer is not valid JSON.",
+      "invalid": "The answer does not have the expected shape ({detail}).",
+      "schema_newer": "The data uses a newer format than this version of the app ({detail}). Reload the app to update it.",
+      "schema_older": "The data uses an old format ({detail}). Redeploy the Feed.gs script.",
+      "feed_error": "The sheet's script failed: {detail}"
+    }
+  },
+  "pager": {
+    "label": "Pages",
+    "prev": "Previous page",
+    "next": "Next page",
+    "info": "Page {page} of {pages}"
+  },
+  "pick": {
+    "close": "Closing price",
+    "closeShort": "close",
+    "fairCloseEv": "Expected value against the closing price without the margin",
+    "evShort": "EV"
+  },
+  "chart": {
+    "showTable": "Show as table",
+    "showChart": "Show chart",
+    "noData": "No data for this chart yet."
+  },
+  "summaries": {
+    "record": "{label}: {record} at an average price of {price}, {profit} ({yield}) over {n} graded.",
+    "noGraded": "{label}: no graded picks yet.",
+    "pending": { "one": "{pending} pending.", "other": "{pending} pending." },
+    "hitAbove": "Hits {hit}, above the {be} it needs to break even.",
+    "hitBelow": "Hits {hit}, below the {be} it needs to break even.",
+    "closeEv": "Against the close without the margin: {ev} on average (n {n}).",
+    "closeEvRange": "Likely range: {lo} to {hi}.",
+    "closeEvNone": "No closes with both sides to measure against the close.",
+    "smallSample": "Small sample (n {n}): it does not say much yet."
+  },
+  "pwa": {
+    "updateReady": "A new version of the app is ready.",
+    "reload": "Update",
+    "updateAfterWork": "It will update when this finishes.",
+    "updated": "App updated."
+  }
+}

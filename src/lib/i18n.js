@@ -196,7 +196,14 @@ const DATE_STYLES = {
 export function formatDate(dateStr, style = 'medium', locale = getLocale()) {
   if (!dateStr) return '';
   const [y, m, d] = dateStr.slice(0, 10).split('-').map(Number);
-  return dtf(locale, { ...DATE_STYLES[style], timeZone: 'UTC' }).format(new Date(Date.UTC(y, m - 1, d)));
+  const date = new Date(Date.UTC(y, m - 1, d));
+  const f = dtf(locale, { ...DATE_STYLES[style], timeZone: 'UTC' });
+  if (locale === 'es' && (style === 'short' || style === 'medium')) {
+    // '15 nov 2026' (the app's date style), not Intl's '15 de nov de 2026'.
+    const parts = Object.fromEntries(f.formatToParts(date).map((p) => [p.type, p.value]));
+    return [parts.day, String(parts.month || '').replace('.', ''), parts.year].filter(Boolean).join(' ');
+  }
+  return f.format(date);
 }
 
 /**

@@ -1,0 +1,8 @@
+{
+  "count": { "one": "{n} pick", "other": "{n} picks" },
+  "emptyTitle": "Ningún pick con estos filtros",
+  "emptyBody": "Quita un filtro para ver más.",
+  "reason": "Motivo",
+  "notes": "Notas",
+  "row": "{source}, fila {row} de la hoja"
+}

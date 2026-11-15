@@ -33,6 +33,8 @@ export function validateFeed(json) {
   if (!j.meta || typeof j.meta !== 'object') j.meta = { rows: {}, redactions: 0, missingHeaders: [] };
   if (!Array.isArray(j.meta.missingHeaders)) j.meta.missingHeaders = [];
   if (typeof j.meta.redactions !== 'number') j.meta.redactions = 0;
+  if (typeof j.meta.cached !== 'boolean') j.meta.cached = false;
+  if (typeof j.meta.cacheTtlSeconds !== 'number') j.meta.cacheTtlSeconds = null;
   return { ok: true, feed: j };
 }
 
@@ -76,7 +78,9 @@ export async function fetchFeed(url, fetchImpl = fetch) {
     return { ok: false, code: 'parse', detail: String(e) };
   }
   const v = validateFeed(json);
-  return v.ok ? { ok: true, feed: v.feed } : { ok: false, code: v.code, detail: v.detail };
+  if (v.ok === true) return { ok: true, feed: v.feed };
+  const bad = /** @type {{ code: ValidationCode, detail: string }} */ (/** @type {any} */ (v));
+  return { ok: false, code: bad.code, detail: bad.detail };
 }
 
 // ---------------------------------------------------------------- IndexedDB cache

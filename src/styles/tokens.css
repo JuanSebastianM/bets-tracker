@@ -1,0 +1,114 @@
+/* Design tokens. Light by default; dark under [data-theme='dark'] (set by theme-boot.js / settings.js).
+   Identity: a match-night ledger read on a phone. Cool concrete greys, one floodlight-teal accent,
+   green and red only for results, amber only for "pending / attention". Numbers are tabular. */
+
+:root {
+  /* Surfaces and text */
+  --c-bg: #eceff1;
+  --c-surface: #ffffff;
+  --c-surface-2: #f5f7f8;
+  --c-raised: #ffffff;
+  --c-ink: #111c24;
+  --c-ink-2: #34434e;
+  --c-muted: #5a6a76;
+  --c-line: #d3dae0;
+  --c-line-strong: #b4bfc7;
+
+  /* One accent */
+  --c-accent: #0d6870;
+  --c-accent-ink: #ffffff;
+  --c-accent-soft: #dcefee;
+  --c-focus: #0d6870;
+
+  /* Meaning (results and attention). Never decorative. */
+  --c-won: #1d7443;
+  --c-won-soft: #dcf0e3;
+  --c-lost: #b0302a;
+  --c-lost-soft: #f7e0de;
+  --c-void: #66737c;
+  --c-void-soft: #e6eaec;
+  --c-pending: #94600c;
+  --c-pending-soft: #f6ead2;
+  --c-info: #2a5d9c;
+  --c-info-soft: #e0e9f5;
+
+  /* Charts */
+  --c-chart-line: var(--c-accent);
+  --c-chart-area: rgba(13, 104, 112, 0.1);
+  --c-chart-dd: rgba(176, 48, 42, 0.12);
+  --c-chart-grid: #e1e6ea;
+  --c-chart-2: #7a5ea8;
+  --c-chart-3: #b06a1c;
+
+  /* Type */
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-num: ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-md: 0.9375rem;
+  --fs-lg: 1.0625rem;
+  --fs-xl: 1.375rem;
+  --fs-2xl: 1.875rem;
+  --fs-score: 2.75rem;
+  --lh: 1.45;
+
+  /* Space and shape: cards are slabs (small radius), chips are pills, sheets are rounded on top. */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --r-card: 10px;
+  --r-ctl: 8px;
+  --r-pill: 999px;
+  --r-sheet: 18px;
+  --shadow-sheet: 0 -8px 32px rgba(10, 20, 28, 0.18);
+  --border: 1px solid var(--c-line);
+
+  --tap: 44px;
+  --tabbar-h: 60px;
+  --rail-w: 232px;
+  --header-h: 56px;
+  --content-max: 760px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --c-bg: #0c1318;
+  --c-surface: #141e25;
+  --c-surface-2: #18242c;
+  --c-raised: #1c2a33;
+  --c-ink: #e3ebef;
+  --c-ink-2: #c3d0d7;
+  --c-muted: #8fa1ac;
+  --c-line: #26353f;
+  --c-line-strong: #3a4c58;
+
+  --c-accent: #4cb5b1;
+  --c-accent-ink: #062224;
+  --c-accent-soft: #143a3c;
+  --c-focus: #6fd0cc;
+
+  --c-won: #54c483;
+  --c-won-soft: #17352a;
+  --c-lost: #f07d72;
+  --c-lost-soft: #3d1f1f;
+  --c-void: #9aa7af;
+  --c-void-soft: #263139;
+  --c-pending: #e3b35a;
+  --c-pending-soft: #3a2f17;
+  --c-info: #86b2ec;
+  --c-info-soft: #1b2a3e;
+
+  --c-chart-area: rgba(76, 181, 177, 0.14);
+  --c-chart-dd: rgba(240, 125, 114, 0.16);
+  --c-chart-grid: #22313a;
+  --c-chart-2: #b49ae0;
+  --c-chart-3: #e3a25a;
+  --shadow-sheet: 0 -8px 32px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}

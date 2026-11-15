@@ -1,0 +1,9 @@
+{
+  "sub": {
+    "bets": "Real bets, with the profit the sheet records",
+    "shadow": "Shadow picks at 1u each; nothing staked",
+    "grok": "Grok's picks at 1u each"
+  },
+  "sparkline": "Cumulative curve of {source}",
+  "seePicks": "See the picks"
+}

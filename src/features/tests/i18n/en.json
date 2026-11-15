@@ -1,0 +1,16 @@
+{
+  "reviewTitle": "Next Shadow review",
+  "reviewDue": "Due from {date} and at {rows} graded rows (now {graded}): {days} days and {left} rows to go.",
+  "reviewUnknown": "There is no \"Revisión Sombra\" row in Decisions to count from.",
+  "frozenTitle": "Frozen tests",
+  "frozenRule": "One decision per test at {graded} graded rows with {close} two-sided closes; it passes when the EV against the close is {z} standard errors above zero.",
+  "test": "Test",
+  "graded": "Graded",
+  "withClose": "With a close",
+  "state": "State",
+  "states": {
+    "collecting": "Collecting rows",
+    "pass": "Passes: propose 0.25u",
+    "stop": "Fails: propose stopping"
+  }
+}

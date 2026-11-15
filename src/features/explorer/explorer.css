@@ -1,0 +1,2 @@
+/* explorer section. Scope every rule under .explorer. Tokens only (src/styles/tokens.css). */
+.explorer .explorer-notes { overflow-wrap: anywhere; white-space: pre-wrap; }

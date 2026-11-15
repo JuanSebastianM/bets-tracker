@@ -1,0 +1,9 @@
+{
+  "sub": {
+    "bets": "Apuestas reales, con la ganancia que registra la hoja",
+    "shadow": "Picks en sombra, a 1u cada uno; nada apostado",
+    "grok": "Los picks de Grok, a 1u cada uno"
+  },
+  "sparkline": "Curva acumulada de {source}",
+  "seePicks": "Ver los picks"
+}

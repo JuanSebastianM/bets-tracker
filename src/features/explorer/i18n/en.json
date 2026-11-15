@@ -1,0 +1,8 @@
+{
+  "count": { "one": "{n} pick", "other": "{n} picks" },
+  "emptyTitle": "No picks match these filters",
+  "emptyBody": "Remove a filter to see more.",
+  "reason": "Reason",
+  "notes": "Notes",
+  "row": "{source}, sheet row {row}"
+}

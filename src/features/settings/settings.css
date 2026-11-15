@@ -1,0 +1,4 @@
+/* settings section. Scope every rule under .settings. Tokens only (src/styles/tokens.css). */
+.settings .settings-presets { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-1); }
+.settings .settings-presets li { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+.settings .kv-chips { justify-content: flex-end; }

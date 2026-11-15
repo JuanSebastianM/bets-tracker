@@ -20,7 +20,15 @@ export interface Feed {
   schema: number;
   generatedAt: string;
   timeZone?: string;
-  meta: { rows: Record<string, number>; redactions: number; missingHeaders: string[] };
+  meta: {
+    rows: Record<string, number>;
+    redactions: number;
+    missingHeaders: string[];
+    /** true when the script served this JSON from its response cache. */
+    cached?: boolean;
+    /** How long the script keeps a read of the sheet (seconds). */
+    cacheTtlSeconds?: number | null;
+  };
   tabs: {
     bets: FeedTab; shadow: FeedTab; grok: FeedTab; decisions: FeedTab; pinnacle: FeedTab; rules: string[];
   };
