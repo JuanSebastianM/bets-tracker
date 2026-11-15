@@ -1,16 +1,184 @@
 {
   "reviewTitle": "Próxima revisión de Sombra",
-  "reviewDue": "Toca desde el {date} y con {rows} filas calificadas (hoy {graded}): faltan {days} días y {left} filas.",
   "reviewUnknown": "No hay una fila \"Revisión Sombra\" en Decisiones para contar desde ahí.",
   "frozenTitle": "Pruebas congeladas",
-  "frozenRule": "Una decisión por prueba con {graded} calificadas y {close} con cierre de dos lados; pasa si el EV contra el cierre está {z} errores estándar sobre cero.",
-  "test": "Prueba",
   "graded": "Calificadas",
   "withClose": "Con cierre",
-  "state": "Estado",
   "states": {
     "collecting": "Juntando filas",
-    "pass": "Pasa: proponer 0.25u",
-    "stop": "No pasa: proponer parar"
-  }
+    "pass": "Pasaría",
+    "stop": "No pasaría",
+    "extended": "Sigue hasta 120",
+    "context": "Contexto"
+  },
+  "strip": {
+    "label": "Resumen de las pruebas",
+    "collecting": {
+      "one": "prueba juntando filas",
+      "other": "pruebas juntando filas"
+    },
+    "ready": {
+      "one": "llegó a su conteo de decisión",
+      "other": "llegaron a su conteo de decisión"
+    },
+    "closest": "La más cerca de decidir",
+    "closestValue": "{share} del camino",
+    "none": "Ninguna"
+  },
+  "howTo": {
+    "summary": "Cómo leer esta pantalla",
+    "priceTitle": "Precio contra el cierre, no resultados",
+    "price": "Una prueba se juzga por cuánto mejor fue tu cuota que la cuota de cierre sin el margen de la casa ({term}), no por cuántas ganó. El resultado de un pick varía muchísimo; la cuota contra el cierre varía poco, así que 50 filas con cierre dicen más que cientos de resultados.",
+    "seTitle": "Qué son 2 errores estándar",
+    "se": "El {term} mide cuánto podría moverse la media solo por suerte; si la media está a 2 errores estándar o más sobre cero, es difícil que sea suerte.",
+    "onceTitle": "Por qué se decide una sola vez",
+    "once": "Si miras una prueba cada semana y decides cuando se ve bien, tarde o temprano alguna pasa por pura suerte. Por eso cada prueba se decide una vez, al llegar a su conteo, con una regla fijada antes de ver los datos. Yield y acierto se muestran como contexto: no deciden nada.",
+    "barsTitle": "Las barras",
+    "bars": "Cada prueba tiene dos barras: filas calificadas y filas con cierre de dos lados. Hacen falta las dos. La franja muestra la media con su intervalo de ±2 errores estándar contra la línea del cero.",
+    "termFairClose": "EV contra el cierre",
+    "termSe": "error estándar"
+  },
+  "review": {
+    "rule": "Una revisión de Sombra toca solo cuando se cumplen las dos: al menos {days} días desde la última fila \"Revisión Sombra\" en Decisiones y al menos {rows} filas calificadas desde ella.",
+    "last": "Última: {topic}, {date}.",
+    "days": "Días desde la última",
+    "rows": "Filas calificadas desde la última",
+    "ofDays": "{n} de {total} días",
+    "ofRows": "{n} de {total} filas",
+    "dueNow": "Toca ya",
+    "notDue": "Todavía no",
+    "dueWhen": "Toca desde el {date} y con {rows} filas calificadas en Sombra (hoy {graded}).",
+    "left": "Faltan {days} días y {rows} filas.",
+    "leftDays": {
+      "one": "Falta {n} día; las filas ya están.",
+      "other": "Faltan {n} días; las filas ya están."
+    },
+    "leftRows": {
+      "one": "Falta {n} fila; los días ya pasaron.",
+      "other": "Faltan {n} filas; los días ya pasaron."
+    },
+    "dueBody": "Se cumplen los días y las filas: la revisión se corre con milestone-reviewer.",
+    "history": "Revisiones anteriores",
+    "historyEmpty": "Todavía no hay filas \"Revisión Sombra\".",
+    "historyItem": "{topic}",
+    "decisionRow": "Decisiones fila {row}"
+  },
+  "frozen": {
+    "intro": "Pruebas del modelo que siguen registrándose tal cual. Regla de la fila 111: se decide una sola vez, a las {graded} filas, por precio contra el cierre y no por resultados; si pasa se te propone dinero real a {stake}u, nunca se aplica solo.",
+    "since": "Desde el {date}",
+    "sinceFirst": "Desde su primera fila ({date})",
+    "sinceNone": "Sin filas todavía",
+    "closeSources": "casa {own}, feed bet365 {feed}",
+    "pending": {
+      "one": "{n} pendiente",
+      "other": "{n} pendientes"
+    },
+    "measure": "EV del precio contra el cierre",
+    "measureValue": "{mean} (n {n})",
+    "interval": "±2 EE: {lo} a {hi}",
+    "z": "z {z}",
+    "noMeasure": "Todavía no hay filas con cierre de dos lados.",
+    "ruleCollecting": "No se decide nada hasta {graded} calificadas con {close} con cierre, se vean como se vean los resultados.",
+    "ruleCollectingCloses": "Ya tiene {graded} calificadas; espera hasta tener {close} con cierre de dos lados.",
+    "rulePass": "Con z {z} (2 o más), la revisión te propondría dinero real a {stake}u en esta prueba. Nunca se aplica solo: decides tú.",
+    "ruleStop": "Con z {z} (menos de 2), la revisión te propondría parar la categoría.",
+    "context": "Contexto, no decide",
+    "contextLine": "Récord {record}; yield {yield} (n {n}); acierto {hit} (n {n})",
+    "projection": "Estimado: llegaría a la decisión hacia el {date}, al ritmo de los últimos {days} días.",
+    "projectionReached": "Ya llegó a su conteo de decisión.",
+    "projectionNone": "Sin filas calificadas en los últimos {days} días: no hay ritmo para estimar.",
+    "projectionPace": "{graded} calificadas y {close} con cierre por día",
+    "explorer": "Ver las filas en el Explorador",
+    "explorerHint": "El filtro del Explorador es una aproximación: puede incluir algunas filas que la prueba no cuenta.",
+    "decision": "Decisiones fila {row}",
+    "chart": "EV contra el cierre {mean}, intervalo de {lo} a {hi}, n {n}.",
+    "chartNone": "Sin intervalo: hacen falta al menos dos partidos con cierre.",
+    "what": {
+      "rule30_pass_all": "Córners y tarjetas totales que pasaron todos los filtros y solo los frena la pausa de la regla 30.",
+      "cards_under": "Unders de tarjetas totales del modelo, cuota 1.70–4.0, con equipos de 10+ partidos, pasen o no los filtros.",
+      "under45_control": "La línea Under 4.5 dentro de la prueba de unders de tarjetas, con su propia decisión.",
+      "corner_rejects": "Córners totales que el modelo ve con valor pero rechazó un filtro (F-gap, F-ratio o razor), cuota 1.70–2.0.",
+      "team_corners": "Córners de un equipo que pasaron todos los filtros (regla 32).",
+      "model_only_shots": "El pick diario de tiros de equipo con la probabilidad más alta del modelo, aunque la casa no esté de acuerdo; cuota 1.70–4.0.",
+      "match_total_shots": "Tiros y tiros al arco totales del partido con veredicto SHADOW (regla 25).",
+      "relaxed_sample_corners": "Córners totales con muestra relajada de 6–9 partidos (regla 18)."
+    },
+    "of": "{n} de {total}",
+    "decisions": "Decisiones",
+    "rowShort": "fila {row}"
+  },
+  "priceFirst": {
+    "title": "Pruebas de precio primero",
+    "intro": "Picks juzgados contra un precio justo de consenso entre casas, sin el modelo. Cada una tiene su propia regla, no la de la fila 111.",
+    "what": {
+      "value": "Resultado y goles donde una casa paga 3% o más sobre el precio justo de consenso (regla 29).",
+      "near_value": "Resultado y goles donde una casa paga entre 0% y 3% sobre el precio justo: sirven para juzgar el umbral del 3%.",
+      "prop_value": "Córners y tarjetas totales donde una casa, cuota 1.70–4.0, paga 3% o más sobre el consenso de casas con ambos lados.",
+      "prop_near_value": "Córners y tarjetas totales entre 0% y 3% sobre el consenso, hasta 3 por slate."
+    },
+    "rule": {
+      "value": "Decidido antes de ver los datos (filas 79 y 80): la línea que decide es cuota 4.0 o menos. Pasa con 30+ calificadas con EV justo contra el cierre, media sobre cero y yield plano positivo. Si pasa se propone dinero real en ≤4.0, o solo en ≤3.0 si el tramo 3.0–4.0 tiene 10+ filas con media negativa. Si ≤4.0 no pasa pero ≤3.0 sí, se juzga ≤3.0 solo con filas desde el 30 oct. Si ninguna pasa, resultado y goles siguen en SHADOW. Siempre con stake pequeño y tu aprobación.",
+      "near_value": "No tiene decisión propia: se reporta aparte de VALOR para ver si el umbral del 3% está bien puesto.",
+      "prop_value": "Fijada el 6 nov antes de ver filas (fila 97): con {first} filas calificadas con cierre de bet365 de ambos lados, si es CLARA (intervalo de 95% entero sobre cero y yield plano positivo) se te propone dinero real a {stake}u; si la media es cero o menos, se propone parar; si no, sigue hasta {final}, donde CLARA se propone y cualquier otra cosa se para.",
+      "prop_near_value": "No tiene decisión propia: se reporta aparte de VALOR PROP."
+    },
+    "case": {
+      "a": "La línea ≤4.0 pasa la puerta: se te propondría dinero real en ≤4.0.",
+      "a_le3": "La línea ≤4.0 pasa, pero el tramo 3.0–4.0 sale negativo con 10+ filas: se te propondría solo ≤3.0.",
+      "b": "≤4.0 no pasa, pero ≤3.0 sí, también con las filas desde el 30 oct: se te propondría ≤3.0.",
+      "b_waiting": "≤4.0 no pasa y ≤3.0 sí, pero ≤3.0 tiene que pasar solo con filas desde el 30 oct: todavía no.",
+      "c": "Ni ≤4.0 ni ≤3.0 pasan: resultado y goles siguen en SHADOW."
+    },
+    "propState": {
+      "collecting": "Todavía no llega a {target} filas con cierre de bet365 de ambos lados: no se decide nada.",
+      "pass": "CLARA: intervalo de 95% entero sobre cero y yield positivo. Se te propondría dinero real a {stake}u.",
+      "stop": "Se te propondría parar la categoría.",
+      "extended": "Ni clara ni negativa a las {first}: sigue hasta {final} filas."
+    },
+    "measureValue": "EV justo contra el cierre (apertura contra el cierre de su misma fuente)",
+    "measureProp": "EV contra el cierre de bet365 sin margen (método power)",
+    "interval95": "IC 95%: {lo} a {hi}",
+    "lines": "Por tramo de cuota",
+    "books": "Por casa del precio",
+    "line": "Línea",
+    "lineAll": "Todas",
+    "lineLe4": "≤ 4.0 (la que decide)",
+    "lineLe3": "≤ 3.0 (control)",
+    "line34": "3.0–4.0",
+    "lineGt4": "> 4.0",
+    "lineFresh": "≤ 3.0 desde el 30 oct",
+    "book": "Casa",
+    "bookOther": "Feed u otra",
+    "colN": "Calificadas",
+    "colRecord": "Récord",
+    "colYield": "Yield",
+    "colEv": "EV (n)",
+    "pinnacle": "VALOR y VALOR CASI calificadas con id de Pinnacle",
+    "pinnacleNote": "A las {total} con cierre de Pinnacle, VALOR se juzga también contra el precio justo de Pinnacle. El cruce con el cierre de Pinnacle lo hace la revisión, no esta app.",
+    "perSlate": "{n} filas por slate en {slates} slates",
+    "perSlateLow": "Menos de 1 por slate: la revisión lo reporta y te pregunta si ampliar a toda línea que compartan dos casas.",
+    "contextOnly": "Contexto: yield {yield} (n {n}), récord {record}",
+    "valueCollecting": "Todavía no hay {total} filas con EV justo en la línea ≤4.0: no se decide nada.",
+    "linesAndBooks": "Por tramo de cuota y por casa",
+    "gateLabel": "Filas ≤4.0 con EV justo",
+    "propLabel": "Con cierre de bet365 de ambos lados"
+  },
+  "stopped": {
+    "title": "Categorías paradas o que no cuentan",
+    "intro": "Ya no se registran (o sus filas nunca cuentan), pero siguen en la hoja. Aquí está cuándo y por qué pararon, con sus números finales.",
+    "when": "Parada el {date}",
+    "final": "Récord {record}; yield {yield} (n {n}); EV contra el cierre {ev} (n {evn})",
+    "span": "Filas del {first} al {last}",
+    "empty": "Sin filas en los datos.",
+    "why": {
+      "ai_watch_corners": "La IA de Sofascore en córners no le ganó al cierre; se dejó de registrar.",
+      "ai_watch_cards": "La IA de Sofascore en tarjetas tampoco le ganó al cierre; se paró en la revisión de 500 filas.",
+      "team_corner_rejects": "Desde el 2 nov solo se registran los córners de equipo que pasan todos los filtros; los rechazos iban peor contra el cierre.",
+      "team_shots": "Los tiros de equipo perdían contra el mercado; solo quedan los totales del partido y el pick MODELO SOLO.",
+      "corner_card_fillers": "Los rechazos de córners y tarjetas usados como relleno perdían contra el cierre con cualquier motivo de rechazo.",
+      "shots_fillers": "Los rechazos de tiros dejaron de usarse como relleno: solo se registra un tiro con veredicto SHADOW.",
+      "model_only_shots_low": "Filas de MODELO SOLO bajo 1.70: nunca podrían ser apuesta (regla 5), así que no cuentan para la prueba."
+    }
+  },
+  "withCloseTwo": "Con cierre de dos lados"
 }
