@@ -1,0 +1,2647 @@
+{
+ "categories": [
+  {
+   "id": "basics",
+   "label": "Basics"
+  },
+  {
+   "id": "markets",
+   "label": "Markets"
+  },
+  {
+   "id": "system",
+   "label": "The system"
+  },
+  {
+   "id": "tags",
+   "label": "Sheet tags"
+  },
+  {
+   "id": "notes",
+   "label": "Notes"
+  },
+  {
+   "id": "filters",
+   "label": "Filters and reasons"
+  },
+  {
+   "id": "statuses",
+   "label": "Statuses"
+  },
+  {
+   "id": "reviews",
+   "label": "Review measures"
+  },
+  {
+   "id": "sources",
+   "label": "Sources and tools"
+  }
+ ],
+ "entries": [
+  {
+   "slug": "decimal-odds",
+   "term": "Decimal odds",
+   "aliases": [
+    "odds",
+    "price",
+    "cuota"
+   ],
+   "category": "basics",
+   "short": "The number the book pays per unit staked, your own unit included. At 2.10, 1u staked returns 2.10u if it wins.",
+   "inSheet": "The Cuota column (F in Sombra, H in Apuestas, G in Grok). The app shows it with 2 decimals, or 3 when the sheet has 3.",
+   "example": "Price 1.85 and stake 1u: a win earns 0.85u; a loss costs 1u.",
+   "related": [
+    "implied-probability",
+    "fair-price",
+    "minimum-price"
+   ]
+  },
+  {
+   "slug": "implied-probability",
+   "term": "Implied probability",
+   "aliases": [
+    "probability of the price"
+   ],
+   "category": "basics",
+   "short": "The probability hidden in a price: 1 divided by the price. It includes the book's margin, so all outcomes add up to more than 100%.",
+   "inSheet": "It is the starting point for removing the margin and getting the market's fair probability (column I on value rows).",
+   "example": "Price 2.00 → 1 / 2.00 = 50%. Price 1.60 → 62.5%.",
+   "related": [
+    "decimal-odds",
+    "margin",
+    "de-vig"
+   ]
+  },
+  {
+   "slug": "margin",
+   "term": "Margin (vig)",
+   "aliases": [
+    "vig",
+    "juice",
+    "overround",
+    "margen"
+   ],
+   "category": "basics",
+   "short": "What the book keeps: the implied probabilities of all outcomes add up to more than 100%, and the excess is its profit.",
+   "inSheet": "The bet365 feed's margin on results is about 6%, as large as the 3% value threshold. Since model.py v4.6 there is no value verdict when the reference carries more than 10% margin.",
+   "example": "Over 1.90 and under 1.90: 52.6% + 52.6% = 105.3%, so a 5.3% margin.",
+   "related": [
+    "implied-probability",
+    "de-vig",
+    "closing-margin",
+    "fair-price"
+   ]
+  },
+  {
+   "slug": "fair-price",
+   "term": "Fair odds",
+   "aliases": [
+    "fair price",
+    "justa",
+    "cuota justa"
+   ],
+   "category": "basics",
+   "short": "The price there would be with no margin: 1 divided by the true probability (or the best estimate of it).",
+   "inSheet": "Column K (Cuota justa). For results and goals it comes from the margin-free market consensus (rule 29); for corners and cards, from the blend. In the reason it reads “vs justa Y”.",
+   "example": "Fair probability 52% → fair odds 1 / 0.52 = 1.92.",
+   "related": [
+    "consensus",
+    "de-vig",
+    "value-bet",
+    "rule-29"
+   ]
+  },
+  {
+   "slug": "value-bet",
+   "term": "Value bet",
+   "aliases": [
+    "value",
+    "valor (concept)"
+   ],
+   "category": "basics",
+   "short": "A bet whose price pays more than the true probability justifies. It doesn't mean it will win: it means that, repeated many times, it should make a profit.",
+   "inSheet": "In this system value on results and goals is sought by price only: one of your books paying 3% or more above the consensus fair price. Those rows are tagged VALOR.",
+   "example": "Fair odds 2.00 and Betano pays 2.10: (2.10 / 2.00) − 1 = +5% value.",
+   "related": [
+    "value",
+    "ev",
+    "fair-price",
+    "value-scan"
+   ]
+  },
+  {
+   "slug": "ev",
+   "term": "EV (expected value)",
+   "aliases": [
+    "expected value",
+    "edge",
+    "valor esperado"
+   ],
+   "category": "basics",
+   "short": "What you win or lose on average per unit staked: probability × price − 1. Positive is good; negative loses in the long run.",
+   "inSheet": "Column J (EV blend in Sombra, EV in Apuestas). On VALOR rows it is the value EV against the consensus fair price; on model rows, against the blend.",
+   "example": "55% probability at 2.00: 0.55 × 2.00 − 1 = +10%.",
+   "related": [
+    "value-bet",
+    "blend",
+    "fair-close-ev",
+    "variance"
+   ]
+  },
+  {
+   "slug": "yield",
+   "term": "Yield",
+   "aliases": [
+    "return",
+    "flat yield",
+    "rendimiento"
+   ],
+   "category": "basics",
+   "short": "Total profit divided by total staked. It is the measure for comparing groups of bets of different sizes.",
+   "inSheet": "The app computes it at 1u per pick over graded picks (voids count as staked). Reviews call it “plano” or “flat”.",
+   "example": "53 picks at 1u and +4.3u profit → yield +8.1%.",
+   "related": [
+    "roi",
+    "flat-staking",
+    "unit",
+    "standard-error"
+   ]
+  },
+  {
+   "slug": "roi",
+   "term": "ROI",
+   "aliases": [
+    "return on investment"
+   ],
+   "category": "basics",
+   "short": "Return on what was invested. In betting it is sometimes used as a synonym for yield; other times it is measured on the whole bankroll.",
+   "inSheet": "The app uses yield for profit over the amount staked and, in the Simulator, the return on the bankroll you type in Settings.",
+   "related": [
+    "yield",
+    "bankroll"
+   ]
+  },
+  {
+   "slug": "unit",
+   "term": "Unit (u)",
+   "aliases": [
+    "u",
+    "units",
+    "unidad"
+   ],
+   "category": "basics",
+   "short": "A fixed stake size that doesn't depend on how much money you have. Talking in units lets you compare without showing money.",
+   "inSheet": "The sheet and the app work in units (Stake (u), Ganancia (u)). You type the value of your unit in Settings and it stays in your browser.",
+   "example": "A 0.5u stake is half your unit, whatever it is.",
+   "related": [
+    "stake",
+    "bankroll",
+    "flat-staking"
+   ]
+  },
+  {
+   "slug": "stake",
+   "term": "Stake",
+   "aliases": [
+    "amount staked",
+    "bet size"
+   ],
+   "category": "basics",
+   "short": "How much is bet on a pick, in units.",
+   "inSheet": "Rule 4 sets it: the lower of 2u and a quarter Kelly, minimum 0.25u. Today the model's markets have no real money, so Sombra rows have no stake.",
+   "example": "Full Kelly suggests 4u → a quarter is 1u → stake 1u.",
+   "related": [
+    "rule-4",
+    "kelly",
+    "unit",
+    "low-stake"
+   ]
+  },
+  {
+   "slug": "bankroll",
+   "term": "Bankroll",
+   "aliases": [
+    "bank",
+    "banca"
+   ],
+   "category": "basics",
+   "short": "Everything you set aside for betting. Stakes are sized against it.",
+   "inSheet": "The bank lives only in the sheet (the Bank tab) and never leaves it. In the app you type it yourself in Settings if you want to see amounts.",
+   "related": [
+    "unit",
+    "stake",
+    "drawdown",
+    "kelly"
+   ]
+  },
+  {
+   "slug": "variance",
+   "term": "Variance",
+   "aliases": [
+    "luck",
+    "noise"
+   ],
+   "category": "basics",
+   "short": "How far results stray from the average by pure chance. With few bets, variance matters more than skill.",
+   "inSheet": "That is why reviews give the standard error and ask for large samples before changing a rule: “a single result is never a reason to change a rule”.",
+   "related": [
+    "sample-size",
+    "standard-error",
+    "two-se",
+    "drawdown"
+   ]
+  },
+  {
+   "slug": "sample-size",
+   "term": "Sample size (n)",
+   "aliases": [
+    "n",
+    "sample",
+    "muestra"
+   ],
+   "category": "basics",
+   "short": "How many cases are behind a figure. A percentage over 8 picks says very little; over 300, much more.",
+   "inSheet": "The app shows n next to every rate or mean and never gives a rate on fewer than 5 picks without its n. The frozen tests wait for 100 rows.",
+   "related": [
+    "variance",
+    "standard-error",
+    "frozen-tests"
+   ]
+  },
+  {
+   "slug": "standard-error",
+   "term": "Standard error (SE)",
+   "aliases": [
+    "SE",
+    "clustered standard error"
+   ],
+   "category": "basics",
+   "short": "How much a mean could move by chance alone. The larger the sample, the smaller the SE.",
+   "inSheet": "Means of CLV and fair-close EV use the SE clustered by match (rows from the same match count as one group). The flat yield uses the SD of profit per row / √n.",
+   "example": "Mean EV +2% with SE 1% → the ±2 SE range runs from 0% to +4%.",
+   "related": [
+    "two-se",
+    "sample-size",
+    "variance"
+   ]
+  },
+  {
+   "slug": "drawdown",
+   "term": "Drawdown",
+   "aliases": [
+    "maximum drawdown",
+    "losing run"
+   ],
+   "category": "basics",
+   "short": "The largest fall from a peak to the next lowest point of the profit curve.",
+   "inSheet": "The Simulator gives it in units and as a % of the bankroll you set in Settings.",
+   "example": "The curve climbs to +6u and then drops to −1u: a 7u drawdown.",
+   "related": [
+    "variance",
+    "bankroll",
+    "flat-staking"
+   ]
+  },
+  {
+   "slug": "closing-line",
+   "term": "Closing price",
+   "aliases": [
+    "close",
+    "closing line",
+    "cierre"
+   ],
+   "category": "basics",
+   "short": "The last price before kickoff. It is the market's best estimate, because by then all the information is in.",
+   "inSheet": "Column G in Sombra (the bet365 feed close) and V in Apuestas (only with a close at the bet's own book, rule 34f).",
+   "related": [
+    "clv",
+    "fair-close-ev",
+    "feed-close",
+    "logger-close"
+   ]
+  },
+  {
+   "slug": "clv",
+   "term": "CLV (closing line value)",
+   "aliases": [
+    "closing line value",
+    "raw CLV"
+   ],
+   "category": "basics",
+   "short": "How much better your price was than the close: price taken / closing price − 1. Beating the close consistently is the best sign of a real edge.",
+   "inSheet": "Always within one source (rule 34): never one book's price against another book's close. Raw CLV keeps the margin inside; that is why the headline measure is fair-close EV.",
+   "example": "You took 2.10 and it closed at 2.00: CLV +5%.",
+   "related": [
+    "rule-34",
+    "fair-close-ev",
+    "closing-line",
+    "closing-margin"
+   ]
+  },
+  {
+   "slug": "line-movement",
+   "term": "Line movement (steam)",
+   "aliases": [
+    "steam",
+    "movement",
+    "the line moved"
+   ],
+   "category": "basics",
+   "short": "When a price changes before the match. A strong, fast move across several books (“steam”) often comes from informed money.",
+   "inSheet": "The “apertura feed” note measures how much a line moves before it is logged. On corner totals two thirds of lines close where they opened.",
+   "related": [
+    "feed-open",
+    "barely-moving-lines",
+    "closing-line"
+   ]
+  },
+  {
+   "slug": "sharp-vs-soft",
+   "term": "Sharp and soft books",
+   "aliases": [
+    "sharp",
+    "soft"
+   ],
+   "category": "basics",
+   "short": "A sharp book (like Pinnacle) accepts winning bettors and adjusts its price with them, so its odds are very efficient. A soft book sets slower prices and limits winners.",
+   "inSheet": "Pinnacle is a second fair-price reference on VALOR rows (the “pin” note). Betano, Betsson and Stake are your books.",
+   "related": [
+    "pinnacle",
+    "pin-note",
+    "consensus"
+   ]
+  },
+  {
+   "slug": "kelly",
+   "term": "Kelly",
+   "aliases": [
+    "Kelly criterion",
+    "1/4 Kelly",
+    "quarter Kelly"
+   ],
+   "category": "basics",
+   "short": "A formula for what share of the bankroll to bet given the edge and the price: (probability × price − 1) / (price − 1). A fraction of it is used to avoid over-betting.",
+   "inSheet": "Rule 4 uses a quarter Kelly on the blend probability, capped at 2u; the Stake máx. (u) column of Apuestas keeps it.",
+   "example": "55% at 2.00: Kelly = 0.10 / 1.00 = 10% of the bank; a quarter = 2.5%.",
+   "related": [
+    "stake",
+    "rule-4",
+    "bankroll",
+    "blend"
+   ]
+  },
+  {
+   "slug": "flat-staking",
+   "term": "Flat staking",
+   "aliases": [
+    "flat",
+    "1u per pick",
+    "plano"
+   ],
+   "category": "basics",
+   "short": "Always betting the same amount (say 1u) on every pick. It is the clean way to compare groups of picks.",
+   "inSheet": "Sombra and Grok are measured at 1u flat; the Simulator lets you switch to a % of the bankroll.",
+   "related": [
+    "yield",
+    "unit",
+    "drawdown"
+   ]
+  },
+  {
+   "slug": "break-even",
+   "term": "Break-even",
+   "aliases": [
+    "break-even hit rate",
+    "equilibrio"
+   ],
+   "category": "basics",
+   "short": "The hit rate you need to neither win nor lose at a given price: 1 divided by the price.",
+   "inSheet": "The app computes it as the mean of 1 / price over the graded picks, as review.py does.",
+   "example": "At 1.90 you need to hit 52.6% to break even.",
+   "related": [
+    "hit-rate",
+    "implied-probability",
+    "yield"
+   ]
+  },
+  {
+   "slug": "hit-rate",
+   "term": "Hit rate",
+   "aliases": [
+    "win rate",
+    "acierto"
+   ],
+   "category": "basics",
+   "short": "Wins divided by wins plus losses. It only says something next to the break-even of those prices.",
+   "inSheet": "A half win adds 0.5 to wins and a half loss 0.5 to losses. Reviews compare it with the model, blend and market probabilities.",
+   "related": [
+    "break-even",
+    "calibration",
+    "half-won"
+   ]
+  },
+  {
+   "slug": "line-shopping",
+   "term": "Line shopping",
+   "aliases": [
+    "best price",
+    "comparing books"
+   ],
+   "category": "basics",
+   "short": "Checking the same bet at several books and taking the best price. It is the simplest way to gain a little edge.",
+   "inSheet": "Rules 33 and 35 require checking Betano, Betsson and Stake every time; the best price is logged and the others go in the notes.",
+   "related": [
+    "rule-33",
+    "rule-35",
+    "book-prices"
+   ]
+  },
+  {
+   "slug": "favorite-underdog",
+   "term": "Favourite and underdog",
+   "aliases": [
+    "favourite",
+    "favorite",
+    "underdog"
+   ],
+   "category": "basics",
+   "short": "The favourite is the team with the lower price (more likely); the underdog, the one with the higher price.",
+   "inSheet": "The rule 29 backtest found the model biased towards underdogs and unders: those bets returned about −15% and −11%.",
+   "related": [
+    "rule-11",
+    "rule-29",
+    "long-shot"
+   ]
+  },
+  {
+   "slug": "long-shot",
+   "term": "Long shot",
+   "aliases": [
+    "long odds",
+    "outsider"
+   ],
+   "category": "basics",
+   "short": "A bet at a high price, unlikely to win. Small probability errors produce huge, fake EVs.",
+   "inSheet": "That is why F-ratio exists, VALOR has no verdict above 4.0 and Sombra logs no prices above 10.0 except SHADOW picks.",
+   "related": [
+    "f-ratio",
+    "rule-20",
+    "ev"
+   ]
+  },
+  {
+   "slug": "parlay",
+   "term": "Parlay (accumulator)",
+   "aliases": [
+    "accumulator",
+    "acca",
+    "combinada"
+   ],
+   "category": "basics",
+   "short": "Several selections on one slip: all of them must win. The prices multiply, and so does the book's margin.",
+   "inSheet": "Rule 6 forbids parlays of 3 or more legs.",
+   "related": [
+    "rule-6",
+    "double-bet",
+    "builder"
+   ]
+  },
+  {
+   "slug": "minimum-price",
+   "term": "Minimum price",
+   "aliases": [
+    "min_odds",
+    "minimum odds",
+    "cuota mín."
+   ],
+   "category": "basics",
+   "short": "The lowest price at which a pick still makes sense: below it, the EV is no longer enough.",
+   "inSheet": "A single needs at least 1.70 (rule 5). Each pick has its own minimum; taking it below is an exception you decide (rule 26). In Grok it is the Cuota mín. Grok column.",
+   "related": [
+    "rule-5",
+    "rule-26",
+    "fair-price"
+   ]
+  },
+  {
+   "slug": "h2h",
+   "term": "H2H (head to head)",
+   "aliases": [
+    "head to head",
+    "past meetings"
+   ],
+   "category": "basics",
+   "short": "Previous matches between the same two teams.",
+   "inSheet": "A check, never a bet, and always with the sample size (rule 14). Under rule 23 it can back the model.",
+   "related": [
+    "rule-14",
+    "rule-23",
+    "sample-size"
+   ]
+  },
+  {
+   "slug": "1x2",
+   "term": "1X2",
+   "aliases": [
+    "ML",
+    "moneyline",
+    "match result",
+    "winner"
+   ],
+   "category": "markets",
+   "short": "The three outcomes of a match: home win (1), draw (X) or away win (2).",
+   "inSheet": "It belongs to the “result” family with double chance, DNB, Asian handicap and 1st half. Since rule 29 only price value is sought on results.",
+   "example": "1.80 / 3.50 / 4.20: the home side is the favourite.",
+   "covers": {
+    "markets": [
+     "result"
+    ]
+   },
+   "related": [
+    "double-chance",
+    "dnb",
+    "asian-handicap",
+    "rule-29"
+   ]
+  },
+  {
+   "slug": "double-chance",
+   "term": "Double chance",
+   "aliases": [
+    "1X",
+    "X2",
+    "12",
+    "DC"
+   ],
+   "category": "markets",
+   "short": "A bet on two of the three outcomes: 1X (home or draw), X2 (draw or away) or 12.",
+   "inSheet": "Rule 7 requires pricing it with ML and DNB; when the draw weighs a lot it is usually the best.",
+   "related": [
+    "1x2",
+    "dnb",
+    "rule-7"
+   ]
+  },
+  {
+   "slug": "dnb",
+   "term": "Draw no bet (DNB)",
+   "aliases": [
+    "DNB",
+    "draw no bet"
+   ],
+   "category": "markets",
+   "short": "A bet on one team where a draw refunds your stake.",
+   "inSheet": "It equals Asian handicap 0. Rule 8 prefers it to the ML when the favourite's opponent scores a lot late.",
+   "example": "DNB at 1.60 and it ends 1-1: the bet is void.",
+   "related": [
+    "1x2",
+    "asian-handicap",
+    "void",
+    "rule-8"
+   ]
+  },
+  {
+   "slug": "asian-handicap",
+   "term": "Asian handicap",
+   "aliases": [
+    "Asian",
+    "AH",
+    "handicap"
+   ],
+   "category": "markets",
+   "short": "Gives or takes goals from a team before kickoff, to remove the draw. There are whole lines (refund if it lands exactly), half lines (no refund) and quarter lines (half and half).",
+   "inSheet": "Rule 12 explains how it settles. Half won and half lost come from quarter lines.",
+   "example": "Home −1: wins by 2 → won; wins by 1 → void; draw → lost.",
+   "related": [
+    "quarter-line",
+    "dnb",
+    "rule-12",
+    "half-won"
+   ]
+  },
+  {
+   "slug": "quarter-line",
+   "term": "Quarter line",
+   "aliases": [
+    "+0.25",
+    "−0.75",
+    "split line",
+    "half won",
+    "half lost"
+   ],
+   "category": "markets",
+   "short": "An Asian line ending in .25 or .75: the stake is split into two equal bets on the two neighbouring lines. That is why it can end half won or half lost.",
+   "inSheet": "At +0.25 a draw is a half win (half wins, half is refunded) and a one-goal loss is a full loss (rule 12).",
+   "example": "+0.25 at 1.90 with 1u and a draw: 0.5u on the 0 line is refunded and 0.5u on the +0.5 line wins 0.45u. Total: +0.45u, half won.",
+   "related": [
+    "asian-handicap",
+    "half-won",
+    "half-lost",
+    "rule-12"
+   ]
+  },
+  {
+   "slug": "totals",
+   "term": "Totals (over/under)",
+   "aliases": [
+    "over",
+    "under",
+    "goals total",
+    "O/U"
+   ],
+   "category": "markets",
+   "short": "Bets on whether a match figure (goals, corners, cards, shots) ends above (over) or below (under) a line.",
+   "inSheet": "The “goals” family includes totals, team goals, 1st half and BTTS. Goals follow rule 29; corners and cards the shrunk model (rule 30).",
+   "example": "Over 2.5 goals wins with 3 or more goals; under 2.5 with 2 or fewer.",
+   "covers": {
+    "markets": [
+     "goals"
+    ]
+   },
+   "related": [
+    "btts",
+    "corners",
+    "cards",
+    "razor"
+   ]
+  },
+  {
+   "slug": "btts",
+   "term": "Both teams to score (BTTS)",
+   "aliases": [
+    "BTTS",
+    "ambos marcan"
+   ],
+   "category": "markets",
+   "short": "A bet on whether both teams score at least one goal (yes or no).",
+   "inSheet": "It is part of the rule 29 value scan at all three books.",
+   "related": [
+    "totals",
+    "rule-29",
+    "value-scan"
+   ]
+  },
+  {
+   "slug": "first-half",
+   "term": "First half",
+   "aliases": [
+    "1H",
+    "half time",
+    "1er tiempo"
+   ],
+   "category": "markets",
+   "short": "Markets settled only on what happens in the first 45 minutes.",
+   "inSheet": "Rule 8 prefers them for unders when a team scores late, and for goals when a team scores early.",
+   "related": [
+    "rule-8",
+    "totals",
+    "1x2"
+   ]
+  },
+  {
+   "slug": "corners",
+   "term": "Corners",
+   "aliases": [
+    "corner kicks",
+    "match corners",
+    "team corners",
+    "córners"
+   ],
+   "category": "markets",
+   "short": "Markets on how many corner kicks there are: match totals, one team's, who takes more (corners 1X2) or per half.",
+   "inSheet": "Totals use the model shrunk to 36% and are paused for real money (rule 30); team corners are tracked separately (rule 32). Betano offers only overs on team corners.",
+   "covers": {
+    "markets": [
+     "corners_total",
+     "corners_team"
+    ]
+   },
+   "related": [
+    "rule-30",
+    "rule-32",
+    "team-corners",
+    "shrink"
+   ]
+  },
+  {
+   "slug": "cards",
+   "term": "Cards",
+   "aliases": [
+    "match cards",
+    "team cards",
+    "yellows",
+    "reds",
+    "tarjetas"
+   ],
+   "category": "markets",
+   "short": "Markets on how many cards are shown. The books count yellow 1 and red 2, at most 3 per player.",
+   "inSheet": "Rule 28 explains the count. A card shown to a substitute who never came on doesn't count. Stake offers yellows only, so it is not a cards source.",
+   "example": "Two yellows to different players and one straight red = 4.",
+   "covers": {
+    "markets": [
+     "cards_total",
+     "cards_team"
+    ]
+   },
+   "related": [
+    "rule-28",
+    "rule-30",
+    "filter-5",
+    "cards-under"
+   ]
+  },
+  {
+   "slug": "shots",
+   "term": "Shots and shots on target",
+   "aliases": [
+    "shots",
+    "SoT",
+    "shots on target",
+    "tiros"
+   ],
+   "category": "markets",
+   "short": "Markets on how many shots (or shots on target) a team or the match produces.",
+   "inSheet": "Always SHADOW (rule 25). Since 2 Nov 2026 only match totals with the SHADOW verdict and the MODELO SOLO pick are logged.",
+   "covers": {
+    "markets": [
+     "shots"
+    ]
+   },
+   "related": [
+    "rule-25",
+    "model-only-shots",
+    "shadow"
+   ]
+  },
+  {
+   "slug": "early-payout",
+   "term": "Early payout",
+   "aliases": [
+    "2 goals ahead",
+    "2 goles de ventaja"
+   ],
+   "category": "markets",
+   "short": "A winner bet that pays early if your team ever goes two goals up, even if it doesn't win in the end.",
+   "inSheet": "Priced as its own market with a simulation of the order of goals (rule 27). In Apuestas the market is “1X2 (pago anticipado 2 goles)”.",
+   "related": [
+    "rule-27",
+    "1x2",
+    "lambda"
+   ]
+  },
+  {
+   "slug": "builder",
+   "term": "Bet builder",
+   "aliases": [
+    "builder",
+    "crear apuesta",
+    "combo"
+   ],
+   "category": "markets",
+   "short": "Several selections from the same match on one slip, at a price the book computes jointly.",
+   "inSheet": "At most 2 legs, priced as the joint probability of one simulation (rule 6). The app groups builders, doubles and markets joined with + or × as “combo”.",
+   "covers": {
+    "markets": [
+     "combo"
+    ]
+   },
+   "related": [
+    "rule-6",
+    "double-bet",
+    "parlay"
+   ]
+  },
+  {
+   "slug": "double-bet",
+   "term": "Double",
+   "aliases": [
+    "double",
+    "two-leg parlay",
+    "doble"
+   ],
+   "category": "markets",
+   "short": "Two selections from different matches on one slip: both must win.",
+   "inSheet": "Each leg needs an estimated probability of 80% or more (rule 4 of the Reglas tab, cited in rule 6).",
+   "related": [
+    "builder",
+    "parlay",
+    "sheet-rules"
+   ]
+  },
+  {
+   "slug": "live-bet",
+   "term": "Live betting",
+   "aliases": [
+    "live",
+    "in-play",
+    "en vivo"
+   ],
+   "category": "markets",
+   "short": "Betting once the match has started, with prices that change every minute.",
+   "inSheet": "Rule 10 asks to understand the game state before extrapolating and forbids re-entering a market just lost. The Reglas tab forbids chasing losses.",
+   "related": [
+    "rule-10",
+    "sheet-rules"
+   ]
+  },
+  {
+   "slug": "other-markets",
+   "term": "Other markets",
+   "aliases": [
+    "correct score",
+    "first scorer"
+   ],
+   "category": "markets",
+   "short": "Correct score, first goalscorer and any market the app does not recognise.",
+   "inSheet": "They are shown with their original text and fall into the “other” family.",
+   "covers": {
+    "markets": [
+     "other"
+    ]
+   },
+   "related": [
+    "1x2",
+    "totals"
+   ]
+  },
+  {
+   "slug": "shadow-tab",
+   "term": "Sombra (tab)",
+   "aliases": [
+    "Sombra",
+    "shadow tracking",
+    "shadow tab"
+   ],
+   "category": "system",
+   "short": "The tab where picks the system would not bet are logged with no money, to find out with evidence whether the filters are too strict.",
+   "inSheet": "Every slate adds rows written by sombra_rows.py; they are graded like bets. Filters are loosened only with evidence from Sombra.",
+   "related": [
+    "shadow",
+    "cap",
+    "milestone-review",
+    "frozen-tests"
+   ]
+  },
+  {
+   "slug": "bets-tab",
+   "term": "Apuestas (tab)",
+   "aliases": [
+    "Apuestas",
+    "real bets"
+   ],
+   "category": "system",
+   "short": "The tab of your real bets: only what you confirm you placed, with book and price.",
+   "inSheet": "Its profit is the sheet's own (Ganancia (u)), which knows about free bets and odd settlements. Its rows carry the Apuesta tag.",
+   "related": [
+    "bet",
+    "rule-17",
+    "published-bet"
+   ]
+  },
+  {
+   "slug": "grok-tab",
+   "term": "Grok (tab)",
+   "aliases": [
+    "Grok tab",
+    "Grok comparison"
+   ],
+   "category": "system",
+   "short": "The tab where the picks Grok makes from the same slate are logged, with our verdict on each.",
+   "inSheet": "Since the 10 Nov 2026 slate only his team-corner picks are logged. A Grok pick that won is not evidence against a filter; the tab is.",
+   "related": [
+    "grok",
+    "grok-priced",
+    "grok-not-priced",
+    "team-corners"
+   ]
+  },
+  {
+   "slug": "decisions-tab",
+   "term": "Decisiones (tab)",
+   "aliases": [
+    "Decisiones",
+    "decision log"
+   ],
+   "category": "system",
+   "short": "The log of everything you and Claude decide: date, topic, decision, evidence, how it is reviewed and status.",
+   "inSheet": "Fresh chats remember nothing, so the reasons live here. Rows are never deleted: a replaced decision is marked Reemplazada and the new one is added. Decisions are cited by row number (“fila 110”).",
+   "related": [
+    "decision-in-force",
+    "decision-provisional",
+    "decision-open",
+    "decision-replaced"
+   ]
+  },
+  {
+   "slug": "sheet-rules",
+   "term": "Reglas (tab)",
+   "aliases": [
+    "Reglas",
+    "staking rules"
+   ],
+   "category": "system",
+   "short": "The tab with the sheet's staking rules, with its own numbering (different from the betting-analyst rules).",
+   "inSheet": "The app shows its numbered lines in Decisions, without rule 1 or the block above it (amounts), which never leave the sheet.",
+   "related": [
+    "stake",
+    "kelly",
+    "double-bet",
+    "live-bet"
+   ]
+  },
+  {
+   "slug": "slate",
+   "term": "Slate",
+   "aliases": [
+    "daily slate",
+    "card"
+   ],
+   "category": "system",
+   "short": "The set of matches of one day analysed together.",
+   "inSheet": "It covers your Sofascore Favorites from 04:00 Bogotá on the slate day to 03:59 the next day. It runs in a fresh chat with 14 steps and a receipt. The sheet keeps no run date: the slate date is the match date.",
+   "related": [
+    "favorites",
+    "value-scan",
+    "cap"
+   ]
+  },
+  {
+   "slug": "favorites",
+   "term": "Favorites (Sofascore)",
+   "aliases": [
+    "Favorites",
+    "favourite leagues"
+   ],
+   "category": "system",
+   "short": "Your list of followed matches in Sofascore; the slate looks only at those matches.",
+   "inSheet": "Step 3 counts the matches in the window, and the count must match what is on screen. The Reglas tab asks for favourite leagues only.",
+   "related": [
+    "slate",
+    "sofascore"
+   ]
+  },
+  {
+   "slug": "model",
+   "term": "Model",
+   "aliases": [
+    "model.py",
+    "Poisson model"
+   ],
+   "category": "system",
+   "short": "The script that estimates probabilities from season statistics (goals, corners, cards, shots).",
+   "inSheet": "Since rule 29 its view on results and goals is context only. On corners and cards it is used shrunk (rule 30). Its probability is column H (Prob. modelo).",
+   "related": [
+    "blend",
+    "lambda",
+    "shrink",
+    "rule-1"
+   ]
+  },
+  {
+   "slug": "lambda",
+   "term": "Lambda",
+   "aliases": [
+    "λ",
+    "lambdas_model",
+    "lambdas_market"
+   ],
+   "category": "system",
+   "short": "A team's expected number of goals (or corners), which feeds a Poisson distribution to get probabilities.",
+   "inSheet": "The script gives model and market lambdas; rule 23 compares their sums and rule 27 simulates with both. An unconfirmed absence never changes a lambda (rule 15).",
+   "related": [
+    "model",
+    "rule-23",
+    "rule-27"
+   ]
+  },
+  {
+   "slug": "blend",
+   "term": "Blend",
+   "aliases": [
+    "Prob. blend",
+    "mix"
+   ],
+   "category": "system",
+   "short": "Half the model probability and half the margin-free market probability.",
+   "inSheet": "Column I. On model rows it drives the EV (EV blend) and the stake (rule 2). On VALOR rows that column holds the consensus fair probability.",
+   "example": "Model 60% and market 50% → blend 55%.",
+   "related": [
+    "model",
+    "de-vig",
+    "ev",
+    "rule-2"
+   ]
+  },
+  {
+   "slug": "consensus",
+   "term": "Market consensus",
+   "aliases": [
+    "consensus",
+    "consensus price"
+   ],
+   "category": "system",
+   "short": "The probability the market as a whole gives something, with no margin.",
+   "inSheet": "For results and goals it is the Sofascore/bet365 feed with the margin removed by the power method (rule 29). For VALOR PROP it is the average of every source showing both sides (“ref consenso N fuentes”).",
+   "related": [
+    "rule-29",
+    "power-method",
+    "bet365-feed",
+    "reference-tag"
+   ]
+  },
+  {
+   "slug": "value-scan",
+   "term": "Value scan",
+   "aliases": [
+    "scan"
+   ],
+   "category": "system",
+   "short": "Going through every match of the slate looking for one of your books paying above the consensus fair price.",
+   "inSheet": "It covers ML, DNB, double chance, Asian line, goals 1.5/2.5/3.5 and BTTS at Betano, Betsson and Stake, cups included (rules 29 and 35).",
+   "related": [
+    "rule-29",
+    "rule-35",
+    "value",
+    "near-value"
+   ]
+  },
+  {
+   "slug": "candidate",
+   "term": "CANDIDATE",
+   "aliases": [
+    "candidate",
+    "publishable"
+   ],
+   "category": "system",
+   "short": "The script's verdict for a pick that passed everything and can be published with a stake.",
+   "inSheet": "While rules 29 and 30 hold there are no CANDIDATEs: “No bet” is the expected slate result.",
+   "related": [
+    "shadow",
+    "skip",
+    "rule-30"
+   ]
+  },
+  {
+   "slug": "skip",
+   "term": "SKIP",
+   "aliases": [
+    "skip",
+    "Salto"
+   ],
+   "category": "system",
+   "short": "The script's verdict for a pick that is neither played nor logged as SHADOW.",
+   "inSheet": "Some SKIPs still reach Sombra in their own categories (corner rejects, card unders). In the reason they appear as “SKIP: …” or “Salto: …”.",
+   "related": [
+    "candidate",
+    "shadow",
+    "filter-reject"
+   ]
+  },
+  {
+   "slug": "thesis",
+   "term": "Thesis",
+   "aliases": [
+    "one thesis per match",
+    "same thesis"
+   ],
+   "category": "system",
+   "short": "The idea behind a pick: one side's result, goals, corners, cards or shots. ML, DNB, double chance, handicap and 1st half are the same result thesis.",
+   "inSheet": "One row per match and thesis in Sombra, and no doubled exposure in bets (rule 13).",
+   "related": [
+    "rule-13",
+    "cap"
+   ]
+  },
+  {
+   "slug": "cap",
+   "term": "10-row cap",
+   "aliases": [
+    "cap",
+    "filler"
+   ],
+   "category": "system",
+   "short": "The maximum number of regular rows each slate adds to Sombra.",
+   "inSheet": "It is filled in order: (a) the script's SHADOW picks, (b) picks that failed only filter 4, filter 5 or rule 23, (c) VALOR CASI fillers. Many test categories sit outside the cap.",
+   "related": [
+    "shadow-tab",
+    "near-value",
+    "thesis"
+   ]
+  },
+  {
+   "slug": "shrink",
+   "term": "Shrinkage",
+   "aliases": [
+    "shrink",
+    "shrunk model"
+   ],
+   "category": "system",
+   "short": "Pulling the model's prediction towards the league average because it strays too far match by match.",
+   "inSheet": "Corner totals keep 36% of their deviation and cards 17% (rule 30); team corners 100% with 10+ games and 47% with 6–9 (rule 32); shot totals carry a 25% shrink.",
+   "related": [
+    "rule-30",
+    "rule-32",
+    "model",
+    "calibration"
+   ]
+  },
+  {
+   "slug": "last-5",
+   "term": "Prob. modelo últ. 5",
+   "aliases": [
+    "last 5",
+    "form"
+   ],
+   "category": "system",
+   "short": "The model probability using only each team's last 5 matches.",
+   "inSheet": "It is filter 4's check and a column of Apuestas (AA) for comparing calibration with the whole-season one.",
+   "related": [
+    "filter-4",
+    "rule-21",
+    "calibration"
+   ]
+  },
+  {
+   "slug": "published-bet",
+   "term": "PUBLICADA Y APOSTADA",
+   "category": "tags",
+   "short": "A pick Claude published in the top and you did bet.",
+   "inSheet": "The Sombra row is changed to “PUBLICADA Y APOSTADA (Apuestas ID n)”. Since it is already in Apuestas, the app leaves it out of every Sombra figure.",
+   "covers": {
+    "tags": [
+     "published_bet"
+    ]
+   },
+   "related": [
+    "published",
+    "bets-tab"
+   ]
+  },
+  {
+   "slug": "published",
+   "term": "PUBLICADA, NO APOSTADA",
+   "category": "tags",
+   "short": "A published top pick you did not bet.",
+   "inSheet": "It is logged in Sombra with the recommended stake, outside the 10-row cap. It is the cleanest test of the system.",
+   "covers": {
+    "tags": [
+     "published"
+    ]
+   },
+   "related": [
+    "published-bet",
+    "shadow-tab"
+   ]
+  },
+  {
+   "slug": "prop-near-value",
+   "term": "VALOR PROP CASI",
+   "category": "tags",
+   "short": "Corner or card totals where your best book pays between 0% and 3% above the consensus fair price.",
+   "inSheet": "valor_prop.py finds them; up to 3 per slate are logged, priced 1.70–4.0.",
+   "covers": {
+    "tags": [
+     "prop_near_value"
+    ]
+   },
+   "related": [
+    "prop-value",
+    "consensus",
+    "near-value"
+   ]
+  },
+  {
+   "slug": "prop-value",
+   "term": "VALOR PROP",
+   "category": "tags",
+   "short": "Corner or card totals where your best book pays 3% or more above the consensus fair price, with no model.",
+   "inSheet": "A price test since 6 Nov 2026 (row 97). The fair price averages the feed and the books showing both sides of the line, each de-vigged by the power method.",
+   "example": "Fair 2.01 and Betano 2.22: +10.4% → VALOR PROP.",
+   "covers": {
+    "tags": [
+     "prop_value"
+    ]
+   },
+   "related": [
+    "prop-near-value",
+    "consensus",
+    "power-method"
+   ]
+  },
+  {
+   "slug": "near-value",
+   "term": "VALOR CASI",
+   "category": "tags",
+   "short": "Results or goals where one of your books pays between 0% and 3% above the consensus fair price: near value.",
+   "inSheet": "It is Sombra's filler (c), ranked by value EV. Reviews report it apart from VALOR to judge whether the 3% threshold is right.",
+   "example": "Fair 1.86 and Betano 1.90: +2.2% → VALOR CASI.",
+   "covers": {
+    "tags": [
+     "near_value"
+    ]
+   },
+   "related": [
+    "value",
+    "cap",
+    "rule-29"
+   ]
+  },
+  {
+   "slug": "value",
+   "term": "VALOR",
+   "category": "tags",
+   "short": "Results or goals where one of your books pays 3% or more above the consensus fair price.",
+   "inSheet": "Reason “VALOR: {book} X vs justa Y (+Z%)”. It goes to Sombra with no stake (rule 29). No verdict when the reference carries more than 10% margin or the price is above 4.0.",
+   "example": "Fair 2.07 and Betano/Betsson 2.15: +3.9% → VALOR.",
+   "covers": {
+    "tags": [
+     "value"
+    ]
+   },
+   "related": [
+    "near-value",
+    "value-bet",
+    "rule-29",
+    "pin-note"
+   ]
+  },
+  {
+   "slug": "cards-under",
+   "term": "TARJETAS UNDER",
+   "category": "tags",
+   "short": "The model's match-total card unders, logged as their own test even when a filter rejects them.",
+   "inSheet": "Up to 8 per slate, outside the cap, priced 1.70–4.0, blend EV above 0 and both teams with 10+ games. Only rows from 1 Nov 2026 count; it has an Under 4.5 control line.",
+   "covers": {
+    "tags": [
+     "cards_under"
+    ]
+   },
+   "related": [
+    "cards",
+    "frozen-tests",
+    "rule-30"
+   ]
+  },
+  {
+   "slug": "team-corners",
+   "term": "CÓRNERS EQUIPO",
+   "category": "tags",
+   "short": "One team's corners, priced with the team's numbers and logged as their own test.",
+   "inSheet": "Since 2 Nov 2026 only those with the SHADOW verdict. Their notes carry the sample, the feed's opening 1X2 and the FUERZA note.",
+   "covers": {
+    "tags": [
+     "team_corners"
+    ]
+   },
+   "related": [
+    "rule-32",
+    "corners",
+    "fuerza",
+    "sample-note"
+   ]
+  },
+  {
+   "slug": "corner-rejects",
+   "term": "CÓRNERS RECHAZO",
+   "aliases": [
+    "CÓRNERS RECHAZO ≤2.0"
+   ],
+   "category": "tags",
+   "short": "Corner totals the model rejected for F-gap, F-ratio or razor, with a best price between 1.70 and 2.0.",
+   "inSheet": "Up to 4 per slate, outside the cap, as a test with rules fixed before the data. Only rows from 9 Nov 2026 count (row 106).",
+   "covers": {
+    "tags": [
+     "corner_rejects"
+    ]
+   },
+   "related": [
+    "corners",
+    "f-gap",
+    "frozen-tests"
+   ]
+  },
+  {
+   "slug": "model-only-shots",
+   "term": "MODELO SOLO",
+   "aliases": [
+    "MODELO SOLO (tiros)",
+    "model-only shots"
+   ],
+   "category": "tags",
+   "short": "One team-shots pick per slate where the model is most confident, even when F-gap or F-ratio reject it.",
+   "inSheet": "It tests whether the model beats the book when they disagree. Only rows with a best price of 1.70–4.0 count; it carries the FUERZA note.",
+   "covers": {
+    "tags": [
+     "model_only_shots"
+    ]
+   },
+   "related": [
+    "shots",
+    "rule-25",
+    "fuerza"
+   ]
+  },
+  {
+   "slug": "shadow-rule30",
+   "term": "SHADOW (regla 30)",
+   "aliases": [
+    "passed every filter, rule 30"
+   ],
+   "category": "tags",
+   "short": "Corner or card totals that passed every filter and are held back only by the rule 30 pause.",
+   "inSheet": "All of them are logged, outside the cap. They are the rows the rule 30 review measures, because they are the ones that would be bet.",
+   "covers": {
+    "tags": [
+     "shadow_rule30"
+    ]
+   },
+   "related": [
+    "rule-30",
+    "passed-all",
+    "shadow"
+   ]
+  },
+  {
+   "slug": "shadow",
+   "term": "SHADOW",
+   "aliases": [
+    "SHADOW verdict"
+   ],
+   "category": "tags",
+   "short": "The verdict “the model has a view but the market or the sample is unproven”: logged in Sombra, no stake.",
+   "inSheet": "As a tag, it is the other SHADOW rows: new markets or short samples (“SHADOW: 7 games”). It is not a recommendation.",
+   "covers": {
+    "tags": [
+     "shadow"
+    ]
+   },
+   "related": [
+    "shadow-tab",
+    "candidate",
+    "skip",
+    "rule-18"
+   ]
+  },
+  {
+   "slug": "ai-watch",
+   "term": "IA-WATCH",
+   "category": "tags",
+   "short": "Rows where the Sofascore AI differed by 4+ points from the feed's corners or cards line.",
+   "inSheet": "No longer logged (rule 31): corners since 29 Oct and cards since 2 Nov 2026. Old rows are graded as usual.",
+   "covers": {
+    "tags": [
+     "ai_watch"
+    ]
+   },
+   "related": [
+    "rule-31",
+    "sofascore-ai",
+    "ai-mean"
+   ]
+  },
+  {
+   "slug": "low-edge",
+   "term": "Pasó los filtros, stake mínimo",
+   "aliases": [
+    "Stake <",
+    "low edge"
+   ],
+   "category": "tags",
+   "short": "Picks that passed the filters but whose stake fell under the 0.25u minimum.",
+   "inSheet": "Three early rows (9–10 Oct 2026).",
+   "covers": {
+    "tags": [
+     "low_edge"
+    ]
+   },
+   "related": [
+    "low-stake",
+    "stake"
+   ]
+  },
+  {
+   "slug": "filter-reject",
+   "term": "Filtro (rechazo)",
+   "aliases": [
+    "reject",
+    "rejected"
+   ],
+   "category": "tags",
+   "short": "A model pick some filter rejected (F-gap, F-ratio, sample, razor, filter 4 or 5, rule 23…).",
+   "inSheet": "The rows whose reason starts with the filter. Since 8 Nov 2026 corner and card rejects are no longer used as fillers.",
+   "covers": {
+    "tags": [
+     "filter_reject"
+    ]
+   },
+   "related": [
+    "f-gap",
+    "f-ratio",
+    "razor",
+    "filter-4"
+   ]
+  },
+  {
+   "slug": "bet",
+   "term": "Apuesta",
+   "aliases": [
+    "real bet"
+   ],
+   "category": "tags",
+   "short": "A row of the Apuestas tab: a real bet you placed.",
+   "inSheet": "Its profit is the sheet's, not the one the app computes.",
+   "covers": {
+    "tags": [
+     "bet"
+    ]
+   },
+   "related": [
+    "bets-tab",
+    "published-bet"
+   ]
+  },
+  {
+   "slug": "grok-priced",
+   "term": "Cotizado",
+   "aliases": [
+    "Cotizado (regla 29)",
+    "priced"
+   ],
+   "category": "tags",
+   "short": "A Grok pick our script priced: “Cotizado: modelo X% vs mercado Y% → filtro”.",
+   "inSheet": "The verdict in the Nuestro veredicto column of the Grok tab.",
+   "covers": {
+    "tags": [
+     "grok_priced"
+    ]
+   },
+   "related": [
+    "grok-tab",
+    "grok-not-priced"
+   ]
+  },
+  {
+   "slug": "grok-not-priced",
+   "term": "No cotizado",
+   "aliases": [
+    "not priced"
+   ],
+   "category": "tags",
+   "short": "A Grok pick we could not price, with the reason (sample, market not read…).",
+   "inSheet": "Our verdict starts with “No cotizado”.",
+   "covers": {
+    "tags": [
+     "grok_not_priced"
+    ]
+   },
+   "related": [
+    "grok-tab",
+    "grok-priced"
+   ]
+  },
+  {
+   "slug": "grok-other",
+   "term": "Sin veredicto",
+   "aliases": [
+    "no verdict"
+   ],
+   "category": "tags",
+   "short": "A Grok row with nothing in Nuestro veredicto.",
+   "inSheet": "The app counts it apart so it doesn't mix with the priced ones.",
+   "covers": {
+    "tags": [
+     "grok_other"
+    ]
+   },
+   "related": [
+    "grok-tab"
+   ]
+  },
+  {
+   "slug": "feed-price",
+   "term": "feed X",
+   "aliases": [
+    "feed price"
+   ],
+   "category": "notes",
+   "short": "The bet365 feed price for the same side and line at the moment the row was logged.",
+   "inSheet": "Required in N when the feed prices the market (rule 34a). It is the opening that CLV is measured with against G.",
+   "example": "“feed 1.73” and a 1.65 close → CLV +4.8%.",
+   "covers": {
+    "notes": [
+     "feedPrice"
+    ]
+   },
+   "related": [
+    "clv",
+    "feed-close",
+    "bet365-feed"
+   ]
+  },
+  {
+   "slug": "feed-open",
+   "term": "apertura feed",
+   "aliases": [
+    "opening",
+    "invertida?",
+    "feed opening"
+   ],
+   "category": "notes",
+   "short": "bet365's first price for that line and side, with the other side in brackets.",
+   "inSheet": "“apertura feed X (otro lado Y)” on corner, card and shot totals. “invertida?” warns that the feed seems to have swapped over and under. It is a note only: it changes no verdict.",
+   "example": "“apertura feed 1.833 (otro lado 1.950)”.",
+   "covers": {
+    "notes": [
+     "feedOpen",
+     "feedOpenOther",
+     "feedOpenFlipped"
+    ]
+   },
+   "related": [
+    "line-movement",
+    "feed-price",
+    "barely-moving-lines"
+   ]
+  },
+  {
+   "slug": "reference-tag",
+   "term": "ref feed / ref N casas / ref 1 casa / ref consenso",
+   "aliases": [
+    "ref feed",
+    "ref N casas",
+    "ref 1 casa",
+    "ref consenso",
+    "reference"
+   ],
+   "category": "notes",
+   "short": "Which market reference judged the row: the bet365 feed, the average of N books showing both sides, a single book, or the consensus of N sources (VALOR PROP).",
+   "inSheet": "Rule 36. Reviews use it to split rows judged against a shared reference from earlier rows judged against their own book.",
+   "example": "“ref 2 casas (Stake, Betsson)”.",
+   "covers": {
+    "notes": [
+     "ref",
+     "refBooks",
+     "refCount"
+    ]
+   },
+   "related": [
+    "rule-36",
+    "consensus",
+    "de-vig"
+   ]
+  },
+  {
+   "slug": "sample-note",
+   "term": "muestra 10+ / muestra 6–9",
+   "aliases": [
+    "muestra 10+",
+    "muestra 6–9",
+    "sample note"
+   ],
+   "category": "notes",
+   "short": "How many league games both teams had: 10 or more, or between 6 and 9.",
+   "inSheet": "Noted on team-corner rows since 26 Oct 2026, because rule 32 prices the two samples differently.",
+   "covers": {
+    "notes": [
+     "sample"
+    ]
+   },
+   "related": [
+    "rule-32",
+    "f-sample",
+    "team-corners"
+   ]
+  },
+  {
+   "slug": "fuerza",
+   "term": "FUERZA MANTIENE / RECHAZA",
+   "aliases": [
+    "FUERZA",
+    "MANTIENE",
+    "RECHAZA",
+    "strength note"
+   ],
+   "category": "notes",
+   "short": "A team-strength adjustment (from the feed's 1X2 and goals) that says whether the pick holds (MANTIENE) or not (RECHAZA).",
+   "inSheet": "fuerza.py writes it on team-corner and MODELO SOLO rows since 6 Nov 2026. It is a note only: a RECHAZA row is still logged.",
+   "example": "“FUERZA: esperado 3.11, prob 37.1%, RECHAZA (1X2 1.22/6.50/12.00, goles 2.5 1.53/2.40)”.",
+   "covers": {
+    "notes": [
+     "fuerza",
+     "fuerzaExpected",
+     "fuerzaProb"
+    ]
+   },
+   "related": [
+    "team-corners",
+    "model-only-shots",
+    "brier"
+   ]
+  },
+  {
+   "slug": "pin-note",
+   "term": "pin",
+   "aliases": [
+    "pin id",
+    "pin n/d",
+    "Pinnacle note"
+   ],
+   "category": "notes",
+   "short": "Pinnacle's 1X2 for that match, read from the Pinnacle tab, with its read time and id.",
+   "inSheet": "It ends N on VALOR and VALOR CASI rows on 1X2, DNB or double chance. “pin n/d (sin partido)” when it is missing. It changes nothing: it will be used at 100 rows with a Pinnacle close.",
+   "example": "“pin 3.54/3.76/2.00 (2026-11-13T22:05:00Z) | pin id 0380…”.",
+   "covers": {
+    "notes": [
+     "pin",
+     "pinMissing"
+    ]
+   },
+   "related": [
+    "pinnacle",
+    "value",
+    "sharp-vs-soft"
+   ]
+  },
+  {
+   "slug": "open-1x2",
+   "term": "1X2 apertura feed",
+   "aliases": [
+    "opening 1X2"
+   ],
+   "category": "notes",
+   "short": "The feed's opening 1X2 prices (home/draw/away) for that match.",
+   "inSheet": "On team-corner rows since 8 Nov 2026, to measure how much the 1X2 moves (the MOV test, row 96). “n/a” when the feed has no 1X2.",
+   "example": "“1X2 apertura feed 1.80/3.50/4.20”.",
+   "covers": {
+    "notes": [
+     "open1x2"
+    ]
+   },
+   "related": [
+    "team-corners",
+    "line-movement"
+   ]
+  },
+  {
+   "slug": "feed-close",
+   "term": "cierre: Sofascore/bet365",
+   "aliases": [
+    "close",
+    "otro lado",
+    "feed close"
+   ],
+   "category": "notes",
+   "short": "The bet365 feed close for the same side and line, with the other side in brackets so the margin can be removed.",
+   "inSheet": "Grading writes it together with G. Three-way markets carry all three prices. Without the other side there is no fair-close EV.",
+   "example": "“cierre: Sofascore/bet365 1.80 (otro lado 1.91)”.",
+   "covers": {
+    "notes": [
+     "close"
+    ]
+   },
+   "related": [
+    "closing-line",
+    "fair-close-ev",
+    "de-vig"
+   ]
+  },
+  {
+   "slug": "close-missing",
+   "term": "cierre feed: sin línea",
+   "aliases": [
+    "no close line"
+   ],
+   "category": "notes",
+   "short": "The match is over and the feed no longer prices the logged line (or has no such market), so the close can't be read.",
+   "inSheet": "It is noted so no later run tries again (Decisiones rows 119 and 121).",
+   "example": "“cierre feed: sin línea 4.5 (feed sin mercado de tarjetas)”.",
+   "covers": {
+    "notes": [
+     "closeMissing"
+    ]
+   },
+   "related": [
+    "feed-close",
+    "closing-line"
+   ]
+  },
+  {
+   "slug": "logger-close",
+   "term": "Book close (clv-logger)",
+   "aliases": [
+    "Cierre Betano",
+    "EV justa",
+    "CLV vs"
+   ],
+   "category": "notes",
+   "short": "The close you note at the same book, with the CLV and fair EV clv-logger computes.",
+   "inSheet": "It is the best close a row can have, because it is from the same source. “(otro lado de Betsson)” marks a lower-quality EV, with the other side taken from another book.",
+   "example": "“Cierre Betano 2.42 (X 3.2, 2 3.0); … | CLV +2.07% vs Betano | EV justa -3.63%”.",
+   "covers": {
+    "notes": [
+     "bookCloses",
+     "loggerClv",
+     "loggerClvBook",
+     "loggerEv",
+     "loggerEvOtherBook"
+    ]
+   },
+   "related": [
+    "clv-logger",
+    "clv",
+    "fair-close-ev"
+   ]
+  },
+  {
+   "slug": "book-prices",
+   "term": "Prices per book",
+   "aliases": [
+    "sin línea",
+    "solo over",
+    "book prices"
+   ],
+   "category": "notes",
+   "short": "Each of your books' price for that side, with the other side when there is one.",
+   "inSheet": "Books that have the line come before those that don't. “sin línea” means the book was opened and doesn't offer it.",
+   "example": "“Betano 1.82 | Betsson 1.78 (over 1.9) | Stake sin línea”.",
+   "covers": {
+    "notes": [
+     "bookPrices"
+    ]
+   },
+   "related": [
+    "rule-33",
+    "line-shopping"
+   ]
+  },
+  {
+   "slug": "price-source",
+   "term": "Price source",
+   "aliases": [
+    "Precio feed Sofascore",
+    "Precio Betano"
+   ],
+   "category": "notes",
+   "short": "Where the row's price came from: the bet365 feed or a specific book.",
+   "inSheet": "It decides which close CLV is measured against: a book price is never compared with the bet365 close.",
+   "covers": {
+    "notes": [
+     "priceSource"
+    ]
+   },
+   "related": [
+    "clv",
+    "rule-34",
+    "feed-price"
+   ]
+  },
+  {
+   "slug": "model-mean",
+   "term": "media modelo",
+   "aliases": [
+    "mean",
+    "model mean"
+   ],
+   "category": "notes",
+   "short": "The model's expected number of corners, cards or shots for that match.",
+   "inSheet": "It appears in N and in the reason (“media Z, línea W”). Rule 3 (razor) measures the distance between the line and this mean.",
+   "example": "Mean 9.83 and line 10.5: 0.67 from the mean, it passes the razor.",
+   "covers": {
+    "notes": [
+     "modelMean"
+    ]
+   },
+   "related": [
+    "razor",
+    "model",
+    "ai-mean"
+   ]
+  },
+  {
+   "slug": "ai-mean",
+   "term": "IA media",
+   "aliases": [
+    "IA media X",
+    "AI mean"
+   ],
+   "category": "notes",
+   "short": "The expected total the Sofascore AI gives when it gives no probability for the line.",
+   "inSheet": "Noted on corner and card rows; rule 23 still uses it.",
+   "example": "“IA media 9”.",
+   "covers": {
+    "notes": [
+     "aiMean"
+    ]
+   },
+   "related": [
+    "sofascore-ai",
+    "model-mean",
+    "rule-31"
+   ]
+  },
+  {
+   "slug": "single-source",
+   "term": "una sola fuente",
+   "aliases": [
+    "single source"
+   ],
+   "category": "notes",
+   "short": "The result was graded from a single source.",
+   "inSheet": "Grading marks it so when it found no second source to confirm the score.",
+   "covers": {
+    "notes": [
+     "singleSource"
+    ]
+   },
+   "related": [
+    "espn",
+    "sofascore"
+   ]
+  },
+  {
+   "slug": "passed-all",
+   "term": "pasó todos los filtros",
+   "aliases": [
+    "passed every filter",
+    "pasó todo"
+   ],
+   "category": "notes",
+   "short": "The pick passed every model filter.",
+   "inSheet": "It appears in the reason or the notes. Reviews measure these rows apart because they are the ones that would be bet.",
+   "covers": {
+    "notes": [
+     "passedAll"
+    ]
+   },
+   "related": [
+    "shadow-rule30",
+    "team-corners"
+   ]
+  },
+  {
+   "slug": "razor",
+   "term": "Razor",
+   "aliases": [
+    "navaja",
+    "rule 3 razor"
+   ],
+   "category": "filters",
+   "short": "Rejected because the line is within 0.5 of the model mean.",
+   "inSheet": "Rule 3. It appears as “razor” or “rule 3 razor” in the reason.",
+   "covers": {
+    "reasons": [
+     "razor"
+    ]
+   },
+   "related": [
+    "rule-3",
+    "model-mean"
+   ]
+  },
+  {
+   "slug": "f-gap",
+   "term": "F-gap",
+   "aliases": [
+    "gap",
+    "brecha"
+   ],
+   "category": "filters",
+   "short": "Rejected because the model and the margin-free market differ by more than 10 points.",
+   "inSheet": "Rule 19. Reviews report it on its own, exclusive and inside the union of F filters, split by price (4.0 or less and above 4.0).",
+   "example": "Model 62% and market 50%: 12 points → F-gap.",
+   "covers": {
+    "reasons": [
+     "gap"
+    ]
+   },
+   "related": [
+    "rule-19",
+    "f-ratio",
+    "filter-reject"
+   ]
+  },
+  {
+   "slug": "f-ratio",
+   "term": "F-ratio",
+   "aliases": [
+    "ratio"
+   ],
+   "category": "filters",
+   "short": "Rejected because the model probability is more than 1.35× the market's.",
+   "inSheet": "Rule 20. It protects against long odds, where a small error looks like a huge EV.",
+   "example": "Market 20% and model 30%: 1.5× → F-ratio.",
+   "covers": {
+    "reasons": [
+     "ratio"
+    ]
+   },
+   "related": [
+    "rule-20",
+    "long-shot",
+    "f-gap"
+   ]
+  },
+  {
+   "slug": "f-sample",
+   "term": "F-sample",
+   "aliases": [
+    "F-muestra",
+    "sample",
+    "muestra"
+   ],
+   "category": "filters",
+   "short": "Rejected because the teams don't have enough league games.",
+   "inSheet": "Rule 18: 10 games for goals, results and cards; for count stats (corners, shots) 6–9 gives SHADOW and under 6 is skipped.",
+   "covers": {
+    "reasons": [
+     "sample"
+    ]
+   },
+   "related": [
+    "rule-18",
+    "relaxed-sample",
+    "sample-size"
+   ]
+  },
+  {
+   "slug": "filter-4",
+   "term": "Filter 4 (form)",
+   "aliases": [
+    "filtro 4",
+    "filter 4"
+   ],
+   "category": "filters",
+   "short": "Rejected because, with only the last 5 games, the blend EV drops under 4%.",
+   "inSheet": "Rule 21. A candidate that failed only filter 4 goes into Sombra in slot (b).",
+   "covers": {
+    "reasons": [
+     "filter4"
+    ]
+   },
+   "related": [
+    "rule-21",
+    "last-5"
+   ]
+  },
+  {
+   "slug": "filter-5",
+   "term": "Filter 5 (referee)",
+   "aliases": [
+    "filtro 5",
+    "filter 5",
+    "referee"
+   ],
+   "category": "filters",
+   "short": "A card bet rejected because it no longer has a 4% EV once adjusted for the referee.",
+   "inSheet": "Rule 24: only with referees of 20+ games, and it can only remove bets.",
+   "covers": {
+    "reasons": [
+     "filter5"
+    ]
+   },
+   "related": [
+    "rule-24",
+    "cards"
+   ]
+  },
+  {
+   "slug": "other-side",
+   "term": "Rule 1 (model on the other side)",
+   "aliases": [
+    "regla 1",
+    "rule 1"
+   ],
+   "category": "filters",
+   "short": "Rejected because the model thinks the opposite side is likelier.",
+   "inSheet": "Rule 1. Since 12 Oct 2026 these rejects are no longer logged in Sombra.",
+   "covers": {
+    "reasons": [
+     "rule1"
+    ]
+   },
+   "related": [
+    "rule-1",
+    "model"
+   ]
+  },
+  {
+   "slug": "relaxed-sample",
+   "term": "Rule 18 (relaxed sample)",
+   "aliases": [
+    "regla 18",
+    "6–9 games",
+    "relaxed sample"
+   ],
+   "category": "filters",
+   "short": "The pick has 6–9 league games: it is priced, but gets SHADOW instead of a stake.",
+   "inSheet": "It applies to corners, shots and shots on target (rule 18). Reviews report it as “regla 18”.",
+   "covers": {
+    "reasons": [
+     "rule18"
+    ]
+   },
+   "related": [
+    "rule-18",
+    "f-sample",
+    "shadow"
+   ]
+  },
+  {
+   "slug": "totals-gap",
+   "term": "Rule 23 (gap on totals)",
+   "aliases": [
+    "regla 23",
+    "rule 23"
+   ],
+   "category": "filters",
+   "short": "A cap or skip because the model's and the market's means are far apart on a total and nothing backs the model.",
+   "inSheet": "Rule 23, provisional and dormant: at the 300-row review it had 0 rows.",
+   "covers": {
+    "reasons": [
+     "rule23"
+    ]
+   },
+   "related": [
+    "rule-23",
+    "h2h",
+    "sofascore-ai"
+   ]
+  },
+  {
+   "slug": "low-stake",
+   "term": "Stake under the minimum",
+   "aliases": [
+    "stake < 0.25u",
+    "edge < 4%"
+   ],
+   "category": "filters",
+   "short": "The pick passed, but its computed stake was below 0.25u.",
+   "inSheet": "Rule 4 (minimum 0.25u). It appears as “Stake < 0.25u” on early rows.",
+   "covers": {
+    "reasons": [
+     "low_stake"
+    ]
+   },
+   "related": [
+    "rule-4",
+    "low-edge",
+    "stake"
+   ]
+  },
+  {
+   "slug": "two-way-only",
+   "term": "Two-way only",
+   "aliases": [
+    "rule 22",
+    "one side only"
+   ],
+   "category": "filters",
+   "short": "A market offered on one side only can't have its margin removed and is skipped.",
+   "inSheet": "Rule 22. If a book offers only the over, the under of another book on the same line is used (rule 33).",
+   "related": [
+    "rule-22",
+    "de-vig",
+    "rule-33"
+   ]
+  },
+  {
+   "slug": "won",
+   "term": "Ganada",
+   "aliases": [
+    "won",
+    "win"
+   ],
+   "category": "statuses",
+   "short": "The bet won.",
+   "inSheet": "At 1u it wins price − 1 units.",
+   "example": "Won at 1.95 with 1u: +0.95u.",
+   "covers": {
+    "statuses": [
+     "won"
+    ]
+   },
+   "related": [
+    "lost",
+    "half-won"
+   ]
+  },
+  {
+   "slug": "lost",
+   "term": "Perdida",
+   "aliases": [
+    "lost",
+    "loss"
+   ],
+   "category": "statuses",
+   "short": "The bet lost.",
+   "inSheet": "At 1u it loses 1u.",
+   "covers": {
+    "statuses": [
+     "lost"
+    ]
+   },
+   "related": [
+    "won",
+    "half-lost"
+   ]
+  },
+  {
+   "slug": "void",
+   "term": "Nula",
+   "aliases": [
+    "void",
+    "push",
+    "refund",
+    "devuelta",
+    "anulada"
+   ],
+   "category": "statuses",
+   "short": "Your stake is refunded: you neither win nor lose (for example DNB with a draw, or a whole Asian line landing exactly).",
+   "inSheet": "It counts as staked in the yield, with 0 profit.",
+   "covers": {
+    "statuses": [
+     "void"
+    ]
+   },
+   "related": [
+    "dnb",
+    "asian-handicap"
+   ]
+  },
+  {
+   "slug": "half-won",
+   "term": "Medio ganada",
+   "aliases": [
+    "half won",
+    "media ganada"
+   ],
+   "category": "statuses",
+   "short": "On a quarter line, half the stake wins and the other half is refunded.",
+   "inSheet": "The sheet writes “Medio ganada”. At 1u it wins (price − 1) / 2; in the hit rate it adds half a win.",
+   "example": "Half won at 1.90 with 1u: +0.45u.",
+   "covers": {
+    "statuses": [
+     "half_won"
+    ]
+   },
+   "related": [
+    "quarter-line",
+    "half-lost"
+   ]
+  },
+  {
+   "slug": "half-lost",
+   "term": "Medio perdida",
+   "aliases": [
+    "half lost",
+    "media perdida"
+   ],
+   "category": "statuses",
+   "short": "On a quarter line, half the stake loses and the other half is refunded.",
+   "inSheet": "The sheet writes “Medio perdida”. At 1u it loses 0.5u.",
+   "covers": {
+    "statuses": [
+     "half_lost"
+    ]
+   },
+   "related": [
+    "quarter-line",
+    "half-won"
+   ]
+  },
+  {
+   "slug": "pending",
+   "term": "Pendiente",
+   "aliases": [
+    "pending"
+   ],
+   "category": "statuses",
+   "short": "Not graded yet: the match hasn't been played or the result is missing.",
+   "inSheet": "Grading at 22:26 and 22:48 fills the status; if it can't find the result, it stays Pendiente.",
+   "covers": {
+    "statuses": [
+     "pending"
+    ]
+   },
+   "related": [
+    "won",
+    "lost"
+   ]
+  },
+  {
+   "slug": "other-status",
+   "term": "Other status",
+   "aliases": [
+    "unknown status"
+   ],
+   "category": "statuses",
+   "short": "A status the app does not recognise.",
+   "inSheet": "It is shown with the sheet's text and counts in no figure.",
+   "covers": {
+    "statuses": [
+     "other"
+    ]
+   },
+   "related": [
+    "pending"
+   ]
+  },
+  {
+   "slug": "decision-in-force",
+   "term": "Vigente",
+   "aliases": [
+    "in force"
+   ],
+   "category": "statuses",
+   "short": "A decision that applies today.",
+   "inSheet": "It is not reopened without new evidence, and its review criterion is respected.",
+   "related": [
+    "decisions-tab",
+    "decision-provisional"
+   ]
+  },
+  {
+   "slug": "decision-provisional",
+   "term": "Provisional",
+   "aliases": [
+    "provisional"
+   ],
+   "category": "statuses",
+   "short": "A decision that applies while evidence is gathered; it has a review point.",
+   "inSheet": "Like a Vigente one, it is not reopened without new evidence.",
+   "related": [
+    "decisions-tab",
+    "decision-in-force"
+   ]
+  },
+  {
+   "slug": "decision-open",
+   "term": "Abierta",
+   "aliases": [
+    "open"
+   ],
+   "category": "statuses",
+   "short": "An open topic: something still to investigate or decide.",
+   "inSheet": "It usually comes with a proposal or a question for you.",
+   "related": [
+    "decisions-tab"
+   ]
+  },
+  {
+   "slug": "decision-replaced",
+   "term": "Reemplazada",
+   "aliases": [
+    "replaced"
+   ],
+   "category": "statuses",
+   "short": "A decision a later one superseded.",
+   "inSheet": "Rows are never deleted: the old one is marked Reemplazada and the new one is added below.",
+   "related": [
+    "decisions-tab"
+   ]
+  },
+  {
+   "slug": "fair-close-ev",
+   "term": "Fair-close EV",
+   "aliases": [
+    "EV justo",
+    "EV against the close",
+    "price-vs-close EV",
+    "EV contra el cierre"
+   ],
+   "category": "reviews",
+   "short": "What your price was worth according to the margin-free close: price taken × margin-free closing probability − 1. Positive means you beat the market.",
+   "inSheet": "The headline measure since 22 Oct 2026 (rule 34e) and the one the frozen tests decide on. It uses the same book's close when it has both sides; otherwise the bet365 feed's.",
+   "example": "You took 2.10; close 1.95 / 1.95 → 50% without margin; 2.10 × 0.50 − 1 = +5%.",
+   "related": [
+    "clv",
+    "de-vig",
+    "frozen-tests",
+    "two-se"
+   ]
+  },
+  {
+   "slug": "de-vig",
+   "term": "De-vig (removing the margin)",
+   "aliases": [
+    "no-vig",
+    "vig-free",
+    "de-vigged",
+    "proportional"
+   ],
+   "category": "reviews",
+   "short": "Taking the book's margin out of the prices to get probabilities that add up to 100%.",
+   "inSheet": "Reviews use the proportional method: (1 / c_pick) / (1 / c_pick + 1 / c_other); for three-way markets, over the sum of all three. Rule 29's consensus uses the power method.",
+   "example": "Over 1.80 and under 2.00: 55.6% and 50.0% → 52.6% and 47.4%.",
+   "related": [
+    "power-method",
+    "margin",
+    "fair-close-ev"
+   ]
+  },
+  {
+   "slug": "power-method",
+   "term": "Power method",
+   "aliases": [
+    "power"
+   ],
+   "category": "reviews",
+   "short": "A way of removing the margin that takes more off long prices, where books tend to hide more margin.",
+   "inSheet": "The script uses it for the results and goals consensus (rule 29) and valor_prop.py for VALOR PROP.",
+   "related": [
+    "de-vig",
+    "consensus",
+    "prop-value"
+   ]
+  },
+  {
+   "slug": "two-se",
+   "term": "2 SE (z)",
+   "aliases": [
+    "±2 SE",
+    "z",
+    "two standard errors",
+    "CI"
+   ],
+   "category": "reviews",
+   "short": "A mean is “2 standard errors above zero” when z = mean / SE is 2 or more: it is unlikely to be luck alone.",
+   "inSheet": "A frozen test passes when its mean EV against the close is at least 2 SE above zero; ±2 SE is the interval the reviews give.",
+   "example": "Mean EV +3% with SE 1.2% → z = 2.5: it passes.",
+   "related": [
+    "standard-error",
+    "frozen-tests",
+    "gate"
+   ]
+  },
+  {
+   "slug": "brier",
+   "term": "Brier score",
+   "aliases": [
+    "Brier"
+   ],
+   "category": "reviews",
+   "short": "Measures how good a set of probabilities is: the mean of (probability − outcome)². Lower is better.",
+   "inSheet": "Reviews compare the Brier score of the model, the market and the AI on the same rows.",
+   "example": "You said 70% and it won: (0.7 − 1)² = 0.09.",
+   "related": [
+    "calibration",
+    "fuerza",
+    "ai-watch"
+   ]
+  },
+  {
+   "slug": "calibration",
+   "term": "Calibration",
+   "aliases": [
+    "calibrated"
+   ],
+   "category": "reviews",
+   "short": "Probabilities that tell the truth: of the picks at 60%, about 60% should win.",
+   "inSheet": "The Analysis section compares probability with hit rate. The rule 30 backtest showed the corners and cards model was badly calibrated match by match.",
+   "related": [
+    "brier",
+    "hit-rate",
+    "shrink"
+   ]
+  },
+  {
+   "slug": "frozen-tests",
+   "term": "Frozen tests",
+   "aliases": [
+    "frozen test",
+    "100 rows, 50 with a close"
+   ],
+   "category": "reviews",
+   "short": "The model's tests in Sombra under fixed rules: no new cuts, one decision at 100 rows (50 with a close), by price against the close.",
+   "inSheet": "Since 9 Nov 2026 (row 111). If the mean EV against the close is 2 SE above zero, real money at 0.25u is proposed to you; otherwise closing the category.",
+   "related": [
+    "fair-close-ev",
+    "two-se",
+    "shadow-rule30",
+    "cards-under"
+   ]
+  },
+  {
+   "slug": "milestone-review",
+   "term": "Milestone review",
+   "aliases": [
+    "Sombra review",
+    "Grok review",
+    "milestone"
+   ],
+   "category": "reviews",
+   "short": "The periodic analysis of the tabs to decide with evidence whether anything changes.",
+   "inSheet": "A Sombra review is due when 14 days have passed and there are 150 newly graded rows since the last one. Grok's come at 30, 60, 100 and then every 50. Each leaves its row in Decisiones.",
+   "related": [
+    "shadow-tab",
+    "frozen-tests",
+    "decisions-tab"
+   ]
+  },
+  {
+   "slug": "gate",
+   "term": "Gate",
+   "aliases": [
+    "fair-close EV gate",
+    "puerta"
+   ],
+   "category": "reviews",
+   "short": "The condition a group of picks must meet before real money is proposed to you.",
+   "inSheet": "In general: mean fair-close EV above zero over 30+ rows, positive flat yield and your approval. Raw CLV never clears a gate alone. The frozen tests have their own rule.",
+   "related": [
+    "fair-close-ev",
+    "barely-moving-lines",
+    "frozen-tests"
+   ]
+  },
+  {
+   "slug": "barely-moving-lines",
+   "term": "Lines that barely move",
+   "aliases": [
+    "gate B and C"
+   ],
+   "category": "reviews",
+   "short": "Markets where more than half of the closes equal the opening (corner totals, cards, shots). There, fair-close EV is little more than minus the margin.",
+   "inSheet": "Since 8 Nov 2026 their gate asks for two things over 30+ rows: flat yield 2 SE above break-even and EV against the margin-free bet365 close of 0 or more.",
+   "related": [
+    "gate",
+    "closing-margin",
+    "line-movement"
+   ]
+  },
+  {
+   "slug": "closing-margin",
+   "term": "Closing margin",
+   "aliases": [
+    "closing overround"
+   ],
+   "category": "reviews",
+   "short": "The book's margin in the closing prices. Fair-close EV ≈ raw CLV − margin.",
+   "inSheet": "Reviews report it next to CLV to say what makes fair-close EV negative: the selection or the margin.",
+   "example": "Raw CLV +2.3% with a 7.4% margin → fair-close EV around −4.7%.",
+   "related": [
+    "margin",
+    "clv",
+    "fair-close-ev"
+   ]
+  },
+  {
+   "slug": "sofascore",
+   "term": "Sofascore",
+   "category": "sources",
+   "short": "The scores and stats app holding your Favorites, the odds feed and the AI.",
+   "inSheet": "It gives the slate's matches, the bet365 feed (prices and closes), the referee and the results for grading.",
+   "related": [
+    "bet365-feed",
+    "sofascore-ai",
+    "favorites"
+   ]
+  },
+  {
+   "slug": "sofascore-ai",
+   "term": "Sofascore AI",
+   "aliases": [
+    "Sofascore Pro AI",
+    "Prob. IA Sofascore",
+    "AI",
+    "IA de Sofascore"
+   ],
+   "category": "sources",
+   "short": "The Sofascore Pro AI's predictions for each match.",
+   "inSheet": "A contrast, never a filter (rule 16). Its probability goes in column O of Sombra and AB of Apuestas.",
+   "related": [
+    "rule-16",
+    "ai-mean",
+    "ai-watch"
+   ]
+  },
+  {
+   "slug": "bet365-feed",
+   "term": "bet365 feed",
+   "aliases": [
+    "feed",
+    "Sofascore/bet365",
+    "odds feed"
+   ],
+   "category": "sources",
+   "short": "The bet365 prices Sofascore shows, with the initial and current price of each market.",
+   "inSheet": "It is rule 29's consensus and the source of G (the close) in Sombra. Its margin on results is about 6%.",
+   "related": [
+    "consensus",
+    "feed-price",
+    "feed-close",
+    "feed-open"
+   ]
+  },
+  {
+   "slug": "pinnacle",
+   "term": "Pinnacle",
+   "aliases": [
+    "Pinnacle tab"
+   ],
+   "category": "sources",
+   "short": "A sharp book whose prices are considered among the most efficient in the market.",
+   "inSheet": "A script inside the sheet fills the Pinnacle tab from The Odds API; VALOR rows on results note its 1X2 (“pin”).",
+   "related": [
+    "pin-note",
+    "sharp-vs-soft"
+   ]
+  },
+  {
+   "slug": "betano",
+   "term": "Betano",
+   "category": "sources",
+   "short": "One of your three books.",
+   "inSheet": "Read in every scan; its team corners are overs only, so they are priced against another book's under.",
+   "related": [
+    "betsson",
+    "stake-book",
+    "rule-33"
+   ]
+  },
+  {
+   "slug": "betsson",
+   "term": "Betsson",
+   "category": "sources",
+   "short": "One of your three books.",
+   "inSheet": "Its corner and card totals are read from each match page.",
+   "related": [
+    "betano",
+    "stake-book",
+    "rule-33"
+   ]
+  },
+  {
+   "slug": "stake-book",
+   "term": "Stake (book)",
+   "aliases": [
+    "Stake.com"
+   ],
+   "category": "sources",
+   "short": "One of your three books (not to be confused with the stake, the amount bet).",
+   "inSheet": "Read from its own pages; Oddspedia only as a fallback. It offers yellows only, so it is not a cards source.",
+   "related": [
+    "betano",
+    "betsson",
+    "oddspedia",
+    "stake"
+   ]
+  },
+  {
+   "slug": "fstats",
+   "term": "fstats",
+   "category": "sources",
+   "short": "The stats site for teams, leagues, goal minutes and referees that feeds the model.",
+   "inSheet": "It counts a red as 1 (not 2), so the model's card totals run slightly low (rule 28).",
+   "related": [
+    "model",
+    "rule-8",
+    "rule-28"
+   ]
+  },
+  {
+   "slug": "grok",
+   "term": "Grok",
+   "category": "sources",
+   "short": "Another AI you give the same slate to, for comparison.",
+   "inSheet": "His picks go to the Grok tab; since 10 Nov 2026 only team corners. He marks each pick as automatic or manual.",
+   "related": [
+    "grok-tab",
+    "grok-priced"
+   ]
+  },
+  {
+   "slug": "oddspedia",
+   "term": "Oddspedia",
+   "category": "sources",
+   "short": "A site with odds histories per book and time.",
+   "inSheet": "It gives Stake's close (“cierre Stake X (Oddspedia)”, rule 34c) and is the fallback when Stake's page doesn't load.",
+   "related": [
+    "stake-book",
+    "closing-line"
+   ]
+  },
+  {
+   "slug": "espn",
+   "term": "ESPN",
+   "category": "sources",
+   "short": "ESPN's public feeds with scores and stats (Opta data).",
+   "inSheet": "The 22:48 cloud grading uses them, with no browser.",
+   "related": [
+    "single-source",
+    "sofascore"
+   ]
+  },
+  {
+   "slug": "clv-logger",
+   "term": "clv-logger",
+   "category": "sources",
+   "short": "The tool that copies the closes you note on your phone into the sheet and computes CLV and fair EV.",
+   "inSheet": "It writes the “Cierre {book} X (otro lado Y)” segments in the notes of Sombra, Grok and Apuestas.",
+   "related": [
+    "logger-close",
+    "clv"
+   ]
+  }
+ ]
+}

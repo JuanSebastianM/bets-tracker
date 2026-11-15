@@ -1,3 +1,79 @@
 /* glossary section. Scope every rule under .glossary. Tokens only (src/styles/tokens.css). */
-.glossary .glossary-tags { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); }
-.glossary .glossary-rules { margin: 0; padding-left: 0; list-style: none; display: grid; gap: var(--sp-2); }
+.glossary .gl-cats { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.glossary .gl-az { display: flex; flex-wrap: wrap; gap: 2px; position: sticky; top: var(--header-h); z-index: 2; background: var(--c-bg); padding: var(--sp-1) 0; }
+.glossary .gl-az-btn {
+  min-width: 32px; min-height: 36px; border: 0; border-radius: var(--r-ctl); background: transparent;
+  color: var(--c-accent); font-weight: 700; font-size: var(--fs-sm); cursor: pointer;
+}
+.glossary .gl-az-btn:hover { background: var(--c-surface-2); }
+.glossary .gl-list { display: grid; gap: var(--sp-4); }
+.glossary .gl-letter { display: grid; gap: var(--sp-2); scroll-margin-top: calc(var(--header-h) + 56px); }
+.glossary .gl-letter-h { font-family: var(--font-num); font-size: var(--fs-xl); color: var(--c-muted); border-bottom: var(--border); padding-bottom: 2px; }
+.glossary .gl-items { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.glossary .gl-item {
+  display: grid; gap: 4px; padding: var(--sp-3) var(--sp-4); min-height: var(--tap);
+  background: var(--c-surface); border: var(--border); border-radius: var(--r-card); color: var(--c-ink); text-decoration: none;
+}
+.glossary .gl-item:hover { border-color: var(--c-line-strong); }
+.glossary .gl-item-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2); }
+.glossary .gl-item-term { font-weight: 700; overflow-wrap: anywhere; }
+.glossary .gl-item-cat { flex: none; font-size: var(--fs-xs); color: var(--c-muted); }
+.glossary .gl-item-short { font-size: var(--fs-sm); color: var(--c-ink-2); }
+
+.glossary .gl-rules { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.glossary .gl-rule {
+  display: flex; gap: var(--sp-3); align-items: flex-start; padding: var(--sp-3) var(--sp-4);
+  background: var(--c-surface); border: var(--border); border-radius: var(--r-card); color: var(--c-ink); text-decoration: none;
+}
+.glossary .gl-rule:hover { border-color: var(--c-line-strong); }
+.glossary .gl-rule-n {
+  flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: var(--r-ctl);
+  background: var(--c-surface-2); border: var(--border); font-family: var(--font-num); font-weight: 800; color: var(--c-ink-2);
+}
+.glossary .gl-rule-body { display: grid; gap: 4px; min-width: 0; }
+.glossary .gl-rule-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1) var(--sp-2); }
+.glossary .gl-rule-title { font-weight: 700; }
+.glossary .gl-rule-says {
+  font-size: var(--fs-sm); color: var(--c-ink-2);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* Rule state: icon + word, and a border style per state so colour is never the only signal. */
+.glossary .rstate {
+  display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: var(--r-pill);
+  font-size: var(--fs-xs); font-weight: 650; border: 1px solid transparent; white-space: nowrap;
+}
+.glossary .rstate-in_force { background: var(--c-won-soft); color: var(--c-won); }
+.glossary .rstate-provisional { background: var(--c-info-soft); color: var(--c-info); border-style: dashed; border-color: var(--c-info); }
+.glossary .rstate-paused { background: var(--c-pending-soft); color: var(--c-pending); }
+.glossary .rstate-stopped, .glossary .rstate-replaced { background: var(--c-void-soft); color: var(--c-void); border-color: var(--c-void); }
+
+.glossary .gl-back { justify-self: start; padding-left: 0; }
+.glossary .gl-entry { gap: var(--sp-4); }
+.glossary .gl-entry-head { display: grid; gap: var(--sp-2); justify-items: start; }
+.glossary .gl-entry-cat { text-decoration: none; }
+.glossary .gl-entry-title { font-size: var(--fs-xl); line-height: 1.2; overflow-wrap: anywhere; }
+.glossary .gl-rule-eyebrow { font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--c-accent); }
+.glossary .gl-entry-short { font-size: var(--fs-lg); line-height: 1.4; }
+.glossary .gl-state-note { color: var(--c-ink-2); }
+.glossary .gl-sec { display: grid; gap: var(--sp-1); }
+.glossary .gl-sec h3, .glossary .gl-example h3 { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.04em; color: var(--c-muted); }
+.glossary .gl-example { display: grid; gap: var(--sp-1); padding: var(--sp-3); border-radius: var(--r-ctl); background: var(--c-surface-2); border-left: 3px solid var(--c-accent); }
+.glossary .gl-links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.glossary .gl-link { display: inline-flex; align-items: center; min-height: 36px; padding: 6px var(--sp-3); border: 1px solid var(--c-line-strong); border-radius: var(--r-ctl); font-size: var(--fs-sm); font-weight: 600; color: var(--c-accent); text-decoration: none; }
+.glossary .gl-link:hover { border-color: var(--c-accent); }
+.glossary .gl-decisions { margin: 0; padding-left: var(--sp-4); display: grid; gap: var(--sp-2); }
+.glossary .gl-decisions a { font-weight: 600; }
+.glossary .gl-dstatus { font-size: var(--fs-xs); font-weight: 650; color: var(--c-muted); border: 1px solid var(--c-line-strong); border-radius: var(--r-pill); padding: 0 6px; white-space: nowrap; }
+.glossary .gl-dstatus-replaced { text-decoration: line-through; }
+.glossary .gl-pager { display: flex; justify-content: space-between; gap: var(--sp-2); }
+
+/* Phones: categories and letters each take one line that scrolls sideways inside itself. */
+@media (max-width: 719px) {
+  .glossary .gl-cats, .glossary .gl-az {
+    flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--sp-4)); padding-left: var(--sp-4); padding-right: var(--sp-4);
+  }
+  .glossary .gl-cats::-webkit-scrollbar, .glossary .gl-az::-webkit-scrollbar { display: none; }
+  .glossary .gl-cats > * { flex: none; }
+  .glossary .gl-az-btn { flex: none; min-width: 36px; min-height: var(--tap); }
+}

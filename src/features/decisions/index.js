@@ -9,5 +9,8 @@ export const feature = {
   order: 6,
   i18n: true,
   descKey: 'nav.desc.decisions',
-  routes: [{ path: '/decisions', component: DecisionsScreen }],
+  routes: [
+    { path: '/decisions', component: DecisionsScreen },
+    { path: '/decisions/:row', component: DecisionsScreen, titleKey: 'decisions.detailTitle' },
+  ],
 };

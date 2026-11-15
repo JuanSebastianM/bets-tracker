@@ -1,1 +1,81 @@
 /* decisions section. Scope every rule under .decisions. Tokens only (src/styles/tokens.css). */
+
+/* Status chips: the sheet's word + an icon + a border style per kind, so colour is never the only signal.
+   Vigente solid, Provisional dashed, Abierta dotted, Reemplazada struck through. */
+.decisions .dchip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: var(--r-pill);
+  font-size: var(--fs-xs); font-weight: 650; border: 1px solid transparent; white-space: nowrap; text-decoration: none;
+}
+.decisions .dchip-in_force { background: var(--c-won-soft); color: var(--c-won); border-color: var(--c-won); }
+.decisions .dchip-provisional { background: var(--c-info-soft); color: var(--c-info); border: 1px dashed var(--c-info); }
+.decisions .dchip-open { background: var(--c-pending-soft); color: var(--c-pending); border: 1px dotted var(--c-pending); }
+.decisions .dchip-replaced { background: var(--c-void-soft); color: var(--c-void); border-color: var(--c-line-strong); }
+.decisions .dchip-replaced span { text-decoration: line-through; }
+.decisions .dchip-other { background: var(--c-surface-2); color: var(--c-muted); border-color: var(--c-line); }
+.decisions a.dchip:hover { filter: brightness(0.97); }
+
+.decisions .dcounts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); }
+.decisions .dcounts li { display: inline-flex; align-items: center; gap: var(--sp-1); font-weight: 700; }
+.decisions .dfilter-toggle { display: inline-flex; align-items: center; gap: var(--sp-1); min-height: var(--tap); }
+.decisions .dfilters { gap: var(--sp-4); }
+.decisions .dfilters input[type='date'] { min-width: 0; width: 100%; }
+
+.decisions .dtimeline { display: grid; gap: var(--sp-6); }
+.decisions .dmonth { display: grid; gap: var(--sp-3); }
+.decisions .dmonth-h {
+  font-size: var(--fs-md); position: sticky; top: var(--header-h); z-index: 2;
+  background: var(--c-bg); padding: var(--sp-2) 0; border-bottom: var(--border);
+}
+.decisions .ditems { list-style: none; margin: 0; padding: 0 0 0 var(--sp-3); display: grid; gap: var(--sp-3); border-left: 2px solid var(--c-line); }
+.decisions .ditems > li { position: relative; }
+.decisions .ditems > li::before {
+  content: ''; position: absolute; left: calc(-1 * var(--sp-3) - 6px); top: 18px; width: 10px; height: 10px;
+  border-radius: 50%; background: var(--c-surface); border: 2px solid var(--c-accent);
+}
+.decisions .dcard { gap: var(--sp-2); }
+.decisions .dmeta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1) var(--sp-3); font-size: var(--fs-xs); color: var(--c-muted); }
+.decisions .drow { font-weight: 700; color: var(--c-accent); font-variant-numeric: tabular-nums; }
+.decisions span.drow { color: var(--c-ink-2); }
+.decisions .dtheme-label { font-weight: 600; color: var(--c-muted); }
+.decisions a.dtheme-label { color: var(--c-accent); }
+.decisions .dtopic { font-size: var(--fs-md); line-height: 1.35; overflow-wrap: anywhere; }
+.decisions .dtopic a, .decisions .dtopic-link { color: var(--c-ink); text-decoration: none; font-weight: 650; overflow-wrap: anywhere; }
+.decisions .dtopic a:hover, .decisions .dtopic-link:hover { color: var(--c-accent); text-decoration: underline; }
+.decisions .dtext, .decisions .dlong { overflow-wrap: anywhere; }
+.decisions .dlong { line-height: 1.55; }
+.decisions .ddisc summary { font-size: var(--fs-sm); }
+.decisions .ddisc .disclosure-body { font-size: var(--fs-sm); color: var(--c-ink-2); }
+
+.decisions .dthemes { display: grid; gap: var(--sp-4); }
+.decisions .dnow { list-style: none; margin: 0; padding: 0; display: grid; }
+.decisions .dnow-item { display: grid; gap: 4px; padding: var(--sp-3) 0; border-top: var(--border); }
+.decisions .dnow-item:first-child { border-top: 0; padding-top: 0; }
+
+.decisions .dback { justify-self: start; padding-left: 0; }
+.decisions .ddetail { gap: var(--sp-4); }
+.decisions .ddetail-title { font-size: var(--fs-xl); line-height: 1.25; overflow-wrap: anywhere; }
+.decisions .dsec { display: grid; gap: var(--sp-2); }
+.decisions .dsec h3, .decisions .drel-h { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.04em; color: var(--c-muted); }
+.decisions .drel { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.decisions .drel-link {
+  display: grid; gap: 2px; padding: var(--sp-2) var(--sp-3); min-height: var(--tap); border: var(--border); border-radius: var(--r-ctl);
+  color: var(--c-ink); text-decoration: none;
+}
+.decisions .drel-link:hover { border-color: var(--c-accent); }
+.decisions .drel-topic { font-size: var(--fs-sm); font-weight: 600; overflow-wrap: anywhere; }
+.decisions .drules { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.decisions .drule-link {
+  display: inline-flex; align-items: center; min-height: 36px; padding: 0 var(--sp-3); border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-pill); font-size: var(--fs-sm); font-weight: 600; text-decoration: none;
+}
+.decisions .dpager { display: flex; justify-content: space-between; gap: var(--sp-2); }
+
+.decisions .dstaking { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
+.decisions .dstaking li { display: flex; gap: var(--sp-3); align-items: flex-start; }
+.decisions .dstaking-n {
+  flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: var(--r-ctl);
+  background: var(--c-surface-2); border: var(--border); font-weight: 800; font-size: var(--fs-sm); color: var(--c-ink-2);
+}
+.decisions .dstaking-body { display: grid; gap: 0; min-width: 0; font-size: var(--fs-sm); overflow-wrap: anywhere; }
+.decisions .dstaking-body .link-btn { justify-self: start; }
+.decisions .dmonth-h::first-letter { text-transform: uppercase; }

@@ -36,7 +36,7 @@ test('bottom bar navigates and marks the current tab', async ({ page }) => {
 
 test('glossary deep link keeps the term', async ({ page }) => {
   await openApp(page, '/glossary/near-value');
-  await expect(page.getByTestId('glossary-term')).toContainText('near-value');
+  await expect(page.getByTestId('glossary-term')).toContainText('VALOR CASI');
 });
 
 test('language switch to English applies everywhere and persists', async ({ page }) => {

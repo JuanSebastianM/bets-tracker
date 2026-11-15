@@ -455,6 +455,10 @@ const decisionRows = [
   ['2026-11-09', 'Pruebas congeladas', 'Una decisión por prueba a las 100 filas, 50 con cierre.', 'Ejemplo.', 'Por prueba.', 'Vigente'],
   ['2026-11-10', 'Grok solo córners de equipo', 'Desde el slate del 10 nov solo se registran sus córners de equipo.', 'Ejemplo.', 'Revisión Grok 200 filas.', 'Abierta'],
   ['2026-11-14', 'Filas de Sombra por script', 'Las filas las escribe un script guardado.', 'Ejemplo.', 'Señal: el recibo imprime OK.', 'Provisional'],
+  // Cross-references for the Decisions section (feat/knowledge): decision rows, ranges, lists, rules, and
+  // row numbers of other tabs that must stay plain text. Invented text.
+  ['2026-11-15', 'Conteo de tarjetas y pausa (regla 28)', 'Se mantiene lo de la fila 7 y de las filas 4-5; reglas 29 y 30 sin cambios.', 'Evidencia inventada y larga para el fixture. La Sombra fila 12 y la fila 17 de Apuestas no son decisiones. Ver Decisiones row 11. ' + 'Texto de relleno para que la evidencia sea larga. '.repeat(12), 'Se revisa con la fila 10.', 'Abierta'],
+  ['2026-09-30', 'Inicio del registro de decisiones', 'Primera decisión de ejemplo, de septiembre.', 'Ejemplo.', 'Sin revisión.', 'Provisional'],
 ];
 const pinRows = [];
 for (let i = 0; i < 12; i++) {

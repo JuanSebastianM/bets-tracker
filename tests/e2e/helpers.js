@@ -13,6 +13,9 @@ export const ROUTES = [
   { path: '/glossary', title: 'Glosario', ready: 'glossary-tags' },
   { path: '/settings', title: 'Ajustes', ready: 'settings-feed' },
   { path: '/explorer/shadow%3A169', title: 'Pick', ready: 'pick-sheet' },
+  { path: '/decisions/14', title: 'Decisión', ready: 'decision-related' },
+  { path: '/glossary/rule-29', title: 'Glosario', ready: 'glossary-term' },
+  { path: '/glossary/near-value', title: 'Glosario', ready: 'glossary-term' },
 ];
 
 /**
