@@ -304,7 +304,7 @@ function StakingRules({ rules }) {
     <ol class="dstaking">
       ${rules.map((line) => {
         const { n, text } = parseSheetRule(line);
-        const slug = sheetRuleSlug(text);
+        const slug = sheetRuleSlug(text, n);
         return html`<li>
           <span class="dstaking-n num" aria-hidden="true">${n ?? '·'}</span>
           <span class="dstaking-body">
