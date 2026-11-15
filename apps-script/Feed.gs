@@ -54,7 +54,7 @@ var BT_FEED_HIDDEN = '[oculto]';
 /**
  * Whitelist per tab: sheet header -> [feed key, kind]. A header not listed here is never read.
  * kinds: date, time, int, price, units, prob (probability as a fraction), frac (EV / CLV as a
- * fraction), text, iso (instant text), stamp (local date-time text).
+ * fraction), minutes (a count of minutes, no upper bound), text, iso (instant text), stamp (local date-time text).
  */
 var BT_FEED_TABS = {
   bets: {
@@ -111,7 +111,7 @@ var BT_FEED_TABS = {
       ['away', 'away', 'text'], ['open_1', 'open_1', 'price'], ['open_x', 'open_x', 'price'], ['open_2', 'open_2', 'price'],
       ['open_read_utc', 'open_read_utc', 'iso'], ['last_1', 'last_1', 'price'], ['last_x', 'last_x', 'price'],
       ['last_2', 'last_2', 'price'], ['last_read_utc', 'last_read_utc', 'iso'],
-      ['mins_before_kickoff', 'mins_before_kickoff', 'price'], ['api_last_update', 'api_last_update', 'iso'],
+      ['mins_before_kickoff', 'mins_before_kickoff', 'minutes'], ['api_last_update', 'api_last_update', 'iso'],
     ],
   },
 };
@@ -129,14 +129,41 @@ var BT_FEED_MONEY_HEADER = /COP|bank|\$/i;
  */
 var BT_FEED_MONEY_PATTERNS = [
   // a dollar sign followed by a number, optional mil/k/millones
-  /\$\s*[+\-−]?\d[\d.,]*(?:\s*(?:mil(?:lones|lón|lon)?|k|m)\b)?/gi,
+  /\$\s*[+\-−]?\d[\d.,]*(?:\s\d{3}(?!\d))*(?:\s*(?:mil(?:lones|lón|lon)?|k|m)\b)?/gi,
   // COP / pesos before a number
-  /\b(?:COP|pesos)\s*\$?\s*[+\-−]?\d[\d.,]*(?:\s*(?:mil(?:lones|lón|lon)?|k)\b)?/gi,
+  /\b(?:COP|pesos)\s*\$?\s*[+\-−]?\d[\d.,]*(?:\s\d{3}(?!\d))*(?:\s*(?:mil(?:lones|lón|lon)?|k)\b)?/gi,
   // a number (optionally with mil/k/millones) followed by COP or pesos
-  /[+\-−]?\d[\d.,]*\s*(?:(?:mil(?:lones|lón|lon)?|k|m)\s*)?(?:de\s+)?(?:COP|pesos)\b/gi,
+  /[+\-−]?\d[\d.,]*(?:\s\d{3}(?!\d))*\s*(?:(?:mil(?:lones|lón|lon)?|k|m)\s*)?(?:de\s+)?(?:COP|pesos)\b/gi,
   // any number with two or more thousand groups (no price or stat looks like that)
   /\d{1,3}(?:[.,]\d{3}){2,}(?![\d])/g,
+  // Added by the audit (each shape has a case in tests/fixtures/privacy-money.json, auditTexts).
+  // Currency words and signs other than COP / pesos / $, before or after the number; a colon or a dot
+  // between COP / pesos and the number; thousands written with spaces (also no-break and thin spaces).
+  /(?:\b(?:COP|pesos|USD|EUR|GBP)\b|€|£)\s*[:.]?\s*\$?\s*[+\-−]?\d{1,3}(?:[.,\s]\d{3})*(?:[.,]\d+)?(?:\s*(?:mil(?:lones|lón|lon)?|k|mm?)(?![A-Za-zÀ-ÿ]))?/gi,
+  /[+\-−]?\d{1,3}(?:[.,\s]\d{3})*(?:[.,]\d+)?\s*(?:(?:mil(?:lones|lón|lon)?|k|mm?)\s*)?(?:de\s+)?(?:€|£|(?:COP|pesos|euros?|libras?(?:\s+esterlinas)?|d[oó]lares?|USD|EUR|GBP)(?![A-Za-zÀ-ÿ]))/gi,
+  // thousands written with spaces and no currency ("7 000 000"; no-break and thin spaces too)
+  /\d{1,3}(?:\s\d{3}){2,}(?!\d)/g,
+  // a number followed by a dollar sign ("25.000" followed by a dollar sign)
+  /[+\-−]?\d[\d.,]*\s*\$/g,
+  // millions in words or slang, with or without a currency ("7 millones", "1.2 millones", "7 palos")
+  /[+\-−]?\d+(?:[.,]\d+)?\s*(?:millones|millón|millon|mill\.|mm|palos|lucas)(?![A-Za-zÀ-ÿ])/gi,
+  // "7M", "6.3M", "6,3 M" (capital M only: lower-case m is minutes or metres)
+  /[+\-−]?\d+(?:[.,]\d+)?\s?M(?![A-Za-zÀ-ÿ0-9])/g,
+  // "25 mil" without a currency; counts of things ("60 mil caracteres") stay readable
+  /[+\-−]?\d+(?:[.,]\d+)?\s*mil(?![A-Za-zÀ-ÿ])(?!\s+(?:caracteres|tokens|filas|partidos|simulaciones|iteraciones|líneas|registros|lecturas|corridas|veces|apuestas|picks|muestras))/gi,
+  // a money-sized number shortly after a money word: bank, saldo, freebet, bono, depósito, retiro,
+  // unidad, "1u =" ("freebet de 25.000", "1u = 25.000", "unidad de 25k"). Prices such as 1.83 are not
+  // money-sized, so "1.71 por unidad de xm" stays readable.
+  /(?<=(?:\bbank(?:roll)?|\bbanca\b|\bsaldo|\bfree\s?bets?|\bapuestas? gratis|\bbono|\bdep[oó]sit\w*|\bretir\w*|\bunidad(?:es)?\b|\bgan[éó](?![A-Za-zÀ-ÿ])|\bperd[íió](?![A-Za-zÀ-ÿ])|\bapost[éó](?![A-Za-zÀ-ÿ])|\bapuesta de\b|\bpag[óo](?![A-Za-zÀ-ÿ])|\bcobr[éó](?![A-Za-zÀ-ÿ])|\b1\s?u\s*=|\bu\s*=)[^|;\n\d]{0,25})[+\-−]?(?:\d{1,3}(?:[.,\s]\d{3})+(?:[.,]\d+)?|\d{4,}(?:[.,]\d+)?|\d+(?:[.,]\d+)?\s*(?:k|mil|M)(?![A-Za-zÀ-ÿ]))/gi,
+  // a bare integer of five or more digits ("7000000", "25000"); ids written as "id 12345678" stay
+  /(?<![\w.,])(?<!\bid\s?)(?<!\bid:\s?)\d{5,}(?![\w])/gi,
 ];
+
+/**
+ * Plausibility bounds for numeric cells (audit): a value outside them is not a price, a unit amount,
+ * a probability or an EV, so it is dropped and counted as a redaction (money typed in a number column).
+ */
+var BT_FEED_NUMERIC_BOUNDS = { int: 10000, price: 1000, units: 1000, prob: 1, frac: 100 };
 
 /**
  * Leftover money markers searched in the final JSON (a hit means a scrubbing bug). A dollar sign only
@@ -254,8 +281,13 @@ function btFeedCell(value, kind, ctx) {
     if (num === null) return null;
     if (pct) num = num / 100;
   }
-  if (kind === 'int') return Math.round(num);
   if (kind === 'prob' && num > 1.5) num = num / 100; // "59.7" written as a number
+  var bound = BT_FEED_NUMERIC_BOUNDS[kind];
+  if (bound !== undefined && Math.abs(num) > bound) {
+    ctx.count(1); // not a price, unit amount, probability or EV: possibly money typed in a number column
+    return null;
+  }
+  if (kind === 'int') return Math.round(num);
   return Math.round(num * 1e6) / 1e6;
 }
 
@@ -277,9 +309,13 @@ function btFeedTab(def, values, ctx, missing) {
   def.columns.forEach(function (c) {
     if (BT_FEED_MONEY_HEADER.test(c[0])) throw new Error('Whitelist header refused (money): ' + c[0]);
     var idx = -1;
+    var found = 0;
     for (var i = 0; i < header.length; i++) {
-      if (header[i] === c[0] && !BT_FEED_MONEY_HEADER.test(header[i])) { idx = i; break; }
+      if (header[i] === c[0] && !BT_FEED_MONEY_HEADER.test(header[i])) { if (idx < 0) idx = i; found++; }
     }
+    // A whitelisted header that appears twice is ambiguous (a new column named like a listed one could
+    // carry anything): neither copy is read and the header is reported as missing.
+    if (found > 1) idx = -1;
     if (idx < 0) missing.push(def.sheet + '!' + c[0]);
     cols.push({ key: c[1], kind: c[2], idx: idx });
   });
