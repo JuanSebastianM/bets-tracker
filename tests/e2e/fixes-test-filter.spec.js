@@ -47,6 +47,8 @@ test('a price-first test and a stopped category link with the same count', async
 
 test('every frozen test link matches its count', async ({ page }) => {
   const { errors } = await openApp(page, '/tests');
+  // evaluateAll does not wait: on a loaded machine it ran before the list rendered and returned [].
+  await expect(page.getByTestId('frozen-list').locator('li.tests-row').first()).toBeVisible();
   const ids = await page.getByTestId('frozen-list').locator('li.tests-row').evaluateAll((els) => els.map((e) => e.id.replace(/^test-/, '')));
   expect(ids.length).toBeGreaterThanOrEqual(8);
   for (const id of ids) {
@@ -64,6 +66,7 @@ test('filter panel: the "Prueba" section, collapsed after Tag, lists the tests w
   const { errors } = await openApp(page, '/explorer');
   await page.getByTestId('filter-button').click();
   const sheet = page.getByTestId('filter-sheet');
+  await expect(sheet.locator('.fp-section[data-section="test"]')).toBeVisible();
   const sections = await sheet.locator('.fp-section').evaluateAll((els) => els.map((e) => e.getAttribute('data-section')));
   expect(sections.indexOf('test')).toBe(sections.indexOf('tag') + 1);
   const sec = sheet.locator('[data-section="test"]');
