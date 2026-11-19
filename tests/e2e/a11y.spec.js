@@ -215,10 +215,13 @@ test.describe('keyboard', () => {
     await expect(page.locator('[data-rail="explorer"]')).toHaveAttribute('aria-current', 'page');
   });
 
-  test('every Tab stop on every route is visible and in a sensible place, never the page body', async ({ page }) => {
-    test.setTimeout(90_000);
-    for (const r of ROUTES) {
-      await openApp(page, r.path);
+  // One test per route, each on a fresh page load (round 2). The single test that walked all 16 routes
+  // took about a minute unloaded and timed out (90 s) on a loaded machine; and opening the next route by
+  // a hash change left the start of the walk to a race between the new page's title taking focus and
+  // the first Tab. A fresh load has no previous focus, so every walk starts at the document's start.
+  for (const r of ROUTES) {
+    test(`every Tab stop is visible and in a sensible place, never the page body: ${r.path}`, async ({ page }) => {
+      await fresh(page, r.path);
       await expect(page.getByTestId(r.ready).first()).toBeVisible();
       const seen = [];
       for (let i = 0; i < 25; i++) {
@@ -242,7 +245,43 @@ test.describe('keyboard', () => {
         seen.push(f);
       }
       expect(new Set(seen).size, r.path).toBeGreaterThan(3);
-    }
+    });
+  }
+
+  test('a control that disables itself keeps the focus (Quitar todos in the filter sheet, the Settings refresh)', async ({ page }) => {
+    await page.setViewportSize(PHONE);
+    await fresh(page, '/explorer?tag=near_value');
+    await page.getByTestId('filter-button').click();
+    const sheet = page.getByTestId('filter-sheet');
+    const clear = sheet.getByRole('button', { name: 'Quitar todos' });
+    await clear.focus();
+    await page.keyboard.press('Enter');
+    await expect(sheet.getByTestId('filter-live-count')).toHaveText('247 picks con estos filtros');
+    // Still focused, marked unavailable, and Tab stays inside the dialog.
+    await expect(clear).toBeFocused();
+    await expect(clear).toHaveAttribute('aria-disabled', 'true');
+    await page.keyboard.press('Tab');
+    expect(await page.evaluate(() => !!document.activeElement?.closest('[role="dialog"]'))).toBe(true);
+    // Once focus has moved on it is really disabled.
+    await expect(clear).toBeDisabled();
+
+    // The refresh in Settings disables itself while the (slow) feed is fetched.
+    let release = () => {};
+    await page.route('**/tests/fixtures/feed.json', async (route) => {
+      await new Promise((res) => (release = res));
+      await route.continue();
+    });
+    await fresh(page, '/settings');
+    release();
+    await expect(page.getByTestId('settings-feed')).toBeVisible();
+    const refresh = page.getByTestId('settings-feed').getByRole('button', { name: 'Actualizar datos' });
+    await refresh.focus();
+    await page.keyboard.press('Enter');
+    await expect(refresh).toHaveAttribute('aria-disabled', 'true');
+    await expect(refresh).toBeFocused();
+    release();
+    await expect(refresh).not.toHaveAttribute('aria-disabled', 'true');
+    await expect(refresh).toBeFocused();
   });
 
   test('filter panel: chips, sections and the sheet on a phone-width window', async ({ page }) => {
