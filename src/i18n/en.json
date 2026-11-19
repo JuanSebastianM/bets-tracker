@@ -233,7 +233,9 @@
     "sinceApprox": "It counts graded picks dated from the day of your visit (the sheet does not record when a pick is graded).",
     "realNone": "No real bets graded in this period yet.",
     "realAtPeak": "Real bets stand at {total}, at their highest point.",
-    "realBelowPeak": "Real bets stand at {total}, {dd} below their best point ({peak})."
+    "realBelowPeak": "Real bets stand at {total}, {dd} below their best point ({peak}).",
+    "recordOne": "{label}: {record} at an average price of {price}, {profit} ({yield}) over 1 graded.",
+    "sampleSmallOne": "With 1 graded it is still very early: the result may be pure variance."
   },
   "pwa": {
     "updateReady": "A new version of the app is ready.",

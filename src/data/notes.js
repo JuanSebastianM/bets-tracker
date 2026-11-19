@@ -66,6 +66,8 @@ const EV_JUSTA_RE = new RegExp(String.raw`^EV justa\s+([+\-−]?${NUM})\s*%(?:\s
 const FEED_PRICE_RE = new RegExp(String.raw`(?<![\w])feed\s+(${NUM})(?![\d.,:/])`, 'g');
 const FEED_CLOSE_RE = new RegExp(String.raw`cierre:\s*Sofascore/bet365\s+(?:(?:1X|X2|12)\s+)?(${NUM})(?:\s*\(([^)]*)\))?`);
 const THREE_WAY_RE = new RegExp(String.raw`^\s*1\s+(${NUM})\s*/\s*X\s+(${NUM})\s*/\s*2\s+(${NUM})`);
+/** Double-chance close written as its three prices: '(1X 1.615 / X2 1.40 / 12 1.286)'. */
+const DC_THREE_RE = new RegExp(String.raw`^\s*1X\s+(${NUM})\s*/\s*X2\s+(${NUM})\s*/\s*12\s+(${NUM})`);
 const FEED_OPEN_RE = new RegExp(String.raw`(?<!1X2 )apertura feed\s+(${NUM})\s*\(otro lado\s+(${NUM})(;\s*invertida\?)?`);
 const FEED_SOURCE_RE = new RegExp(String.raw`Precio feed Sofascore|(?:^|\|\s*)bet365 feed(?:\s*\||\s*$|\.|\s+${NUM})`);
 const PIN_RE = new RegExp(String.raw`\bpin (${NUM})/(${NUM})/(${NUM}) \(([^)]+)\)(?:\s*\|\s*pin id ([0-9a-f]+))?`);
@@ -173,7 +175,7 @@ export function parseFeed(n, need = 1) {
     out.feedClose = fnum(m[1]);
     const inner = m[2] || '';
     out.feedTriple = triple(inner);
-    const three = THREE_WAY_RE.exec(inner);
+    const three = THREE_WAY_RE.exec(inner) || DC_THREE_RE.exec(inner);
     if (three) {
       const rest = [fnum(three[1]), fnum(three[2]), fnum(three[3])];
       const i = rest.findIndex((v) => Math.abs(v - out.feedClose) < 0.006);
@@ -261,6 +263,8 @@ export function powerProb(c, others) {
   return qs[0] ** ((lo + hi) / 2);
 }
 
+const THREE_WAY_MARKET_RE = /^(?:c[oó]rners 1x2|tarjetas 1x2|m[aá]s c[oó]rners|m[aá]s tarjetas)/;
+
 /**
  * Outcomes a close must show to be de-vigged: 2 for a 1X2, 1 for a two-way line, 'dc' for a double chance.
  * @param {string} market
@@ -269,6 +273,10 @@ export function powerProb(c, others) {
 export function outcomesNeeded(market) {
   const m = String(market || '').trim().toLowerCase();
   if (m.startsWith('1x2')) return 2;
+  // Three-way corner and card markets (Grok's 'Córners 1X2', 'Más córners (equipo)', 'Tarjetas 1X2',
+  // 'Más tarjetas (3 vías)'): a close needs the draw and the other team (audit 2, 18 Nov 2026). As a
+  // two-way line the draw was read as the only other side and the fair probability came out far too high.
+  if (THREE_WAY_MARKET_RE.test(m)) return 2;
   if (m.startsWith('doble oportunidad')) return 'dc';
   return 1;
 }
@@ -491,4 +499,39 @@ export function measure(row, parsed) {
     need,
     hasTwoSidedClose: pvc != null,
   };
+}
+
+/**
+ * A Grok pick's same-book figures (review.py v1.1's load_grok): the opening is the book's own price in
+ * the notes (a segment that starts with the book) or in our verdict, never Grok's price in G, which is
+ * often another book's (Kambi) or Grok's own quote. Among the books with a two-sided close whose
+ * opening is within 30% of their close, the CLV book first, then the higher opening.
+ * Returns null when no book qualifies.
+ * @param {string} n notes @param {string} verdict column K @param {ParsedNotes} parsed
+ * @param {1 | 2 | 'dc'} need @param {string} sel
+ * @returns {{ book: string, open: number, close: number, clv: number, fev: number, margin: number } | null}
+ */
+export function grokSameBook(n, verdict, parsed, need, sel) {
+  const pre = String(n || '').split(/\|\s*[Cc]ierr[ea]:?\s+(?:Betano|Betsson|Stake)/)[0];
+  const openOf = (/** @type {string} */ book) => {
+    for (const seg of pre.split(' | ')) {
+      const m = new RegExp(String.raw`^\s*${book}\s+@?(${NUM})(?!\d|[.,]\d)`).exec(seg);
+      if (m) return fnum(m[1]);
+    }
+    const m = new RegExp(String.raw`${book}\s+(${NUM})(?!\d|[.,]\d)`).exec(verdict || '');
+    return m ? fnum(m[1]) : null;
+  };
+  /** @type {{ pref: boolean, open: number, book: string, close: number, cp: [number, number] }[]} */
+  const cands = [];
+  for (const b of BOOKS) {
+    const bk = parsed.bookCloses[b];
+    if (!bk) continue;
+    const o = openOf(b);
+    const cp = closeProb(bk.close, bk.others, bk.triple, need, sel);
+    if (o && cp && Math.abs(o / bk.close - 1) <= 0.3) cands.push({ pref: b === parsed.loggerClvBook, open: o, book: b, close: bk.close, cp });
+  }
+  if (!cands.length) return null;
+  cands.sort((a, b) => Number(b.pref) - Number(a.pref) || b.open - a.open);
+  const c = cands[0];
+  return { book: c.book, open: c.open, close: c.close, clv: c.open / c.close - 1, fev: c.open * c.cp[0] - 1, margin: c.cp[1] };
 }

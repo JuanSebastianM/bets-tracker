@@ -111,10 +111,10 @@
     {
       "n": 16, "slug": "rule-16", "title": "Sofascore AI is a contrast, never a filter",
       "short": "The Sofascore app's prediction is read as one more opinion, but it never decides a bet.",
-      "says": "The Sofascore AI is opened on every slate for context and its probability is recorded, but it never feeds the model, the blend, the stake or any filter. If a pick passes everything it is published even when the AI disagrees, with one line when they differ by 5 points or more. The one exception is rule 23, where the AI can only help lift a cap.",
+      "says": "The Sofascore AI is opened for each shortlisted pick, for context, and its probability is recorded; since 15 Nov 2026 it is no longer read for every match (lean run). It never feeds the model, the blend, the stake or any filter. If a pick passes everything it is published even when the AI disagrees, with one line when they differ by 5 points or more. The one exception is rule 23, where the AI can only help lift a cap.",
       "why": "Its numbers seem to track the market closely, so they add little information of their own.",
       "state": "in_force", "since": "2026-10-09",
-      "decisions": [3, 32, 33], "terms": ["sofascore-ai", "blend", "totals-gap"]
+      "decisions": [3, 32, 33, 125], "terms": ["sofascore-ai", "blend", "totals-gap"]
     },
     {
       "n": 17, "slug": "rule-17", "title": "Only what you confirm is logged",

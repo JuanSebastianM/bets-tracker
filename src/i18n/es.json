@@ -233,7 +233,9 @@
     "sinceApprox": "Cuenta los picks calificados con fecha desde el día de tu visita (la hoja no guarda la hora en que se califica).",
     "realNone": "Todavía no hay apuestas reales calificadas en este periodo.",
     "realAtPeak": "Las apuestas reales van {total} y están en su punto más alto.",
-    "realBelowPeak": "Las apuestas reales van {total}, {dd} por debajo de su mejor punto ({peak})."
+    "realBelowPeak": "Las apuestas reales van {total}, {dd} por debajo de su mejor punto ({peak}).",
+    "recordOne": "{label}: {record} a cuota media {price}, {profit} ({yield}) en 1 calificada.",
+    "sampleSmallOne": "Con 1 calificada todavía es muy pronto: el resultado puede ser pura varianza."
   },
   "pwa": {
     "updateReady": "Hay una versión nueva de la app.",

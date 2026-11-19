@@ -111,10 +111,10 @@
     {
       "n": 16, "slug": "rule-16", "title": "La IA de Sofascore es contraste, nunca filtro",
       "short": "La predicción de la app Sofascore se mira como una opinión más, pero nunca decide una apuesta.",
-      "says": "En cada slate se abre la IA de Sofascore para contexto y se anota su probabilidad, pero no entra al modelo, al blend, al stake ni a ningún filtro. Si un pick pasa todo, se publica aunque la IA no esté de acuerdo, con una línea cuando difieren 5 puntos o más. La única excepción es la regla 23, donde la IA solo puede ayudar a quitar un tope.",
+      "says": "La IA de Sofascore se abre para cada pick de la lista corta, como contexto, y se anota su probabilidad; desde el 15 nov 2026 ya no se lee en cada partido (corrida liviana). No entra al modelo, al blend, al stake ni a ningún filtro. Si un pick pasa todo, se publica aunque la IA no esté de acuerdo, con una línea cuando difieren 5 puntos o más. La única excepción es la regla 23, donde la IA solo puede ayudar a quitar un tope.",
       "why": "Sus números parecen seguir muy de cerca al mercado, así que aportan poca información propia.",
       "state": "in_force", "since": "2026-10-09",
-      "decisions": [3, 32, 33], "terms": ["sofascore-ai", "blend", "totals-gap"]
+      "decisions": [3, 32, 33, 125], "terms": ["sofascore-ai", "blend", "totals-gap"]
     },
     {
       "n": 17, "slug": "rule-17", "title": "Solo se registra lo que confirmas",
