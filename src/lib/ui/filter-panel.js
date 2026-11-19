@@ -12,6 +12,7 @@
 // Option counts are "how many picks this option would show with the other filters as they are"
 // (facetCounts); options that would show nothing are disabled, or hidden in the long lists.
 import { html, useMemo, useState, useEffect, useId } from '../../../vendor/preact.js';
+import { memoLast } from '../../data/memo.js';
 import { t, getLocale } from '../i18n.js';
 import { formatDate, formatPct, todayIn } from '../format.js';
 import { toast } from '../toast.js';
@@ -237,8 +238,10 @@ function TriState({ label, value, counts, onValue }) {
  */
 export function FilterPanel({ picks, filters: f, onChange, hide = [], today, testId = 'filter-panel' }) {
   const day = today || todayIn(APP_TIMEZONE);
-  const options = useMemo(() => filterOptions(picks), [picks]);
-  const counts = useMemo(() => facetCounts(picks, f, { today: day }), [picks, toQueryString(f), day]);
+  // Kept across openings of the sheet (memoLast): the counts of an unchanged filter are not redone.
+  const qs = toQueryString(f);
+  const options = useMemo(() => memoLast('filters.options', [picks], () => filterOptions(picks)), [picks]);
+  const counts = useMemo(() => memoLast('filters.counts', [picks, qs, day], () => facetCounts(picks, f, { today: day })), [picks, qs, day]);
   const [open, setOpen] = useState(() => {
     /** @type {Record<string, boolean>} */
     const o = {};

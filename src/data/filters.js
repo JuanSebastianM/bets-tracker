@@ -151,10 +151,10 @@ export function lastSlate(picks) {
 /** @param {number | null} v @param {Range} r */
 const inRange = (v, r) => (r.min == null || (v != null && v >= r.min)) && (r.max == null || (v != null && v <= r.max));
 
-/** @param {number | null} price @param {FilterState} f */
-function priceMatches(price, f) {
+/** @param {number | null} price @param {FilterState} f @param {(typeof PRICE_PRESETS)[number] | null} [preset] the preset, when already looked up */
+function priceMatches(price, f, preset) {
   if (f.pricePreset) {
-    const p = PRICE_PRESETS.find((x) => x.id === f.pricePreset);
+    const p = preset !== undefined ? preset : PRICE_PRESETS.find((x) => x.id === f.pricePreset);
     if (!p) return true;
     if (price == null) return false;
     if (p.min != null && (p.minInc ? price < p.min : price <= p.min)) return false;
@@ -166,6 +166,18 @@ function priceMatches(price, f) {
 
 const fold = (/** @type {string} */ s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
+/** The folded search text of each pick, built once per pick (picks are immutable once normalized). */
+const HAYSTACKS = new WeakMap();
+/** @param {Pick} p @returns {string} */
+function haystackOf(p) {
+  let h = HAYSTACKS.get(p);
+  if (h === undefined) {
+    h = fold(`${p.match} ${p.league} ${p.selection} ${p.marketRaw} ${p.tagRaw} ${p.notes}`);
+    HAYSTACKS.set(p, h);
+  }
+  return h;
+}
+
 /** The reference kind of a pick for the 'refs' filter. @param {Pick} p */
 export const refOf = (p) => p.parsed.ref || 'none';
 
@@ -176,9 +188,12 @@ export const refOf = (p) => p.parsed.ref || 'none';
  * @param {{ today: string, lastSlate?: string | null }} ctx
  */
 export function applyFilters(picks, f, ctx) {
-  const [from, to] = resolveDates(f, { lastSlate: lastSlate(picks), ...ctx });
+  // The last slate is a scan of every pick: only when the date filter needs it and the caller did not pass it.
+  const needsLast = !f.slate && f.datePreset === 'last_slate' && !('lastSlate' in ctx);
+  const [from, to] = resolveDates(f, needsLast ? { lastSlate: lastSlate(picks), ...ctx } : /** @type {any} */ (ctx));
   const q = f.q ? fold(f.q.trim()) : '';
   const words = q ? q.split(/\s+/) : [];
+  const preset = f.pricePreset ? PRICE_PRESETS.find((x) => x.id === f.pricePreset) || null : null;
   return picks.filter((p) => {
     if (f.sources.length && !f.sources.includes(p.source)) return false;
     if (f.tags.length && !f.tags.includes(p.tag)) return false;
@@ -187,7 +202,7 @@ export function applyFilters(picks, f, ctx) {
     if (f.leagues.length && !f.leagues.includes(p.league)) return false;
     if (f.books.length && !p.books.some((b) => f.books.includes(b))) return false;
     if (f.statuses.length && !f.statuses.includes(p.status)) return false;
-    if (!priceMatches(p.price, f)) return false;
+    if (!priceMatches(p.price, f, preset)) return false;
     if (from && p.date < from) return false;
     if (to && p.date > to) return false;
     if (f.hasClose != null && (p.closePrice != null) !== f.hasClose) return false;
@@ -202,7 +217,7 @@ export function applyFilters(picks, f, ctx) {
     if (f.lines && f.lines.length && !f.lines.includes(/** @type {string} */ (p.lineKey))) return false;
     if (f.passedAll != null && Boolean(p.parsed.passedAll) !== f.passedAll) return false;
     if (words.length) {
-      const hay = fold(`${p.match} ${p.league} ${p.selection} ${p.marketRaw} ${p.tagRaw} ${p.notes}`);
+      const hay = haystackOf(p);
       if (!words.every((w) => hay.includes(w))) return false;
     }
     return true;
@@ -402,8 +417,12 @@ export function facetCounts(picks, f, ctx) {
   // Text, EV and probability are never faceted: apply them once.
   const base = applyFilters(picks, { ...d, q: f.q, ev: f.ev, prob: f.prob }, c);
   const rest = { ...f, q: '', ev: d.ev, prob: d.prob };
+  // Leaving out a filter that is not set changes nothing: those counts come from the full result
+  // instead of another pass over every pick (same numbers, far less work with thousands of picks).
+  const filtered = applyFilters(base, rest, c);
+  const without = (/** @type {Partial<FilterState>} */ patch, /** @type {boolean} */ unset) => (unset ? filtered : applyFilters(base, { ...rest, ...patch }, c));
   /** @type {any} */
-  const out = { total: applyFilters(base, rest, c).length };
+  const out = { total: filtered.length };
   const tally = (/** @type {Pick[]} */ list, /** @type {(p: Pick) => Array<string | null>} */ get) => {
     /** @type {Record<string, number>} */
     const m = {};
@@ -411,22 +430,23 @@ export function facetCounts(picks, f, ctx) {
     return m;
   };
   for (const field of FACET_FIELDS) {
-    out[field] = tally(applyFilters(base, { ...rest, [field]: [] }, c), FACET_VALUES[field]);
+    const cur = /** @type {any} */ (rest)[field];
+    out[field] = tally(without({ [field]: [] }, !cur || !cur.length), FACET_VALUES[field]);
   }
-  const noPrice = applyFilters(base, { ...rest, pricePreset: null, price: d.price }, c);
+  const noPrice = without({ pricePreset: null, price: d.price }, !rest.pricePreset && rest.price.min == null && rest.price.max == null);
   out.pricePresets = Object.fromEntries(PRICE_PRESETS.map((p) => [p.id, applyFilters(noPrice, { ...d, pricePreset: p.id }, c).length]));
-  const noDate = applyFilters(base, { ...rest, datePreset: null, dateFrom: null, dateTo: null, slate: null }, c);
+  const noDate = without({ datePreset: null, dateFrom: null, dateTo: null, slate: null }, !rest.datePreset && !rest.dateFrom && !rest.dateTo && !rest.slate);
   out.datePresets = Object.fromEntries(
     DATE_PRESETS.map((id) => [id, id === 'since' && !f.dateFrom ? noDate.length : applyFilters(noDate, { ...d, datePreset: id, dateFrom: f.dateFrom }, c).length]),
   );
   out.slates = tally(noDate, (p) => [p.date]);
   for (const field of /** @type {const} */ (['hasClose', 'twoSidedClose'])) {
-    const list = applyFilters(base, { ...rest, [field]: null }, c);
+    const list = without({ [field]: null }, rest[field] == null);
     const yes = list.filter((p) => (field === 'hasClose' ? p.closePrice != null : p.hasTwoSidedClose)).length;
     out[field] = { yes, no: list.length - yes };
   }
   {
-    const list = applyFilters(base, { ...rest, passedAll: null }, c);
+    const list = without({ passedAll: null }, rest.passedAll == null);
     const yes = list.filter((p) => p.parsed.passedAll).length;
     out.passedAll = { yes, no: list.length - yes };
   }

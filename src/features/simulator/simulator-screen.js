@@ -15,7 +15,8 @@ import {
 import { MultiLineChart } from '../../lib/charts/index.js';
 import { formatUnits, formatPct, formatPrice, formatDate, formatMoney, todayIn } from '../../lib/format.js';
 import { APP_TIMEZONE } from '../../config.js';
-import { applyFilters, countActive, defaultFilters } from '../../data/filters.js';
+import { applyFilters, countActive, defaultFilters, toQueryString } from '../../data/filters.js';
+import { memoLast } from '../../data/memo.js';
 import { summarize } from '../../data/stats.js';
 import { useSettings, bankrollUnits } from '../../data/settings.js';
 import { simulate, defaultStaking, scenariosFromQuery, simulatorQueryString } from '../../data/simulate.js';
@@ -143,8 +144,10 @@ function Simulator({ data, query }) {
   const setFilters = (/** @type {FilterState} */ filters) => go({ ...a, filters }, b);
   const setStaking = (/** @type {Staking} */ staking) => go({ ...a, staking }, b);
 
-  const listA = useMemo(() => applyFilters(data.picks, a.filters, { today }), [data, qkey, today]);
-  const countA = useMemo(() => summarize(listA), [listA]);
+  // Keyed on the filters only (not the whole query): a stake change does not filter or count again.
+  const fqsA = toQueryString(a.filters);
+  const listA = useMemo(() => memoLast('simulator.listA', [data, fqsA, today], () => applyFilters(data.picks, a.filters, { today })), [data, fqsA, today]);
+  const countA = useMemo(() => memoLast('simulator.countA', [listA], () => summarize(listA)), [listA]);
   const simA = useMemo(() => simulate(listA, a.staking), [listA, JSON.stringify(a.staking)]);
   const active = countActive(a.filters);
 

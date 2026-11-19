@@ -15,6 +15,7 @@
     "fixture": "node scripts/make-fixture.mjs",
     "icons": "node scripts/make-icons.mjs",
     "screenshots": "SCREENSHOT_DIR=${SCREENSHOT_DIR:-/home/claude/review/foundation} node scripts/bin.mjs playwright test --config playwright.screenshots.config.js",
+    "perf:phone": "node scripts/perf-phone.mjs",
     "screenshots:readme": "README_SHOTS=1 node scripts/bin.mjs playwright test --config playwright.screenshots.config.js tests/e2e/readme-screenshots.spec.js"
   },
   "devDependencies": {

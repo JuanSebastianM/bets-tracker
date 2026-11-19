@@ -63,4 +63,33 @@ const versionPath = join(out, 'src', 'version.js');
 const versionSrc = readFileSync(versionPath, 'utf8');
 if (!versionSrc.includes("/* __APP_VERSION__ */ 'dev'")) throw new Error('src/version.js placeholder not found');
 writeFileSync(versionPath, versionSrc.replace("/* __APP_VERSION__ */ 'dev'", JSON.stringify(version)));
+// Slow phones (docs/PERFORMANCE.md): every module the app imports at start is announced in the HTML,
+// so the browser fetches them all at once instead of discovering them one import level at a time
+// (each level is a round trip, about half a second on 3G). The modules are the static import graph
+// of src/main.js; the strings fetched at start are preloaded too.
+{
+  /** @type {Set<string>} */
+  const graph = new Set();
+  const visit = (/** @type {string} */ rel) => {
+    if (graph.has(rel)) return;
+    graph.add(rel);
+    const src = readFileSync(join(out, rel), 'utf8');
+    for (const m of src.matchAll(/(?:^|\n)\s*(?:import|export)\s[^'"]*?from\s*['"](\.{1,2}\/[^'"]+)['"]|(?:^|\n)\s*import\s*['"](\.{1,2}\/[^'"]+)['"]/g)) {
+      const spec = m[1] || m[2];
+      visit(relative(out, resolve(join(out, rel, '..'), spec)).replaceAll('\\', '/'));
+    }
+  };
+  visit('src/main.js');
+  const strings = files.filter((f) => /^src\/(i18n|features\/[^/]+\/i18n)\/(es|en)\.json$/.test(f));
+  const links = [
+    ...[...graph].filter((f) => f !== 'src/main.js' && f !== 'vendor/preact.js').sort().map((f) => `<link rel="modulepreload" href="${f}" />`),
+    ...strings.map((f) => `<link rel="preload" href="${f}" as="fetch" crossorigin="anonymous" />`),
+  ];
+  const indexPath = join(out, 'index.html');
+  const index = readFileSync(indexPath, 'utf8');
+  const anchor = '<link rel="modulepreload" href="vendor/preact.js" />';
+  if (!index.includes(anchor)) throw new Error('index.html modulepreload anchor not found');
+  writeFileSync(indexPath, index.replace(anchor, `${anchor}\n    ${links.join('\n    ')}`));
+  console.log(`index.html: ${graph.size - 2} module preloads, ${strings.length} string preloads`);
+}
 console.log(`Built ${out}: ${files.length} files, service worker ${version}`);
