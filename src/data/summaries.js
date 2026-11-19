@@ -18,7 +18,7 @@ import { MIN_N_FOR_RATE } from './stats.js';
  */
 export function describeRecord(label, s) {
   if (!s.n) return t('summaries.noGraded', { label, count: s.pending, pending: s.pending });
-  let out = t('summaries.record', {
+  let out = t(s.n === 1 ? 'summaries.recordOne' : 'summaries.record', {
     label,
     record: formatRecord(s),
     price: formatPrice(s.avgPrice, { average: true }),
@@ -85,7 +85,7 @@ export const SAMPLE_MEDIUM = 100;
  */
 export function describeSampleSize(n) {
   if (!n) return '';
-  if (n < SAMPLE_SMALL) return t('summaries.sampleSmall', { n });
+  if (n < SAMPLE_SMALL) return t(n === 1 ? 'summaries.sampleSmallOne' : 'summaries.sampleSmall', { n });
   if (n < SAMPLE_MEDIUM) return t('summaries.sampleMedium', { n });
   return t('summaries.sampleLarge', { n });
 }

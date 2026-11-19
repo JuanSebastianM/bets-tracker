@@ -66,6 +66,8 @@ const EV_JUSTA_RE = new RegExp(String.raw`^EV justa\s+([+\-−]?${NUM})\s*%(?:\s
 const FEED_PRICE_RE = new RegExp(String.raw`(?<![\w])feed\s+(${NUM})(?![\d.,:/])`, 'g');
 const FEED_CLOSE_RE = new RegExp(String.raw`cierre:\s*Sofascore/bet365\s+(?:(?:1X|X2|12)\s+)?(${NUM})(?:\s*\(([^)]*)\))?`);
 const THREE_WAY_RE = new RegExp(String.raw`^\s*1\s+(${NUM})\s*/\s*X\s+(${NUM})\s*/\s*2\s+(${NUM})`);
+/** Double-chance close written as its three prices: '(1X 1.615 / X2 1.40 / 12 1.286)'. */
+const DC_THREE_RE = new RegExp(String.raw`^\s*1X\s+(${NUM})\s*/\s*X2\s+(${NUM})\s*/\s*12\s+(${NUM})`);
 const FEED_OPEN_RE = new RegExp(String.raw`(?<!1X2 )apertura feed\s+(${NUM})\s*\(otro lado\s+(${NUM})(;\s*invertida\?)?`);
 const FEED_SOURCE_RE = new RegExp(String.raw`Precio feed Sofascore|(?:^|\|\s*)bet365 feed(?:\s*\||\s*$|\.|\s+${NUM})`);
 const PIN_RE = new RegExp(String.raw`\bpin (${NUM})/(${NUM})/(${NUM}) \(([^)]+)\)(?:\s*\|\s*pin id ([0-9a-f]+))?`);
@@ -173,7 +175,7 @@ export function parseFeed(n, need = 1) {
     out.feedClose = fnum(m[1]);
     const inner = m[2] || '';
     out.feedTriple = triple(inner);
-    const three = THREE_WAY_RE.exec(inner);
+    const three = THREE_WAY_RE.exec(inner) || DC_THREE_RE.exec(inner);
     if (three) {
       const rest = [fnum(three[1]), fnum(three[2]), fnum(three[3])];
       const i = rest.findIndex((v) => Math.abs(v - out.feedClose) < 0.006);
