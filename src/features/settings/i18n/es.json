@@ -50,7 +50,7 @@
   "feedUrl": "Script de la hoja",
   "feedUrlSet": "Configurado",
   "feedUrlUnset": "Sin configurar",
-  "scriptVersion": "Script de la hoja",
+  "scriptVersion": "Versión del script del feed",
   "scriptDeployed": "Versión en la hoja",
   "scriptExpected": "Versión que espera la app",
   "scriptNone": "sin versión (script anterior)",

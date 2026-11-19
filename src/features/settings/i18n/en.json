@@ -50,7 +50,7 @@
   "feedUrl": "Sheet script",
   "feedUrlSet": "Configured",
   "feedUrlUnset": "Not configured",
-  "scriptVersion": "Sheet script",
+  "scriptVersion": "Feed script version",
   "scriptDeployed": "Version in the sheet",
   "scriptExpected": "Version the app expects",
   "scriptNone": "no version (older script)",
