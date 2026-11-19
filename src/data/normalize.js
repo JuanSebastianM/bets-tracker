@@ -2,7 +2,7 @@
 // (docs/DATA_CONTRACT.md section 4); everything else derives from it with pure functions.
 
 import { classifyGrok, classifyShadow, marketFamily, reviewClass, sideOf, booksInReason, BOOKS } from './tags.js';
-import { measure, parseNotes } from './notes.js';
+import { grokSameBook, measure, parseNotes } from './notes.js';
 import { parseLine } from './lines.js';
 
 /** @typedef {import('./types').Pick} Pick */
@@ -138,6 +138,19 @@ function fromGrok(r) {
   const m = measure(base, parsed);
   const src = parsed.priceSource;
   const own = src && parsed.bookCloses[src] ? parsed.bookCloses[src].close : null;
+  // Grok's G is Grok's quote, not necessarily a price at the book whose close is noted: the measures
+  // against the close use that book's own opening (review.py's load_grok; rule 34), and no bet365 feed
+  // fallback (a book price is never compared with another source's close). Audit 2, 18 Nov 2026.
+  const sb = grokSameBook(notes, verdict, parsed, m.need, str(r.selection));
+  const gm = {
+    fairCloseEv: sb ? sb.fev : null,
+    closeSource: sb ? /** @type {const} */ ('same_book') : null,
+    clv: sb ? sb.clv : null,
+    clvSource: sb ? /** @type {const} */ ('own') : null,
+    openingFairEv: sb ? sb.fev : null,
+    closeMargin: sb ? sb.margin : null,
+    hasTwoSidedClose: !!sb,
+  };
   return /** @type {Pick} */ ({
     ...common('grok', r),
     time: str(r.time) || null,
@@ -151,11 +164,12 @@ function fromGrok(r) {
     probAI: null,
     ev: null,
     fairOdds: null,
-    closePrice: own ?? (parsed.close ? parsed.close.price : null),
+    closePrice: sb ? sb.close : own ?? (parsed.close ? parsed.close.price : null),
     notes,
     parsed,
     ...m,
-    extra: { reason: str(r.reason) || null, verdict: verdict || null, minPrice: num(r.minPrice), result: str(r.result) || null },
+    ...gm,
+    extra: { grokOpen: sb ? sb.open : null, grokBook: sb ? sb.book : null, reason: str(r.reason) || null, verdict: verdict || null, minPrice: num(r.minPrice), result: str(r.result) || null },
   });
 }
 
