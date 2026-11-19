@@ -55,5 +55,6 @@
   "stakingTitle": "Staking rules (Reglas tab)",
   "stakingSub": "As written in the sheet, with their own numbering. Tap “What it means” for the explanation.",
   "sheetRuleN": "Rule {n} of the Reglas tab",
-  "whatItMeans": "What it means"
+  "whatItMeans": "What it means",
+  "monthPart": "{total} ({shown} on this page)"
 }

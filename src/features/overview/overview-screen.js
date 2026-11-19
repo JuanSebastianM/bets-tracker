@@ -4,24 +4,24 @@
 import { html, useMemo, useEffect, useState } from '../../../vendor/preact.js';
 import { t, useLocale } from '../../lib/i18n.js';
 import { href, navigate } from '../../lib/router.js';
-import { Card, Stat, Scoreboard, FeedGate, SegmentedControl, Chip, Button, Icon, TagGlossaryLinks, VerdictChip } from '../../lib/ui/index.js';
+import { Card, Stat, Scoreboard, FeedGate, SegmentedControl, Chip, Button, Icon, TagGlossaryLinks, VerdictChip, Term } from '../../lib/ui/index.js';
 import { MARKET_SLUGS } from '../../lib/glossary-links.js';
 import { Sparkline, LineChart } from '../../lib/charts/index.js';
 import { formatPct, formatUnits, formatPrice, formatRecord, formatDate, formatAgo, todayIn } from '../../lib/format.js';
 import { readJSON, writeJSON } from '../../lib/storage.js';
 import { APP_TIMEZONE } from '../../config.js';
-import { defaultFilters, toQueryString, resolveDates } from '../../data/filters.js';
+import { defaultFilters, toQueryString, resolveDates, exactSlice } from '../../data/filters.js';
 import { tagLabel } from '../../data/tags.js';
 import { useSettings, updateSettings, settingsStore, bankrollUnits } from '../../data/settings.js';
 import {
   SOURCES, PERIODS, VERDICT_MIN_N, periodFromQuery, periodFilter, picksInPeriod, lastGradedSlate, closeVerdict, shadowTagRows,
   shadowMarketRows, bestWorst, rangeAxis, axisPct, sourceSummary, cumulativeUnits, realBetsExtras, slateReport, upcomingPending,
-  overduePending, visitSnapshot, sinceLastVisit, shadowTagLineRows,
+  overduePending, visitSnapshot, sinceLastVisit, shadowTagLineRows, reviewFairEv, shadowTagReviewEv, realStakeShape, pendingSlateLink,
 } from '../../data/overview.js';
 import { lineLabel } from '../../data/lines.js';
 import {
-  describeSource, describeResultsVsClose, describeBestWorst, describeLastSlate, describePending, describeSinceVisit, describeRealBets,
-  verdictLabel,
+  describeResultsVsClose, describeBestWorst, describeLastSlate, describePending, describeSinceVisit, describeRealBets,
+  verdictLabel, describeSourceFull,
 } from '../../data/summaries.js';
 
 /** @typedef {import('../../data/types').Pick} Pick */
@@ -94,6 +94,11 @@ function qs(/** @type {Partial<import('../../data/filters.js').FilterState>} */ 
 function SourceCard({ source, picks, periodPart }) {
   const mine = useMemo(() => picks.filter((p) => p.source === source), [picks, source]);
   const s = useMemo(() => sourceSummary(mine, source), [mine, source]);
+  // Sombra: the reviewer's fair-close EV beside price vs close (the number of Juan's reviews).
+  const review = useMemo(() => (source === 'shadow' ? reviewFairEv(mine) : null), [mine, source]);
+  // Real bets: uneven stakes and free bets, so the hit rate is not set against a flat break-even.
+  const shape = useMemo(() => (source === 'bets' ? realStakeShape(mine) : null), [mine, source]);
+  const flatBreakEven = !shape || (!shape.uneven && !shape.freeBets);
   const curve = useMemo(() => cumulativeUnits(mine).map((p) => p.cum), [mine]);
   const verdict = closeVerdict(s.fairCloseEv);
   const label = t(`sources.${source}`);
@@ -112,21 +117,31 @@ function SourceCard({ source, picks, periodPart }) {
       <${Stat}
         label=${t('overview.hit')}
         value=${formatPct(s.hitRate, { sign: false })}
-        sub=${s.breakEven != null ? `${t('overview.needs', { be: formatPct(s.breakEven, { sign: false }) })} · n ${s.n}` : `n ${s.n}`}
+        sub=${s.breakEven != null && flatBreakEven ? `${t('overview.needs', { be: formatPct(s.breakEven, { sign: false }) })} · n ${s.n}` : `n ${s.n}`}
       />
       <${Stat}
         label=${t('stats.fairCloseEv')}
         value=${formatPct(e.mean)}
         sub=${e.lo != null ? `${t('overview.evRange', { lo: formatPct(e.lo), hi: formatPct(e.hi) })} · n ${e.n}` : t('stats.nClose', { n: e.n })}
+        testId=${`price-close-${source}`}
       />
+      ${review
+        ? html`<${Stat}
+            label=${t('stats.openingFairEv')}
+            value=${formatPct(review.mean)}
+            sub=${review.lo != null ? `${t('overview.evRange', { lo: formatPct(review.lo), hi: formatPct(review.hi) })} · n ${review.n}` : `n ${review.n}`}
+            testId=${`review-ev-${source}`}
+          />`
+        : null}
       <${Stat} label=${t('stats.pending')} value=${s.pending} tone=${s.pending ? 'pending' : 'plain'} />
       <div class="ov-verdict-stat">
         <div class="stat-label">${t('overview.verdict')}</div>
         <${VerdictChip} v=${verdict} />
       </div>
     </div>
-    <p class="ov-text" data-testid=${`summary-${source}`}>${describeSource(label, s, verdict)}</p>
-    <a class="link-btn ov-link" href=${href(`/explorer?${qs({ ...periodPart, sources: [source] })}`)}>${t('overview.seePicks')}</a>
+    <p class="ov-text" data-testid=${`summary-${source}`}>${describeSourceFull(label, s, verdict, { shape: shape || undefined, reviewEv: review || undefined })}</p>
+    <a class="link-btn ov-link" href=${href(`/explorer?${qs({ ...periodPart, sources: [source] })}`)} data-testid=${`source-link-${source}`}
+      data-count=${mine.length}>${t('overview.seePicksN', { count: mine.length, n: mine.length })}</a>
   </${Card}>`;
 }
 
@@ -147,8 +162,8 @@ function LineRows({ label, rows, linkOf, tag }) {
         const line = lineLabel(r.key, { scope: scoped });
         const ev = e.n ? t('overview.lines.evN', { ev: formatPct(e.mean), n: e.n }) : t('overview.lines.noClose');
         return html`<li key=${r.key}>
-          <a class="ov-lrow" href=${linkOf(r.key)} data-key=${r.key}
-            aria-label=${t('overview.lines.rowLabel', { line, n: s.n, record: formatRecord(s), yield: formatPct(s.yield), ev, verdict: verdictLabel(r.verdict) })}>
+          <a class="ov-lrow" href=${linkOf(r.key)} data-key=${r.key} data-count=${s.n}
+            aria-label=${`${t('overview.lines.rowLabel', { line, n: s.n, record: formatRecord(s), yield: formatPct(s.yield), ev, verdict: verdictLabel(r.verdict) })}. ${t('overview.tags.rowLink', { count: s.n, n: s.n })}`}>
             <span class="ov-lname">${line}</span>
             <span class="ov-lmeta num">${t('overview.tags.meta', { n: s.n, record: formatRecord(s), yield: formatPct(s.yield) })}</span>
             <span class="ov-lev num">${ev}</span>
@@ -161,10 +176,13 @@ function LineRows({ label, rows, linkOf, tag }) {
 }
 
 /**
+ * Every row links to exactly the picks it counts (graded, priced, no PUBLICADA Y APOSTADA: exactSlice),
+ * and its accessible name says how many the link opens.
  * @param {{ rows: GroupRow[], labelOf: (k: string) => string, linkOf: (k: string) => string, testId: string, compact?: boolean,
- *   linesOf?: Record<string, GroupRow[]>, lineLinkOf?: (k: string, lineKey: string) => string }} props
+ *   linesOf?: Record<string, GroupRow[]>, lineLinkOf?: (k: string, lineKey: string) => string,
+ *   reviewOf?: Record<string, import('../../data/stats.js').MeanStat> }} props
  */
-function GroupTable({ rows, labelOf, linkOf, testId, compact = false, linesOf, lineLinkOf }) {
+function GroupTable({ rows, labelOf, linkOf, testId, compact = false, linesOf, lineLinkOf, reviewOf }) {
   const axis = rangeAxis(rows);
   const zero = axisPct(0, axis);
   if (!rows.length) return html`<p class="ov-muted">${t('overview.tags.empty')}</p>`;
@@ -175,6 +193,7 @@ function GroupTable({ rows, labelOf, linkOf, testId, compact = false, linesOf, l
         const s = r.summary;
         const e = s.fairCloseEv;
         const label = labelOf(r.key);
+        const rv = reviewOf ? reviewOf[r.key] : null;
         const aria = t('overview.tags.rowLabel', {
           label,
           verdict: verdictLabel(r.verdict),
@@ -183,10 +202,12 @@ function GroupTable({ rows, labelOf, linkOf, testId, compact = false, linesOf, l
           n: s.n,
           ev: e.n ? formatPct(e.mean) : t('overview.tags.noClose'),
           nClose: e.n,
+          review: rv && rv.n ? ` ${t('overview.tags.reviewLabel', { ev: formatPct(rv.mean), n: rv.n })}` : '',
+          link: t('overview.tags.rowLink', { count: s.n, n: s.n }),
         });
         const hasRange = e.lo != null && e.hi != null;
         return html`<li key=${r.key}>
-          <a class="ov-grow" href=${linkOf(r.key)} aria-label=${aria} data-key=${r.key}>
+          <a class="ov-grow" href=${linkOf(r.key)} aria-label=${aria} data-key=${r.key} data-count=${s.n}>
             <span class="ov-gname">${label}</span>
             <span class="ov-gmeta num">${t('overview.tags.meta', { n: s.n, record: formatRecord(s), yield: formatPct(s.yield) })}</span>
             <span class="ov-gbar" aria-hidden="true">
@@ -198,6 +219,7 @@ function GroupTable({ rows, labelOf, linkOf, testId, compact = false, linesOf, l
             </span>
             <span class="ov-gev num">
               ${e.n ? html`<b>${t('overview.tags.ev', { ev: formatPct(e.mean) })}</b> <span>${t('overview.tags.evN', { n: e.n })}</span>` : html`<span>${t('overview.tags.noClose')}</span>`}
+              ${rv && rv.n ? html`<span class="ov-grev">${t('overview.tags.reviewShort', { ev: formatPct(rv.mean), n: rv.n })}</span>` : null}
             </span>
             <span class="ov-gverdict"><${VerdictChip} v=${r.verdict} /></span>
             <${Icon} name="chevron-right" size=${16} />
@@ -215,8 +237,8 @@ function GroupTable({ rows, labelOf, linkOf, testId, compact = false, linesOf, l
 
 const MAX_PENDING_SHOWN = 6;
 
-/** @param {{ groups: ReturnType<typeof upcomingPending>, today: string, overdue: number }} props */
-function PendingCard({ groups, today, overdue }) {
+/** @param {{ groups: ReturnType<typeof upcomingPending>, today: string, overdue: number, all: Pick[] }} props */
+function PendingCard({ groups, today, overdue, all }) {
   return html`<${Card} title=${t('overview.pending.title')} testId="overview-pending">
     ${!groups.length ? html`<p class="ov-muted">${t('overview.pending.empty')}</p>` : null}
     ${groups.map(
@@ -236,9 +258,12 @@ function PendingCard({ groups, today, overdue }) {
             </li>`,
           )}
         </ul>
-        <a class="link-btn ov-link" href=${href(`/explorer?${qs({ slate: g.date, statuses: ['pending'] })}`)}>
-          ${g.picks.length > MAX_PENDING_SHOWN ? `${t('overview.pending.more', { count: g.picks.length - MAX_PENDING_SHOWN, n: g.picks.length - MAX_PENDING_SHOWN })} · ` : ''}${t('overview.pending.seeAll', { count: g.picks.length, n: g.picks.length })}
-        </a>
+        ${(() => {
+          const link = pendingSlateLink(all, g.date);
+          return html`<a class="link-btn ov-link" href=${href(`/explorer?${toQueryString(link.filter)}`)} data-count=${link.count} data-testid="pending-link">
+            ${g.picks.length > MAX_PENDING_SHOWN ? `${t('overview.pending.more', { count: g.picks.length - MAX_PENDING_SHOWN, n: g.picks.length - MAX_PENDING_SHOWN })} · ` : ''}${t('overview.pending.seeAll', { count: link.count, n: link.count })}
+          </a>`;
+        })()}
       </div>`,
     )}
     ${overdue ? html`<p class="ov-muted">${t('overview.pending.overdue', { count: overdue, n: overdue })}</p>` : null}
@@ -330,6 +355,7 @@ function Overview({ data, query }) {
   const picks = useMemo(() => picksInPeriod(all, period, { today }), [all, period, today]);
   const tagRows = useMemo(() => shadowTagRows(picks), [picks]);
   const tagLines = useMemo(() => shadowTagLineRows(picks), [picks]);
+  const tagReview = useMemo(() => shadowTagReviewEv(picks), [picks]);
   const marketRows = useMemo(() => shadowMarketRows(picks), [picks]);
   const summaries = useMemo(() => SOURCES.map((source) => ({ source, summary: sourceSummary(picks, source) })), [picks]);
   const lastSlate = useMemo(() => slateReport(all, lastGradedSlate(all)), [all]);
@@ -353,7 +379,12 @@ function Overview({ data, query }) {
       ? t('overview.period.allTime')
       : periodPart.slate
         ? t('overview.period.slateOf', { date: formatDate(periodPart.slate, 'medium') })
-        : t('overview.period.range', { from: formatDate(from, 'short'), to: formatDate(to, 'short') });
+        : to == null
+          ? t('overview.period.rolling', { from: formatDate(from, 'short') })
+          : t('overview.period.range', { from: formatDate(from, 'short'), to: formatDate(to, 'short') });
+  // Row links open exactly the picks a row counts (graded, priced, no PUBLICADA Y APOSTADA).
+  const exactHref = (/** @type {Partial<import('../../data/filters.js').FilterState>} */ patch) =>
+    href(`/explorer?${toQueryString(exactSlice(all, { ...defaultFilters(), ...periodPart, sources: ['shadow'] }, patch, { today }))}`);
 
   return html`
     <div class="ov-period" data-testid="overview-period">
@@ -383,16 +414,21 @@ function Overview({ data, query }) {
       ${SOURCES.map((src) => html`<${SourceCard} key=${src} source=${src} picks=${picks} period=${period} periodPart=${periodPart} />`)}
     </div>
 
-    <${PendingCard} groups=${pendingGroups} today=${today} overdue=${overdue} />
+    <${PendingCard} groups=${pendingGroups} today=${today} overdue=${overdue} all=${all} />
 
     <${Card} title=${t('overview.tags.title')} subtitle=${t('overview.tags.sub', { min: VERDICT_MIN_N })} testId="overview-tags">
+      <p class="ov-legend" data-testid="overview-tags-legend">
+        <${Term} slug="price-vs-close">${t('stats.fairCloseEv')}</${Term}>${t('overview.tags.legendPrice')}
+        <${Term} slug="fair-ev-review">${t('stats.openingFairEv')}</${Term}>${t('overview.tags.legendReview')}
+      </p>
       <${GroupTable}
         rows=${tagRows}
         labelOf=${(/** @type {string} */ k) => tagLabel(/** @type {any} */ (k))}
-        linkOf=${(/** @type {string} */ k) => href(`/explorer?${qs({ ...periodPart, sources: ['shadow'], tags: [k] })}`)}
+        linkOf=${(/** @type {string} */ k) => exactHref({ tags: [k] })}
         testId="tag-table"
         linesOf=${tagLines}
-        lineLinkOf=${(/** @type {string} */ k, /** @type {string} */ lk) => href(`/explorer?${qs({ ...periodPart, sources: ['shadow'], tags: [k], lines: [lk] })}`)}
+        lineLinkOf=${(/** @type {string} */ k, /** @type {string} */ lk) => exactHref({ tags: [k], lines: [lk] })}
+        reviewOf=${tagReview}
       />
       <${TagGlossaryLinks} tags=${tagRows.map((r) => r.key)} testId="overview-tag-glossary" />
     </${Card}>
@@ -401,7 +437,7 @@ function Overview({ data, query }) {
       <${GroupTable}
         rows=${marketRows}
         labelOf=${(/** @type {string} */ k) => t(`markets.${k}`)}
-        linkOf=${(/** @type {string} */ k) => href(`/explorer?${qs({ ...periodPart, sources: ['shadow'], markets: [k] })}`)}
+        linkOf=${(/** @type {string} */ k) => exactHref({ markets: [k] })}
         testId="market-table"
         compact
       />
@@ -412,7 +448,7 @@ function Overview({ data, query }) {
     <${RealBetsCard} bets=${bets} bankrollU=${bankrollU} />
 
     <nav class="ov-links" aria-label=${t('overview.links.title')} data-testid="overview-links">
-      <${Button} variant="primary" icon="explorer" href=${withPeriod('/explorer')}>${t('overview.links.picks')}</${Button}>
+      <${Button} variant="primary" icon="explorer" href=${withPeriod('/explorer')} data-testid="quick-picks" data-count=${picks.length}>${t('overview.links.picksN', { count: picks.length, n: picks.length })}</${Button}>
       <${Button} icon="simulator" href=${withPeriod('/simulator')}>${t('overview.links.simulate')}</${Button}>
       <${Button} icon="tests" href=${withPeriod('/tests')}>${t('overview.links.tests')}</${Button}>
     </nav>

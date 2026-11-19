@@ -14,7 +14,8 @@
     "last_slate": "Last slate",
     "slateOf": "Slate of {date}",
     "range": "From {from} to {to}",
-    "allTime": "Since the first pick"
+    "allTime": "Since the first pick",
+    "rolling": "From {from} on, upcoming slates included"
   },
   "brief": {
     "title": "In short",
@@ -31,16 +32,21 @@
   "evRange": "{lo} to {hi}",
   "tags": {
     "title": "Shadow by tag",
-    "sub": "1u on each pick. Ranked by EV against the close; under {min} closes the verdict is “too early”.",
+    "sub": "1u on each pick. Ranked by price vs close; under {min} closes the verdict is “too early”.",
     "markets": "Shadow by market",
     "marketsSub": "The same figures, grouped by market type.",
-    "rowLabel": "{label}: {verdict}. {record}, yield {yield}, n {n}. EV against the close {ev}, n {nClose}. Open in the Explorer.",
+    "rowLabel": "{label}: {verdict}. {record}, yield {yield}, n {n}. Price vs close {ev}, n {nClose}.{review} {link}",
     "meta": "n {n} · {record} · yield {yield}",
-    "ev": "EV {ev}",
+    "ev": "{ev}",
     "evN": "n {n}",
     "noClose": "no close",
     "empty": "No graded Shadow picks in this period.",
-    "axis": "Scale from {min} to {max}; the line is zero."
+    "axis": "Scale from {min} to {max}; the line is zero.",
+    "reviewLabel": "Fair-close EV (review) {ev}, n {n}.",
+    "reviewShort": "Fair-close EV (review) {ev} · n {n}",
+    "rowLink": {"one": "Opens its graded pick in the Explorer.", "other": "Opens its {n} graded picks in the Explorer."},
+    "legendPrice": ": the figure and the bar (the mean with its ±2 standard error range, against each pick’s close). ",
+    "legendReview": ": below, in grey, the figure of the Sombra reviews (the opening against the close at its own source)."
   },
   "pending": {
     "title": "Today and pending",
@@ -55,8 +61,8 @@
     "title": "Real bets",
     "sub": "With the profit the sheet records (it knows about free bets and odd settlements).",
     "chart": "Cumulative units per day of the real bets: {total} at the end, worst drop {dd}.",
-    "currentDd": "Below the peak",
-    "maxDd": "Worst drop",
+    "currentDd": "Below the peak (by day)",
+    "maxDd": "Worst drop (by day)",
     "ofBank": "{pct} of your bankroll",
     "noBank": "Set your bankroll in Settings to see it in %",
     "avgStake": "Average stake",
@@ -72,7 +78,8 @@
     "title": "Keep looking",
     "picks": "See all picks",
     "simulate": "Simulate",
-    "tests": "Tests"
+    "tests": "Tests",
+    "picksN": {"one": "See the pick", "other": "See the {n} picks"}
   },
   "lines": {
     "summary": {
@@ -80,8 +87,9 @@
       "other": "By line · {n} lines"
     },
     "title": "By line in {label}",
-    "evN": "EV {ev} (n {n})",
+    "evN": "Price vs close {ev} (n {n})",
     "noClose": "no close",
     "rowLabel": "{line}: n {n}, {record}, yield {yield}, {ev}, {verdict}"
-  }
+  },
+  "seePicksN": {"one": "See its pick in the Explorer", "other": "See its {n} picks in the Explorer"}
 }

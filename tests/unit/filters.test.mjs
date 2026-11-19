@@ -30,7 +30,7 @@ test('date presets and slate', () => {
   assert.deepEqual(f({ datePreset: 'since', dateFrom: '2026-11-10' }), ['2026-11-10', '2026-11-15']);
   assert.deepEqual(f({ dateFrom: '2026-11-01', dateTo: '2026-11-09' }), ['2026-11-01', '2026-11-09']);
   assert.deepEqual(f({ slate: '2026-11-10' }), ['2026-11-10']);
-  assert.deepEqual(resolveDates({ ...defaultFilters(), datePreset: '30d' }, ctx), ['2026-10-17', '2026-11-15']);
+  assert.deepEqual(resolveDates({ ...defaultFilters(), datePreset: '30d' }, ctx), ['2026-10-17', null]); // rolling: no end (round 2)
 });
 
 test('lists, close flags, refs, sample, FUERZA, reasons, ranges and text search', () => {

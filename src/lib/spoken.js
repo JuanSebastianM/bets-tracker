@@ -2,7 +2,7 @@
 // figure stays as it is; these strings go into sr-only text or an aria-label next to it.
 //
 //   spokenRecord({ won: 7, lost: 10, void: 2 })   '7 ganadas, 10 perdidas, 2 nulas'
-//   spokenRecord({ won: 15, lost: 19, void: 0, halfWon: 1 })  '15 ganadas, 19 perdidas, 1 media'
+//   spokenRecord({ won: 15, lost: 19, void: 0, halfWon: 1 })  '15 ganadas, 19 perdidas, 1 medio ganada'
 import { t } from './i18n.js';
 
 /**
@@ -18,7 +18,10 @@ export function spokenRecord(s) {
   if (!won && !lost && !voids && !halves) return t('a11y.recordEmpty');
   const parts = [t('a11y.won', { count: won, n: won }), t('a11y.lost', { count: lost, n: lost })];
   if (voids) parts.push(t('a11y.void', { count: voids, n: voids }));
-  if (halves) parts.push(t('a11y.halves', { count: halves, n: halves }));
+  // Half results by kind, in the sheet's own words (Medio ganada / Medio perdida): "1 media" alone said
+  // neither which way it went nor that it was not "a half" of something (round 2).
+  if (s.halfWon) parts.push(t('a11y.halfWon', { count: s.halfWon, n: s.halfWon }));
+  if (s.halfLost) parts.push(t('a11y.halfLost', { count: s.halfLost, n: s.halfLost }));
   return parts.join(', ');
 }
 

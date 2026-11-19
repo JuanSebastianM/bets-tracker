@@ -9,7 +9,7 @@
   "rangeCol": "Range (±2 SE)",
   "noClose": "no closes",
   "yieldShort": "yield {v}",
-  "evShort": "EV {v}",
+  "evShort": "Price vs close {v}",
   "pendingN": "{n} pending",
   "smallTag": "small n",
   "smallRow": "Sample below the minimum you chose: take it as a hint, not a result.",
@@ -18,7 +18,7 @@
   "minNValue": "{n} graded",
   "dirAsc": "Ascending",
   "dirDesc": "Descending",
-  "measure": { "ev": "EV vs close", "yield": "Yield" },
+  "measure": { "ev": "Price vs close", "yield": "Yield" },
   "dim": {
     "tag": "Tag",
     "market": "Market type",
@@ -41,7 +41,7 @@
     "natural": "Own order",
     "n": "Most graded",
     "yield": "Yield",
-    "ev": "EV vs close",
+    "ev": "Price vs close",
     "units": "Units",
     "edge": "Hit rate over break-even",
     "label": "Name"
@@ -54,7 +54,7 @@
     "hit": "Hit / needed",
     "yield": "Yield",
     "units": "Units",
-    "ev": "EV vs close",
+    "ev": "Price vs close",
     "verdict": "Verdict"
   },
   "bd": {
@@ -66,7 +66,7 @@
     "chartTitle": "{measure} by {dim}",
     "chartSummary": { "one": "{measure} by {dim}: {k} group, with its ±2 standard error range.", "other": "{measure} by {dim}: {k} groups, each with its ±2 standard error range." },
     "chartTop": "The chart shows the first {n} of {total} groups in list order.",
-    "axisEv": "EV vs close",
+    "axisEv": "Price vs close",
     "axisYield": "yield at 1u",
     "groupsTitle": "Groups by {dim}",
     "groupsSub": "Tap a group to see all its figures and open its picks in the Explorer.",
@@ -111,12 +111,12 @@
   },
   "cl": {
     "title": "Price against the close",
-    "sub": "EV vs close: the price taken against the margin-free closing probability. It is the measure that does not depend on the luck of the result.",
+    "sub": "Price vs close: the price taken against the margin-free closing probability. It is the measure that does not depend on the luck of the result.",
     "range": "Likely range",
     "rangeSub": "±2 standard errors",
     "beat": "Beat the close",
     "beatShort": "{v} beat it",
-    "histSummary": { "one": "Distribution of EV vs close: {n} pick, mean {mean}.", "other": "Distribution of EV vs close: {n} picks, mean {mean}. Right of the line, picks that beat the margin-free close." },
+    "histSummary": { "one": "Distribution of price vs close: {n} pick, mean {mean}.", "other": "Distribution of price vs close: {n} picks, mean {mean}. Right of the line, picks that beat the margin-free close." },
     "clvTitle": "Raw CLV (context)",
     "clvSummary": { "one": "Distribution of raw CLV: {n} pick, mean {mean}.", "other": "Distribution of raw CLV: {n} picks, mean {mean}." },
     "bin": "Bucket",
@@ -129,7 +129,7 @@
     "flat": "Same",
     "drifted": "Drifted",
     "meanClv": "Mean CLV",
-    "movesNote": "“Shortened” means the market moved towards the pick (it closed lower than the price taken). Raw CLV still carries the book's margin: EV vs close is the measure that counts.",
+    "movesNote": "“Shortened” means the market moved towards the pick (it closed lower than the price taken). Raw CLV still carries the book's margin: price vs close is the measure that counts.",
     "pinTitle": "Pinnacle: towards the pick or against it?",
     "pinSub": "Result picks with a Pinnacle id: Pinnacle's margin-free 1X2 from the opening to the last read.",
     "towards": "Towards the pick",
@@ -222,7 +222,7 @@
     "pinMoves": "Pinnacle moved towards the pick on {towards}, against it on {away} and did not move on {flat}.",
     "pinFew": "Far too few to draw conclusions.",
     "brief": "{record} ({units}, {yield}, n {n}), {ev}",
-    "briefEv": "EV vs close {ev} (n {n})",
+    "briefEv": "price vs close {ev} (n {n})",
     "briefNoEv": "no two-sided closes",
     "grokAll": "Grok is {brief}.",
     "grokPriced": "The ones our script priced are {py} (n {pn}); the ones it could not price, {ny} (n {nn}).",
@@ -230,7 +230,7 @@
     "grokShared": { "one": "They meet on 1 match: same pick {same}, opposite sides {opposite}.", "other": "They meet on {m} matches: same pick {same}, opposite sides {opposite}." },
     "grokNoShared": "They have not picked the same match yet.",
     "grokCautionSmall": "These are small samples: no difference here proves that one picks better than the other.",
-    "grokCaution": "Even with more than 100 picks each, a few points of yield can be variance; EV vs close is the better clue.",
+    "grokCaution": "Even with more than 100 picks each, a few points of yield can be variance; price vs close is the better clue.",
     "grokNone": "No Grok picks with these filters."
   }
 }

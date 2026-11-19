@@ -150,7 +150,7 @@
     "actual": "Profit on those picks",
     "expected": "What the price was worth",
     "range": "{lo} to {hi}",
-    "meanEv": "Mean fair-close EV",
+    "meanEv": "Mean price vs close",
     "chance": "Total ± chance range",
     "chanceNote": "Chance range: the total ± 2 standard errors. If it includes zero, the sample cannot yet tell skill from luck."
   },
@@ -227,5 +227,6 @@
     "empty": "You have not saved any yet.",
     "name": "Scenario name",
     "save": "Save scenario"
-  }
+  },
+  "chanceFlat": "Every pick returned the same per unit: with no variation there is no chance range to estimate yet."
 }

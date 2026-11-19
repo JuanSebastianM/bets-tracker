@@ -6,7 +6,7 @@
 
 import { summarize, groupBy, measureStat, calibration, brier, priceBand, monthOf, weekdayOf, isGraded, isCountable, PRICE_BANDS } from './stats.js';
 import { closeVerdict } from './overview.js';
-import { refOf, defaultFilters, applyFilters, exactSlice, resolveDates, lastSlate, PRICE_PRESETS, priceBandPatch } from './filters.js';
+import { refOf, defaultFilters, applyFilters, exactSlice, resolveDates, lastSlate, PRICE_PRESETS, priceBandPatch, pendingSlate } from './filters.js';
 import { compareLineKeys } from './lines.js';
 import { TAGS, MARKET_FAMILIES, PRICE_FIRST_TAGS, FILTER_REASONS } from './tags.js';
 
@@ -798,7 +798,7 @@ export function exactRowFilter(all, filtered, f, dimId, key, ctx) {
  * @returns {FilterState | null}
  */
 export function exactCellFilter(all, filtered, f, slices, ctx) {
-  const c = { lastSlate: lastSlate(all), ...ctx };
+  const c = { lastSlate: lastSlate(all), pendingSlate: pendingSlate(all), ...ctx };
   let cur = f;
   for (const [dimId, key] of slices) {
     const patch = rowPatch(cur, dimId, key, c);

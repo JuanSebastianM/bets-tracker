@@ -144,7 +144,7 @@
    "related": [
     "value-bet",
     "blend",
-    "fair-close-ev",
+    "price-vs-close",
     "variance"
    ]
   },
@@ -315,7 +315,7 @@
    "inSheet": "Column G in Sombra (the bet365 feed close) and V in Apuestas (only with a close at the bet's own book, rule 34f).",
    "related": [
     "clv",
-    "fair-close-ev",
+    "price-vs-close",
     "feed-close",
     "logger-close"
    ]
@@ -329,11 +329,12 @@
    ],
    "category": "basics",
    "short": "How much better your price was than the close: price taken / closing price − 1. Beating the close consistently is the best sign of a real edge.",
-   "inSheet": "Always within one source (rule 34): never one book's price against another book's close. Raw CLV keeps the margin inside; that is why the headline measure is fair-close EV.",
+   "inSheet": "Always within one source (rule 34): never one book's price against another book's close. Raw CLV keeps the margin inside; that is why the headline measure is fair-close EV (review).",
    "example": "You took 2.10 and it closed at 2.00: CLV +5%.",
    "related": [
     "rule-34",
-    "fair-close-ev",
+    "fair-ev-review",
+    "price-vs-close",
     "closing-line",
     "closing-margin"
    ]
@@ -704,7 +705,6 @@
    "aliases": [
     "corner kicks",
     "match corners",
-    "team corners",
     "córners"
    ],
    "category": "markets",
@@ -712,15 +712,15 @@
    "inSheet": "Totals use the model shrunk to 36% and are paused for real money (rule 30); team corners are tracked separately (rule 32). Betano offers only overs on team corners.",
    "covers": {
     "markets": [
-     "corners_total",
-     "corners_team"
+     "corners_total"
     ]
    },
    "related": [
     "rule-30",
     "rule-32",
     "team-corners",
-    "shrink"
+    "shrink",
+    "corners-team"
    ]
   },
   {
@@ -728,7 +728,6 @@
    "term": "Cards",
    "aliases": [
     "match cards",
-    "team cards",
     "yellows",
     "reds",
     "tarjetas"
@@ -739,15 +738,59 @@
    "example": "Two yellows to different players and one straight red = 4.",
    "covers": {
     "markets": [
-     "cards_total",
-     "cards_team"
+     "cards_total"
     ]
    },
    "related": [
     "rule-28",
     "rule-30",
     "filter-5",
-    "cards-under"
+    "cards-under",
+    "cards-team"
+   ]
+  },
+  {
+   "slug": "corners-team",
+   "term": "Team corners",
+   "aliases": [
+    "corners 1X2",
+    "most corners",
+    "córners equipo"
+   ],
+   "category": "markets",
+   "short": "Markets on one team's corners: its total (over/under) or who takes more (corners 1X2, most corners).",
+   "inSheet": "Tracked apart from match totals (rule 32); the ones that pass every filter are logged as CÓRNERS EQUIPO. Betano offers only overs. “Más córners” and “Córners 1X2” are three-way and have no line, so the Over / Under filter does not pick them.",
+   "example": "Club X corners over 4.5 wins if that team takes 5 or more, whatever the other side takes.",
+   "covers": {
+    "markets": [
+     "corners_team"
+    ]
+   },
+   "related": [
+    "corners",
+    "team-corners",
+    "rule-32"
+   ]
+  },
+  {
+   "slug": "cards-team",
+   "term": "Team cards",
+   "aliases": [
+    "cards 1X2",
+    "most cards",
+    "tarjetas equipo"
+   ],
+   "category": "markets",
+   "short": "Markets on one team's cards, or on who gets more (cards 1X2, three-way most cards).",
+   "inSheet": "Counted like match cards (rule 28): yellow 1, red 2. The three-way ones have no line, so the Over / Under filter does not pick them.",
+   "covers": {
+    "markets": [
+     "cards_team"
+    ]
+   },
+   "related": [
+    "cards",
+    "rule-28"
    ]
   },
   {
@@ -1701,7 +1744,7 @@
    },
    "related": [
     "closing-line",
-    "fair-close-ev",
+    "price-vs-close",
     "de-vig"
    ]
   },
@@ -1749,7 +1792,7 @@
    "related": [
     "clv-logger",
     "clv",
-    "fair-close-ev"
+    "fair-ev-review"
    ]
   },
   {
@@ -2301,23 +2344,47 @@
    ]
   },
   {
-   "slug": "fair-close-ev",
-   "term": "Fair-close EV",
+   "slug": "price-vs-close",
+   "term": "Price vs close",
    "aliases": [
-    "EV justo",
-    "EV against the close",
     "price-vs-close EV",
-    "EV contra el cierre"
+    "EV of the price against the close",
+    "EV vs close",
+    "EV against the close",
+    "precio vs cierre"
    ],
    "category": "reviews",
-   "short": "What your price was worth according to the margin-free close: price taken × margin-free closing probability − 1. Positive means you beat the market.",
-   "inSheet": "The headline measure since 22 Oct 2026 (rule 34e) and the one the frozen tests decide on. It uses the same book's close when it has both sides; otherwise the bet365 feed's.",
-   "example": "You took 2.10; close 1.95 / 1.95 → 50% without margin; 2.10 × 0.50 − 1 = +5%.",
+   "short": "What the price you took was worth according to the margin-free close: price taken × margin-free closing probability − 1. Positive means your price beat the market.",
+   "inSheet": "It is the reviews' “price-vs-close EV” and the measure the frozen tests are decided on (row 111). It uses the same book's two-sided close when the notes have it; otherwise the bet365 feed's, even when the price is from another book. In the app it is the figure of the Overview, Explorer, Simulator, Analysis and the frozen tests. It is not the same as fair-close EV (review).",
+   "example": "You took 2.10 at Betano and Betano closed 1.95 / 1.95 → 50% without margin: 2.10 × 0.50 − 1 = +5%.",
    "related": [
+    "fair-ev-review",
     "clv",
     "de-vig",
     "frozen-tests",
     "two-se"
+   ]
+  },
+  {
+   "slug": "fair-ev-review",
+   "term": "Fair-close EV (review)",
+   "aliases": [
+    "fair-close EV",
+    "fair EV",
+    "EV justo",
+    "EV justa",
+    "EV justo (revisión)"
+   ],
+   "category": "reviews",
+   "short": "The headline figure of the Sombra reviews: the opening price at one source × the margin-free probability of that same source's close − 1. It never mixes one book with another's close.",
+   "inSheet": "The headline measure since 22 Oct 2026 (rule 34e; Decisiones rows 60 and 77): first the pick's book against its own close; without one, the feed opening (“feed X” in the notes) against the feed close. It is clv-logger's “EV justa” and the measure of VALOR and VALOR CASI. The app shows it for Sombra next to price vs close, so it matches your reviews.",
+   "example": "You took 2.10 at Betano, but there is only a bet365 feed close: 1.95 / 1.95 (50% without margin), and the feed opened at 2.00. Fair-close EV (review): 2.00 × 0.50 − 1 = 0%. Price vs close: 2.10 × 0.50 − 1 = +5%.",
+   "related": [
+    "price-vs-close",
+    "clv",
+    "de-vig",
+    "closing-margin",
+    "rule-34"
    ]
   },
   {
@@ -2336,7 +2403,7 @@
    "related": [
     "power-method",
     "margin",
-    "fair-close-ev"
+    "price-vs-close"
    ]
   },
   {
@@ -2412,10 +2479,10 @@
     "100 rows, 50 with a close"
    ],
    "category": "reviews",
-   "short": "The model's tests in Sombra under fixed rules: no new cuts, one decision at 100 rows (50 with a close), by price against the close.",
-   "inSheet": "Since 9 Nov 2026 (row 111). If the mean EV against the close is 2 SE above zero, real money at 0.25u is proposed to you; otherwise closing the category.",
+   "short": "The model's tests in Sombra under fixed rules: no new cuts, one decision at 100 rows (50 with a close), by price vs close.",
+   "inSheet": "Since 9 Nov 2026 (row 111). If the mean price vs close is 2 SE above zero, real money at 0.25u is proposed to you; otherwise closing the category.",
    "related": [
-    "fair-close-ev",
+    "price-vs-close",
     "two-se",
     "shadow-rule30",
     "cards-under"
@@ -2447,9 +2514,9 @@
    ],
    "category": "reviews",
    "short": "The condition a group of picks must meet before real money is proposed to you.",
-   "inSheet": "In general: mean fair-close EV above zero over 30+ rows, positive flat yield and your approval. Raw CLV never clears a gate alone. The frozen tests have their own rule.",
+   "inSheet": "In general: mean fair-close EV (review) above zero over 30+ rows, positive flat yield and your approval. Raw CLV never clears a gate alone. The frozen tests have their own rule.",
    "related": [
-    "fair-close-ev",
+    "fair-ev-review",
     "barely-moving-lines",
     "frozen-tests"
    ]
@@ -2476,13 +2543,13 @@
     "closing overround"
    ],
    "category": "reviews",
-   "short": "The book's margin in the closing prices. Fair-close EV ≈ raw CLV − margin.",
+   "short": "The book's margin in the closing prices. Fair-close EV (review) ≈ raw CLV − margin.",
    "inSheet": "Reviews report it next to CLV to say what makes fair-close EV negative: the selection or the margin.",
    "example": "Raw CLV +2.3% with a 7.4% margin → fair-close EV around −4.7%.",
    "related": [
     "margin",
     "clv",
-    "fair-close-ev"
+    "fair-ev-review"
    ]
   },
   {

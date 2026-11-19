@@ -2,7 +2,8 @@
 // tests (Decisiones row 111), the price-first tests (rows 79, 80, 97, 108) and the stopped categories.
 // Every figure comes from src/data/tests-config.js and src/data/stats.js.
 import { html, useMemo, useEffect, useRef } from '../../../vendor/preact.js';
-import { t } from '../../lib/i18n.js';
+import { t, getLocale } from '../../lib/i18n.js';
+import { sheetLang } from '../../lib/spoken.js';
 import { href, navigate } from '../../lib/router.js';
 import { explorerHref } from '../../lib/links.js';
 import { Card, FeedGate, DataTable, Disclosure, TagBadge, DecisionLink } from '../../lib/ui/index.js';
@@ -42,7 +43,7 @@ function OverviewStrip({ list }) {
     <div class="tests-ov-item tests-ov-closest">
       <span class="tests-ov-label">${t('tests.strip.closest')}</span>
       ${o.closest
-        ? html`<a class="tests-ov-link" href=${testHref(o.closest.test.id)}>${o.closest.test.sheetLabel}</a>
+        ? html`<a class="tests-ov-link" href=${testHref(o.closest.test.id)} lang=${sheetLang(getLocale())}>${o.closest.test.sheetLabel}</a>
             <span class="tests-ov-sub num">${t('tests.strip.closestValue', { share: shareText(o.closestShare) })}</span>`
         : html`<span class="tests-ov-sub">${t('tests.strip.none')}</span>`}
     </div>
@@ -55,7 +56,7 @@ function HowToRead() {
   return html`<div class="tests-howto" data-testid="tests-howto">
     <${Disclosure} summary=${t('tests.howTo.summary')}>
       <h3>${t('tests.howTo.priceTitle')}</h3>
-      <${TermSentence} k="tests.howTo.price" termKey="tests.howTo.termFairClose" slug="fair-close-ev" />
+      <${TermSentence} k="tests.howTo.price" termKey="tests.howTo.termFairClose" slug="price-vs-close" />
       <h3>${t('tests.howTo.seTitle')}</h3>
       <${TermSentence} k="tests.howTo.se" termKey="tests.howTo.termSe" slug="standard-error" />
       <h3>${t('tests.howTo.onceTitle')}</h3>
@@ -143,7 +144,7 @@ function FrozenDetail({ p, today }) {
   else if (wait === 'closes') rule = t('tests.frozen.ruleCollectingCloses', { graded: FROZEN_RULE.minGraded, close: FROZEN_RULE.minWithClose });
   else rule = t('tests.frozen.ruleCollecting', { graded: FROZEN_RULE.minGraded, close: FROZEN_RULE.minWithClose });
   const chartSummary = ev.mean == null ? '' : ev.lo == null ? t('tests.frozen.chartNone')
-    : t('tests.frozen.chart', { mean: formatPct(ev.mean), lo: formatPct(ev.lo), hi: formatPct(ev.hi), n: ev.n });
+    : t('tests.frozen.chart', { measure: t('tests.frozen.measure'), mean: formatPct(ev.mean), lo: formatPct(ev.lo), hi: formatPct(ev.hi), n: ev.n });
   let projText;
   if (proj.reached) projText = t('tests.frozen.projectionReached');
   else if (proj.date) projText = t('tests.frozen.projection', { date: formatDate(proj.date), days: proj.windowDays });
@@ -212,7 +213,8 @@ function PriceFirstDetail({ p }) {
   const ruleText = t(`tests.priceFirst.rule.${test.id}`, { first: PROP_RULE.firstLook, final: PROP_RULE.finalLook, stake: PROP_RULE.passStakeU });
   const intervalText = lo == null ? t('tests.frozen.chartNone')
     : isValue ? t('tests.frozen.interval', { lo: formatPct(lo), hi: formatPct(hi) }) : t('tests.priceFirst.interval95', { lo: formatPct(lo), hi: formatPct(hi) });
-  const chartSummary = ev.mean == null ? '' : lo == null ? t('tests.frozen.chartNone') : t('tests.frozen.chart', { mean: formatPct(ev.mean), lo: formatPct(lo), hi: formatPct(hi), n: ev.n });
+  const chartSummary = ev.mean == null ? '' : lo == null ? t('tests.frozen.chartNone')
+    : t('tests.frozen.chart', { measure: isValue ? t('stats.openingFairEv') : t('tests.list.evProp'), mean: formatPct(ev.mean), lo: formatPct(lo), hi: formatPct(hi), n: ev.n });
   const lines = isValue
     ? [lineRow('le4', t('tests.priceFirst.lineLe4'), p.le4), lineRow('le3', t('tests.priceFirst.lineLe3'), p.le3), lineRow('b34', t('tests.priceFirst.line34'), p.band34),
       lineRow('gt4', t('tests.priceFirst.lineGt4'), p.gt4), lineRow('fresh', t('tests.priceFirst.lineFresh'), p.le3Fresh), lineRow('all', t('tests.priceFirst.lineAll'), p.all)]
@@ -272,7 +274,7 @@ function StoppedSection({ data }) {
         ${list.map(({ category: c, summary: s, first, last, rows }) => html`<li data-testid=${`stopped-${c.id}`}>
           <details class="tests-stopped-item">
             <summary>
-              <span class="tests-stopped-head"><strong>${c.sheetLabel}</strong><span class="tests-muted num">${t('tests.stopped.when', { date: formatDate(c.stoppedOn) })}</span></span>
+              <span class="tests-stopped-head"><strong lang=${sheetLang(getLocale())}>${c.sheetLabel}</strong><span class="tests-muted num">${t('tests.stopped.when', { date: formatDate(c.stoppedOn) })}</span></span>
               <span class="tests-small num tests-stopped-final">${rows.length
                 ? t('tests.stopped.final', { record: formatRecord(s), yield: formatPct(s.yield), n: s.n, ev: formatPct(s.fairCloseEv.mean), evn: s.fairCloseEv.n })
                 : t('tests.stopped.empty')}</span>
@@ -299,7 +301,7 @@ function StoppedSection({ data }) {
  * One row of the list: what it shows, taken as is from the progress objects of src/data/.
  * @typedef {{ id: string, group: 'frozen' | 'price', label: any, state: string,
  *   graded: { n: number, total: number | null }, closes: { n: number, total: number | null },
- *   ev: { mean: number | null, lo: number | null, hi: number | null, n: number }, detail: any }} RowModel
+ *   ev: { mean: number | null, lo: number | null, hi: number | null, n: number }, evLabel: string, detail: any }} RowModel
  */
 
 /** @param {{ m: RowModel, open: boolean, onToggle: (id: string) => void }} props */
@@ -319,7 +321,7 @@ function TestRow({ m, open, onToggle }) {
           <span class="tests-cell-k">${t('tests.list.closes')}</span><span>${frac(m.closes)}</span>${m.closes.total ? html`<${MiniBar} value=${m.closes.n} total=${m.closes.total} />` : null}
         </span>
         <span class="tests-cell tests-cell-ev num" data-testid=${`ev-${m.id}`}>
-          <span class="tests-cell-k">${t('tests.list.ev')}</span>
+          <span class=${`tests-cell-k${m.group === 'price' ? ' tests-cell-k-keep' : ''}`}>${m.evLabel}</span>
           <span>${m.ev.mean == null ? '–' : t('tests.list.evValue', { mean: formatPct(m.ev.mean), n: m.ev.n })}</span>
           <${MiniEv} mean=${m.ev.mean} lo=${m.ev.lo} hi=${m.ev.hi} />
         </span>
@@ -330,12 +332,12 @@ function TestRow({ m, open, onToggle }) {
   </li>`;
 }
 
-/** @param {{ title: string, rows: RowModel[], openId: string | null, onToggle: (id: string) => void, testId?: string }} props */
-function TestGroup({ title, rows, openId, onToggle, testId }) {
+/** @param {{ title: string, rows: RowModel[], openId: string | null, onToggle: (id: string) => void, testId?: string, evHead: string }} props */
+function TestGroup({ title, rows, openId, onToggle, testId, evHead }) {
   return html`<section class="tests-group" aria-label=${title} data-testid=${testId}>
     <div class="tests-group-head" aria-hidden="true">
       <span class="tests-group-title">${title}</span>
-      <span>${t('tests.list.graded')}</span><span>${t('tests.list.closes')}</span><span>${t('tests.list.ev')}</span><span></span>
+      <span>${t('tests.list.graded')}</span><span>${t('tests.list.closes')}</span><span>${evHead}</span><span></span>
     </div>
     <h2 class="sr-only">${title}</h2>
     <ul class="tests-list">${rows.map((m) => html`<${TestRow} key=${m.id} m=${m} open=${openId === m.id} onToggle=${onToggle} />`)}</ul>
@@ -351,9 +353,11 @@ function Tests({ data, query }) {
   const priceFirst = useMemo(() => PRICE_FIRST_TESTS.map((test) => priceFirstProgress(test, data.picks)), [data]);
   const frozenRows = useMemo(
     () => frozen.map((p) => /** @type {RowModel} */ ({
-      id: p.test.id, group: 'frozen', label: p.test.sheetLabel, state: p.state,
+      // The test names are the sheet's own (Spanish) labels: marked so a screen reader switches voice in English.
+      id: p.test.id, group: 'frozen', label: html`<span lang=${sheetLang(getLocale())}>${p.test.sheetLabel}</span>`, state: p.state,
       graded: { n: p.graded, total: FROZEN_RULE.minGraded }, closes: { n: p.withClose, total: FROZEN_RULE.minWithClose },
       ev: { mean: p.ev.mean, lo: p.ev.lo, hi: p.ev.hi, n: p.ev.n },
+      evLabel: t('tests.list.ev'),
       detail: html`<${FrozenDetail} p=${p} today=${today} />`,
     })),
     [frozen, today],
@@ -368,6 +372,8 @@ function Tests({ data, query }) {
         graded: { n: p.all.graded, total: null },
         closes: { n: gate.ev.n, total: decides ? (isProp ? p.target : VALUE_RULE.minWithEv) : null },
         ev: { mean: gate.ev.mean, lo: isProp ? gate.lo95 : gate.ev.lo, hi: isProp ? gate.hi95 : gate.ev.hi, n: gate.ev.n },
+        // VALOR and VALOR CASI are measured with the reviewer's fair-close EV; VALOR PROP with its own bet365 measure.
+        evLabel: isProp ? t('tests.list.evProp') : t('stats.openingFairEv'),
         detail: html`<${PriceFirstDetail} p=${p} />`,
       });
     }),
@@ -394,8 +400,8 @@ function Tests({ data, query }) {
     <${OverviewStrip} list=${frozen} />
     <${NextReview} data=${data} today=${today} />
     <div class="tests-lists stack" data-testid="frozen-table">
-      <${TestGroup} title=${t('tests.frozenTitle')} rows=${frozenRows} openId=${openId} onToggle=${onToggle} testId="frozen-list" />
-      <${TestGroup} title=${t('tests.priceFirst.title')} rows=${priceRows} openId=${openId} onToggle=${onToggle} testId="price-first" />
+      <${TestGroup} title=${t('tests.frozenTitle')} rows=${frozenRows} openId=${openId} onToggle=${onToggle} testId="frozen-list" evHead=${t('tests.list.ev')} />
+      <${TestGroup} title=${t('tests.priceFirst.title')} rows=${priceRows} openId=${openId} onToggle=${onToggle} testId="price-first" evHead=${t('tests.list.evMeasure')} />
     </div>
     <${HowToRead} />
     <${StoppedSection} data=${data} />

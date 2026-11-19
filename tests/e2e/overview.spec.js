@@ -17,7 +17,7 @@ test('the period switch lives in the URL and survives a reload', async ({ page }
 
   await page.getByRole('radio', { name: '7 días' }).click();
   await expect(page).toHaveURL(/#\/\?date=7d$/);
-  await expect(page.getByTestId('period-note')).toHaveText('Del 9 nov al 15 nov');
+  await expect(page.getByTestId('period-note')).toHaveText('Del 9 nov en adelante, con los próximos slates incluidos');
   await expect(page.getByTestId('units-shadow')).not.toHaveText(allUnits || '');
 
   await page.reload();
@@ -28,7 +28,7 @@ test('the period switch lives in the URL and survives a reload', async ({ page }
   await page.getByRole('radio', { name: 'Último slate' }).click();
   await expect(page).toHaveURL(/date=last_slate/);
   await expect(page.getByTestId('period-note')).toHaveText('Slate del 14 nov 2026');
-  await expect(page.getByTestId('overview-links').getByRole('link', { name: 'Ver todos los picks' })).toHaveAttribute('href', '#/explorer?slate=2026-11-14');
+  await expect(page.getByTestId('quick-picks')).toHaveAttribute('href', '#/explorer?slate=2026-11-14');
 
   await page.getByRole('radio', { name: 'Todo' }).click();
   await expect(page).toHaveURL(/#\/$/);
@@ -42,14 +42,16 @@ test('a tag row opens the Explorer filtered by that tag and the period', async (
   await expect(table).toBeVisible();
   const first = table.locator('a.ov-grow').first();
   const key = await first.getAttribute('data-key');
-  expect(await first.getAttribute('href')).toBe(`#/explorer?src=shadow&tag=${key}&date=30d`);
+  // Exactly the row's graded picks (round 2): the row's n is the Explorer's count.
+  expect(await first.getAttribute('href')).toBe(`#/explorer?src=shadow&tag=${key}&st=won%2Clost%2Cvoid%2Chalf_won%2Chalf_lost&date=30d`);
+  const n = await first.getAttribute('data-count');
   await first.click();
-  await expect(page).toHaveURL(new RegExp(`#/explorer\\?src=shadow&tag=${key}&date=30d`));
-  await expect(page.getByTestId('explorer-count')).toBeVisible();
+  await expect(page).toHaveURL(new RegExp(`#/explorer\\?src=shadow&tag=${key}&st=won`));
+  await expect(page.getByTestId('explorer-count')).toHaveText(new RegExp(`^${n} picks?$`));
 
   await page.goBack();
   const market = page.getByTestId('market-table').locator('a.ov-grow').first();
-  await expect(market).toHaveAttribute('href', /^#\/explorer\?src=shadow&mkt=[a-z_]+&date=30d$/);
+  await expect(market).toHaveAttribute('href', /^#\/explorer\?src=shadow&(tag=[a-z_%0-9C]+&)?mkt=[a-z_]+&st=won%2Clost%2Cvoid%2Chalf_won%2Chalf_lost&date=30d$/);
   expect(errors).toEqual([]);
 });
 

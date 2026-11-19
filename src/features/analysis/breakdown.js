@@ -181,7 +181,7 @@ function GroupList({ rows, labelOf, linkOf, small }) {
               <dt>${t('analysis.col.ev')}</dt><dd class="num">${evText(e)}${rangeText(e) ? html`<br />${rangeText(e)}` : ''}</dd>
             </dl>
             ${small(r) ? html`<p class="an-note">${t('analysis.smallRow')}</p>` : null}
-            ${link ? html`<a class="link-btn an-link" href=${link} data-testid="bd-link">${t('analysis.seeInExplorer')}</a>` : null}
+            ${link ? html`<a class="link-btn an-link" href=${link} data-testid="bd-link" data-count=${s.n}>${t('analysis.seeInExplorer')}</a>` : null}
           </div>
         </details>
       </li>`;
@@ -222,7 +222,7 @@ function GroupTable({ rows, labelOf, linkOf, small, view, onSort, dimName }) {
           const e = s.fairCloseEv;
           const link = linkOf(r.key);
           return html`<tr key=${r.key} class=${small(r) ? 'an-small' : ''} data-key=${r.key}>
-            <td class="an-td-label">${link ? html`<a href=${link} data-testid="bd-link">${labelOf(r.key)}</a>` : labelOf(r.key)}<span class="an-sub"><${VerdictChip} v=${r.verdict} /></span>${small(r) ? html`<span class="sr-only"> (${t('analysis.smallTag')})</span>` : null}</td>
+            <td class="an-td-label">${link ? html`<a href=${link} data-testid="bd-link" data-count=${r.summary.n}>${labelOf(r.key)}</a>` : labelOf(r.key)}<span class="an-sub"><${VerdictChip} v=${r.verdict} /></span>${small(r) ? html`<span class="sr-only"> (${t('analysis.smallTag')})</span>` : null}</td>
             <td class="ta-r num">${s.n}<span class="an-sub">${formatRecord(s)}</span></td>
             <td class="ta-r num">${hitText(s)}</td>
             <td class=${`ta-r num ${signClass(s.yield)}`}>${formatPct(s.yield)}</td>
@@ -266,7 +266,7 @@ function TwoWay({ picks, all, today, filters, view, setView, labelOf }) {
                       const v = measureOf(cell, view.measure);
                       const f2 = exactCellFilter(all, picks, filters, [[view.dim, r], [view.dim2, c]], { today });
                       const body = html`<span class=${signClass(v)}>${formatPct(v)}</span><span class="an-dim"> n ${measureN(cell, view.measure)}</span>`;
-                      return html`<td class=${`ta-r num${cell.summary.n < view.minn ? ' an-small' : ''}`}>${f2 ? html`<a href=${explorerHref(f2)}>${body}</a>` : body}</td>`;
+                      return html`<td class=${`ta-r num${cell.summary.n < view.minn ? ' an-small' : ''}`}>${f2 ? html`<a href=${explorerHref(f2)} data-testid="bd-cell-link" data-count=${cell.summary.n}>${body}</a>` : body}</td>`;
                     })}
                   </tr>`,
                 )}

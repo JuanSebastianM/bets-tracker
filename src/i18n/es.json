@@ -33,7 +33,8 @@
     "picks": { "one": "{n} pick", "other": "{n} picks" }
   },
   "record": {
-    "sr": "{won} ganadas, {lost} perdidas, {void} nulas, {halves} medias"
+    "sr": "{won} ganadas, {lost} perdidas, {void} nulas, {halves} medias",
+    "halves": {"one": "{n} media", "other": "{n} medias"}
   },
   "status": {
     "won": "Ganada",
@@ -65,10 +66,11 @@
     "yield": "Yield",
     "graded": "Calificadas",
     "nGraded": "n {n}",
-    "fairCloseEv": "EV vs cierre",
+    "fairCloseEv": "Precio vs cierre",
     "nClose": "n {n} con cierre",
     "pending": "Pendientes",
-    "maxDrawdown": "Peor caída"
+    "maxDrawdown": "Peor caída",
+    "openingFairEv": "EV justo (revisión)"
   },
   "filters": {
     "source": "Fuente",
@@ -99,10 +101,10 @@
     "slate": "Un slate (fecha del partido)",
     "anySlate": "Cualquier fecha",
     "since": "Desde el",
-    "datePreset": { "last_slate": "Último slate", "7d": "7 días", "30d": "30 días", "this_month": "Este mes", "since": "Desde una fecha" },
+    "datePreset": { "last_slate": "Último slate", "7d": "7 días", "30d": "30 días", "this_month": "Este mes", "since": "Desde una fecha", "pending_slate": "Slate pendiente" },
     "close": "Cierre",
     "hasClose": "Tiene cuota de cierre",
-    "twoSidedClose": "Cierre con los dos lados (EV vs cierre)",
+    "twoSidedClose": "Cierre con los dos lados (precio vs cierre)",
     "any": "Todos",
     "yes": "Sí",
     "no": "No",
@@ -142,7 +144,8 @@
     "entry": { "price": "Cuota {range}", "date": "Fecha: {range}", "ev": "EV {range}", "prob": "Prob. {range}", "q": "«{q}»", "slate": "Slate {date}", "hasClose": "Cierre: {v}", "twoSidedClose": "Cierre 2 lados: {v}", "sample": "Muestra {v}", "fuerza": "FUERZA {v}", "test": "Prueba: {label}" },
     "rangeMin": "≥ {min}",
     "rangeMax": "≤ {max}",
-    "rangeBoth": "{min}–{max}"
+    "rangeBoth": "{min}–{max}",
+    "dateNote": {"rolling": "Del {from} en adelante, con los próximos slates incluidos.", "last_slate": "Último slate calificado: {date}.", "last_slateNone": "Todavía no hay un slate calificado.", "pending_slate": "Slate más reciente con picks pendientes: {date}.", "pending_slateNone": "No hay picks pendientes."}
   },
   "feed": {
     "synced": "Sincronizado {ago}",
@@ -183,8 +186,8 @@
   "pick": {
     "close": "Cuota de cierre",
     "closeShort": "cierre",
-    "fairCloseEv": "Valor esperado contra la cuota de cierre sin margen",
-    "evShort": "EV"
+    "fairCloseEv": "Precio vs cierre: tu cuota por la probabilidad del cierre sin margen, menos 1",
+    "evShort": "Precio vs cierre"
   },
   "chart": {
     "showTable": "Ver como tabla",
@@ -197,16 +200,16 @@
     "pending": { "one": "{pending} pendiente.", "other": "{pending} pendientes." },
     "hitAbove": "Acierta {hit}, por encima del {be} que necesita para no perder.",
     "hitBelow": "Acierta {hit}, por debajo del {be} que necesita para no perder.",
-    "closeEv": "Contra el cierre sin margen: {ev} de media (n {n}).",
+    "closeEv": "Precio vs cierre: {ev} de media (n {n}).",
     "closeEvRange": "Rango probable: {lo} a {hi}.",
-    "closeEvNone": "Sin cierres con los dos lados para medir contra el cierre.",
+    "closeEvNone": "Sin cierres con los dos lados: todavía no hay precio vs cierre.",
     "smallSample": "Muestra pequeña (n {n}): todavía no dice mucho.",
     "sampleSmall": "Con {n} calificadas todavía es muy pronto: el resultado puede ser pura varianza.",
     "sampleMedium": "Con {n} calificadas ya orienta, pero una buena o mala racha todavía lo mueve mucho.",
     "sampleLarge": "Con {n} calificadas la muestra ya sirve para ver tendencias, no para dar nada por seguro.",
-    "luckyWin": "Gana en resultados pero pierde contra el cierre: probablemente suerte.",
-    "unluckyLoss": "Pierde en resultados pero le gana al cierre: probablemente mala racha.",
-    "bothGood": "Gana en resultados y también le gana al cierre.",
+    "luckyWin": "Gana en resultados pero pierde en precio vs cierre: probablemente suerte.",
+    "unluckyLoss": "Pierde en resultados pero gana en precio vs cierre: probablemente mala racha.",
+    "bothGood": "Gana en resultados y también en precio vs cierre.",
     "verdict": {
       "none": "sin cierres",
       "too_early": "muy pronto",
@@ -216,7 +219,7 @@
       "lean_below": "tirando en contra"
     },
     "bestWorstNone": "Ninguna etiqueta tiene todavía {min} cierres con los dos lados: muy pronto para compararlas.",
-    "bestTag": "Mejor contra el cierre: {label} ({ev}, n {n}).",
+    "bestTag": "Mejor en precio vs cierre: {label} ({ev}, n {n}).",
     "worstTag": "Peor: {label} ({ev}, n {n}).",
     "onlyOneQualified": "Es la única con {min} cierres o más.",
     "sourceRecord": "{source} {record}, {profit}",
@@ -235,7 +238,12 @@
     "realAtPeak": "Las apuestas reales van {total} y están en su punto más alto.",
     "realBelowPeak": "Las apuestas reales van {total}, {dd} por debajo de su mejor punto ({peak}).",
     "recordOne": "{label}: {record} a cuota media {price}, {profit} ({yield}) en 1 calificada.",
-    "sampleSmallOne": "Con 1 calificada todavía es muy pronto: el resultado puede ser pura varianza."
+    "sampleSmallOne": "Con 1 calificada todavía es muy pronto: el resultado puede ser pura varianza.",
+    "reviewEv": "EV justo (revisión), la cifra de las revisiones de Sombra: {ev} (n {n}).",
+    "realHitOnly": "Acierta {hit} (n {n}).",
+    "realWhyStakes": "Con stakes distintos, el resultado en unidades no sale solo del acierto: una apuesta grande o a cuota alta pesa más que varias pequeñas, así que no se compara con un acierto mínimo.",
+    "realWhyFree": {"one": "Hubo {n} apuesta gratis, que no arriesga stake, así que el resultado en unidades no sale solo del acierto y no se compara con un acierto mínimo.", "other": "Hubo {n} apuestas gratis, que no arriesgan stake, así que el resultado en unidades no sale solo del acierto y no se compara con un acierto mínimo."},
+    "realWhyBoth": {"one": "Con stakes distintos y {n} apuesta gratis (que no arriesga stake), el resultado en unidades no sale solo del acierto: una apuesta grande, a cuota alta o gratis pesa distinto, así que no se compara con un acierto mínimo.", "other": "Con stakes distintos y {n} apuestas gratis (que no arriesgan stake), el resultado en unidades no sale solo del acierto: una apuesta grande, a cuota alta o gratis pesa distinto, así que no se compara con un acierto mínimo."}
   },
   "pwa": {
     "updateReady": "Hay una versión nueva de la app.",
@@ -320,6 +328,8 @@
     "refreshed": "Datos actualizados.",
     "refreshFailed": "No se pudo actualizar: se ve la copia guardada.",
     "offline": "Sin conexión: se ve la copia guardada.",
-    "inUnits": "en unidades"
+    "inUnits": "en unidades",
+    "halfWon": {"one": "{n} medio ganada", "other": "{n} medio ganadas"},
+    "halfLost": {"one": "{n} medio perdida", "other": "{n} medio perdidas"}
   }
 }

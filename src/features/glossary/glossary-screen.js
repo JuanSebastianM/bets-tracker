@@ -6,7 +6,7 @@ import { html, useMemo } from '../../../vendor/preact.js';
 import { t } from '../../lib/i18n.js';
 import { href, navigate } from '../../lib/router.js';
 import { Card, FilterChip, SegmentedControl, SearchInput, EmptyState, Skeleton, Banner, Button, Icon, RefText, Highlight, termIndexOf } from '../../lib/ui/index.js';
-import { glossaryHref, decisionHref, ruleSlug } from '../../lib/glossary-links.js';
+import { glossaryHref, decisionHref, ruleSlug, resolveGlossarySlug } from '../../lib/glossary-links.js';
 import { formatDate, formatCount } from '../../lib/format.js';
 import { useDataset } from '../../data/store.js';
 import { searchGlossary, groupByLetter, filterRules, ruleStateCounts, RULE_STATES } from '../../data/content.js';
@@ -39,7 +39,7 @@ export function GlossaryScreen({ params, query }) {
       <${Banner} tone="error" title=${t('glossary.loadError')} action=${html`<${Button} onClick=${retry}>${t('glossary.retry')}</${Button}>`}>${error}</${Banner}>
     </div>`;
   }
-  const slug = params.term;
+  const slug = params.term ? resolveGlossarySlug(params.term) : params.term;
   if (slug) {
     const m = /^rule-(\d+)$/.exec(slug);
     const rule = m ? content.ruleByN.get(Number(m[1])) : null;
@@ -260,7 +260,7 @@ function EntryDetail({ entry: e, content }) {
             ${tagCounts.map(
               (x) => html`<p class="row-wrap">
                 <span>${t('glossary.tagRows', { count: x.count, n: formatCount(x.count), tag: tagLabel(/** @type {any} */ (x.id)) })}</span>
-                ${x.count ? html`<a class="link-btn" href=${href(`/explorer?tag=${x.id}`)}>${t('glossary.seeInExplorer')}</a>` : null}
+                ${x.count ? html`<a class="link-btn" href=${href(`/explorer?tag=${x.id}`)} data-testid="glossary-tag-link" data-count=${x.count}>${t('glossary.seeInExplorer')}</a>` : null}
               </p>`,
             )}
           </section>`

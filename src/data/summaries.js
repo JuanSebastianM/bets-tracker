@@ -193,3 +193,48 @@ export function describeRealBets(x) {
   if (x.currentDrawdownU <= 1e-9) return t('summaries.realAtPeak', { total: formatUnits(x.total) });
   return t('summaries.realBelowPeak', { total: formatUnits(x.total), dd: formatUnits(x.currentDrawdownU, { sign: false }), peak: formatUnits(x.peak) });
 }
+
+// ---------------------------------------------------------------- round 2 additions
+
+/**
+ * The reviewer's fair-close EV (Pick.openingFairEv, "EV justo (revisión)") with n: the figure Juan reads
+ * in the Sombra reviews. '' without rows.
+ * @param {import('./stats.js').MeanStat | null | undefined} e reviewFairEv(picks) (overview.js)
+ */
+export function describeReviewEv(e) {
+  if (!e || !e.n || e.mean == null) return '';
+  return t('summaries.reviewEv', { ev: formatPct(e.mean), n: e.n });
+}
+
+/**
+ * The hit rate of the real bets, said without a flat break-even when the stakes are uneven or a free bet
+ * is in: their result in units then does not follow from the hit rate, and a "needs X%" next to a
+ * positive result reads as a contradiction. With equal stakes and no free bet it is describeHitRate.
+ * @param {Summary} s summarize(bets, { profit: 'sheet' })
+ * @param {{ freeBets: number, uneven: boolean }} shape realStakeShape(bets) (overview.js)
+ */
+export function describeRealHitRate(s, shape) {
+  if (s.n < MIN_N_FOR_RATE || s.hitRate == null) return '';
+  if (!shape.uneven && !shape.freeBets) return describeHitRate(s);
+  const hit = t('summaries.realHitOnly', { hit: formatPct(s.hitRate, { sign: false }), n: s.n });
+  const why = shape.uneven && shape.freeBets
+    ? t('summaries.realWhyBoth', { count: shape.freeBets, n: shape.freeBets })
+    : shape.uneven
+      ? t('summaries.realWhyStakes')
+      : t('summaries.realWhyFree', { count: shape.freeBets, n: shape.freeBets });
+  return `${hit} ${why}`;
+}
+
+/**
+ * describeSource with the round 2 extras: the real bets' hit rate without a flat break-even (shape given),
+ * and the reviewer's fair-close EV after price vs close (reviewEv given, Sombra).
+ * @param {string} label @param {Summary} s @param {import('./overview.js').Verdict} verdict
+ * @param {{ shape?: { freeBets: number, uneven: boolean }, reviewEv?: import('./stats.js').MeanStat }} [opts]
+ */
+export function describeSourceFull(label, s, verdict, opts = {}) {
+  if (!s.n) return describeRecord(label, s);
+  const hit = opts.shape ? describeRealHitRate(s, opts.shape) : describeHitRate(s);
+  return [describeRecord(label, s), hit, describeCloseEv(s), opts.reviewEv ? describeReviewEv(opts.reviewEv) : '', describeSampleSize(s.n), describeResultsVsClose(s, verdict)]
+    .filter(Boolean)
+    .join(' ');
+}

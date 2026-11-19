@@ -102,3 +102,9 @@
 .filter-panel input[type='date'] { border-color: var(--c-control-line); }
 .af-chip::after { inset: -5px 0; }
 .fp-seg-n { opacity: 1; }
+
+/* Round 2: what the date preset means in dates, under the chips. */
+.fp-note { margin: 0; font-size: var(--fs-sm); color: var(--c-muted); }
+
+/* Round 2: see useFocusSafeDisabled. */
+.fchip[aria-disabled='true'] { opacity: 0.42; cursor: default; border-style: dashed; }

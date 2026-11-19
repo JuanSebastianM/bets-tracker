@@ -4,6 +4,7 @@
 import { MARKET_FAMILIES, TAGS } from './tags.js';
 import { compareLineKeys, isLineKey, LINE_SIDES } from './lines.js';
 import { TEST_IDS, testIdsOf } from './tests-config.js';
+import { isCountable, isGraded } from './stats.js';
 
 /** @typedef {import('./types').Pick} Pick */
 
@@ -113,8 +114,16 @@ export function priceRangeLabel(r) {
   return `${lo}, ${hi}`;
 }
 
-/** Date presets; resolved against `today` and the data's last slate. */
-export const DATE_PRESETS = ['last_slate', '7d', '30d', 'this_month', 'since'];
+/**
+ * Date presets; resolved against `today` and the data's slates. `last_slate` is the last slate with a
+ * graded pick (what the Overview calls "Último slate"); `pending_slate` is the newest slate that still
+ * has pending picks. The rolling ones (`7d`, `30d`, `this_month`) bound only the start: upcoming slates
+ * logged for tomorrow stay in.
+ */
+export const DATE_PRESETS = ['last_slate', '7d', '30d', 'this_month', 'since', 'pending_slate'];
+
+/** Presets that run from a start date onwards, upcoming slates included. */
+export const ROLLING_DATE_PRESETS = ['7d', '30d', 'this_month'];
 
 /** Add days to 'YYYY-MM-DD'. @param {string} d @param {number} n */
 export function addDays(d, n) {
@@ -123,8 +132,9 @@ export function addDays(d, n) {
 }
 
 /**
- * Concrete [from, to] dates of the state's date filter (inclusive; null = open).
- * @param {FilterState} f @param {{ today: string, lastSlate?: string | null }} ctx
+ * Concrete [from, to] dates of the state's date filter (inclusive; null = open). The rolling presets
+ * have no end (to = null), so picks logged for upcoming slates are in.
+ * @param {FilterState} f @param {{ today: string, lastSlate?: string | null, pendingSlate?: string | null }} ctx
  * @returns {[string | null, string | null]}
  */
 export function resolveDates(f, ctx) {
@@ -132,12 +142,14 @@ export function resolveDates(f, ctx) {
   switch (f.datePreset) {
     case 'last_slate':
       return [ctx.lastSlate || null, ctx.lastSlate || null];
+    case 'pending_slate':
+      return [ctx.pendingSlate || null, ctx.pendingSlate || null];
     case '7d':
-      return [addDays(ctx.today, -6), ctx.today];
+      return [addDays(ctx.today, -6), null];
     case '30d':
-      return [addDays(ctx.today, -29), ctx.today];
+      return [addDays(ctx.today, -29), null];
     case 'this_month':
-      return [ctx.today.slice(0, 8) + '01', ctx.today];
+      return [ctx.today.slice(0, 8) + '01', null];
     case 'since':
       return [f.dateFrom, null];
     default:
@@ -145,11 +157,36 @@ export function resolveDates(f, ctx) {
   }
 }
 
-/** Last slate date among picks. @param {Pick[]} picks */
+/**
+ * The last slate: the latest match date with a graded pick that counts (the Overview's "último slate").
+ * The newest date in the sheet is usually tomorrow's slate, all pending: that one is pendingSlate.
+ * @param {Pick[]} picks
+ */
 export function lastSlate(picks) {
   let last = null;
-  for (const p of picks) if (p.date && (!last || p.date > last)) last = p.date;
+  for (const p of picks) if (p.date && isCountable(p) && isGraded(p) && (!last || p.date > last)) last = p.date;
   return last;
+}
+
+/**
+ * The newest slate (match date) that still has pending picks, or null.
+ * @param {Pick[]} picks
+ */
+export function pendingSlate(picks) {
+  let last = null;
+  for (const p of picks) if (p.date && isCountable(p) && p.status === 'pending' && (!last || p.date > last)) last = p.date;
+  return last;
+}
+
+/**
+ * The slates a date preset needs from the data, added to ctx when the caller did not pass them.
+ * @param {Pick[]} picks @param {FilterState} f @param {{ today: string, lastSlate?: string | null, pendingSlate?: string | null }} ctx
+ */
+export function slateContext(picks, f, ctx) {
+  if (f.slate) return ctx;
+  if (f.datePreset === 'last_slate' && !('lastSlate' in ctx)) return { ...ctx, lastSlate: lastSlate(picks) };
+  if (f.datePreset === 'pending_slate' && !('pendingSlate' in ctx)) return { ...ctx, pendingSlate: pendingSlate(picks) };
+  return ctx;
 }
 
 /** @param {number | null} v @param {Range} r */
@@ -182,6 +219,14 @@ function haystackOf(p) {
   return h;
 }
 
+/**
+ * The side the Over / Under filter reads: Pick.side, but only on picks that have a line. Three-way
+ * "most corners / cards" markets have no line and keep side 'over' for review.py parity (DATA_CONTRACT,
+ * section 4); the chips must not select them. '' for every pick without a line.
+ * @param {Pick} p
+ */
+export const lineSide = (p) => (p.lineKey ? p.side : '');
+
 /** The reference kind of a pick for the 'refs' filter. @param {Pick} p */
 export const refOf = (p) => p.parsed.ref || 'none';
 
@@ -189,12 +234,11 @@ export const refOf = (p) => p.parsed.ref || 'none';
  * Apply the filters.
  * @param {Pick[]} picks
  * @param {FilterState} f
- * @param {{ today: string, lastSlate?: string | null }} ctx
+ * @param {{ today: string, lastSlate?: string | null, pendingSlate?: string | null }} ctx
  */
 export function applyFilters(picks, f, ctx) {
-  // The last slate is a scan of every pick: only when the date filter needs it and the caller did not pass it.
-  const needsLast = !f.slate && f.datePreset === 'last_slate' && !('lastSlate' in ctx);
-  const [from, to] = resolveDates(f, needsLast ? { lastSlate: lastSlate(picks), ...ctx } : /** @type {any} */ (ctx));
+  // The last (or pending) slate is a scan of every pick: only when the date filter needs it and the caller did not pass it.
+  const [from, to] = resolveDates(f, slateContext(picks, f, ctx));
   const q = f.q ? fold(f.q.trim()) : '';
   const words = q ? q.split(/\s+/) : [];
   const preset = f.pricePreset ? PRICE_PRESETS.find((x) => x.id === f.pricePreset) || null : null;
@@ -217,7 +261,7 @@ export function applyFilters(picks, f, ctx) {
     if (f.reasons.length && !p.parsed.filters.some((r) => f.reasons.includes(r))) return false;
     if (!inRange(p.ev, f.ev)) return false;
     if (!inRange(p.probModel, f.prob)) return false;
-    if (f.sides && f.sides.length && !f.sides.includes(p.side)) return false;
+    if (f.sides && f.sides.length && !f.sides.includes(lineSide(p))) return false;
     if (f.lines && f.lines.length && !f.lines.includes(/** @type {string} */ (p.lineKey))) return false;
     if (f.passedAll != null && Boolean(p.parsed.passedAll) !== f.passedAll) return false;
     if (f.tests && f.tests.length && !testIdsOf(p).some((id) => f.tests.includes(id))) return false;
@@ -357,7 +401,7 @@ export function filterOptions(picks) {
     add('fuerza', p.parsed.fuerza);
     for (const r of p.parsed.filters) add('reasons', r);
     add('slates', p.date);
-    add('sides', p.side);
+    add('sides', lineSide(p));
     add('lines', p.lineKey);
     for (const id of testIdsOf(p)) add('tests', id);
   }
@@ -403,7 +447,7 @@ const FACET_VALUES = /** @type {Record<string, (p: Pick) => Array<string | null>
   samples: (p) => [p.parsed.sample],
   fuerza: (p) => [p.parsed.fuerza],
   reasons: (p) => p.parsed.filters,
-  sides: (p) => [p.side],
+  sides: (p) => [lineSide(p)],
   lines: (p) => [p.lineKey],
   tests: (p) => testIdsOf(p),
 });
@@ -422,7 +466,7 @@ export const FACET_FIELDS = Object.keys(FACET_VALUES);
  * @returns {Record<string, Record<string, number>> & { total: number }}
  */
 export function facetCounts(picks, f, ctx) {
-  const c = { lastSlate: lastSlate(picks), ...ctx };
+  const c = { lastSlate: lastSlate(picks), pendingSlate: pendingSlate(picks), ...ctx };
   const d = defaultFilters();
   // Text, EV and probability are never faceted: apply them once.
   const base = applyFilters(picks, { ...d, q: f.q, ev: f.ev, prob: f.prob }, c);

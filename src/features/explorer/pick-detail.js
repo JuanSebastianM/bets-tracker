@@ -103,7 +103,11 @@ export function PickDetail({ pick: p, pinnacle, position, onPrev, onNext, onClos
   const pin = pinnacleFor(pinnacle, p);
   const profit = p.source === 'bets' ? sheetProfit(p) : null;
   const fair = p.fairOdds ? 1 / p.fairOdds : null;
-  const closeSourceLabel = p.closeSource ? t(`explorer.d.closeSource.${p.closeSource}`) : '';
+  const isGrok = p.source === 'grok';
+  const grokBook = isGrok && p.extra.grokBook ? String(p.extra.grokBook) : '';
+  // Grok's Cuota is Grok's own quote; its close is measured at a book against that book's opening
+  // (extra.grokOpen / extra.grokBook), so the detail says whose price is whose (round 2).
+  const closeSourceLabel = grokBook ? t('explorer.d.closeAtBook', { book: grokBook }) : p.closeSource ? t(`explorer.d.closeSource.${p.closeSource}`) : '';
   return html`<${BottomSheet} open title=${p.match || t('explorer.d.untitled')} onClose=${onClose} testId="pick-sheet" size="lg" footer=${footer}>
     <div class="ex-detail" data-uid=${p.uid}>
       <div class="ex-d-head">
@@ -137,8 +141,16 @@ export function PickDetail({ pick: p, pinnacle, position, onPrev, onNext, onClos
 
       <${Block} title=${t('explorer.d.prices')} testId="pick-prices">
         <${KV} rows=${[
-          [t('explorer.d.price'), formatPrice(p.price)],
-          [t('explorer.d.books'), p.books.join(', ')],
+          ...(isGrok
+            ? [
+                [t('explorer.d.grokQuote'), p.books.length
+                  ? t('explorer.d.grokQuoteBook', { price: formatPrice(p.price), book: p.books.join(', ') })
+                  : t('explorer.d.grokQuoteNoBook', { price: formatPrice(p.price) })],
+                [t('explorer.d.grokClose'), grokBook && p.extra.grokOpen != null && p.closePrice != null
+                  ? t('explorer.d.grokCloseAt', { book: grokBook, open: formatPrice(/** @type {number} */ (p.extra.grokOpen)), close: formatPrice(p.closePrice) })
+                  : t('explorer.d.grokCloseNone')],
+              ]
+            : [[t('explorer.d.price'), formatPrice(p.price)], [t('explorer.d.books'), p.books.join(', ')]]),
           [t('explorer.d.priceSource'), pp.priceSource],
           [t('explorer.d.feedPrice'), pp.feedPrice != null ? formatPrice(pp.feedPrice) : null],
           [t('explorer.d.feedOpen'), pp.feedOpen != null ? `${formatPrice(pp.feedOpen)}${pp.feedOpenOther != null ? ` (${t('explorer.d.otherSideShort')} ${formatPrice(pp.feedOpenOther)})` : ''}` : null],
@@ -146,6 +158,7 @@ export function PickDetail({ pick: p, pinnacle, position, onPrev, onNext, onClos
           [t('explorer.d.closeMissing'), pp.closeMissing],
           [t('explorer.d.clv'), p.clv != null ? formatPct(p.clv) : null, t('explorer.d.clvHint')],
           [t('explorer.d.fairCloseEv'), p.fairCloseEv != null ? formatPct(p.fairCloseEv) : p.closePrice != null ? t('explorer.d.oneSided') : null, t('explorer.d.fairCloseEvHint')],
+          [t('stats.openingFairEv'), p.source === 'shadow' && p.openingFairEv != null ? formatPct(p.openingFairEv) : null, t('explorer.d.openingFairEvHint')],
           [t('explorer.d.minPrice'), p.extra.minPrice != null ? formatPrice(/** @type {number} */ (p.extra.minPrice)) : null],
         ]} />
         <${BooksTable} pick=${p} />

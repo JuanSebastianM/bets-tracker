@@ -9,7 +9,7 @@
   "rangeCol": "Rango (±2 EE)",
   "noClose": "sin cierres",
   "yieldShort": "yield {v}",
-  "evShort": "EV {v}",
+  "evShort": "Precio vs cierre {v}",
   "pendingN": "{n} pendientes",
   "smallTag": "n pequeño",
   "smallRow": "Muestra por debajo del mínimo que elegiste: tómalo como una pista, no como un resultado.",
@@ -18,7 +18,7 @@
   "minNValue": "{n} calificadas",
   "dirAsc": "Orden ascendente",
   "dirDesc": "Orden descendente",
-  "measure": { "ev": "EV vs cierre", "yield": "Yield" },
+  "measure": { "ev": "Precio vs cierre", "yield": "Yield" },
   "dim": {
     "tag": "Etiqueta",
     "market": "Tipo de mercado",
@@ -41,7 +41,7 @@
     "natural": "Orden propio",
     "n": "Más calificadas",
     "yield": "Yield",
-    "ev": "EV vs cierre",
+    "ev": "Precio vs cierre",
     "units": "Unidades",
     "edge": "Acierto sobre lo necesario",
     "label": "Nombre"
@@ -54,7 +54,7 @@
     "hit": "Acierto / necesario",
     "yield": "Yield",
     "units": "Unidades",
-    "ev": "EV vs cierre",
+    "ev": "Precio vs cierre",
     "verdict": "Veredicto"
   },
   "bd": {
@@ -66,7 +66,7 @@
     "chartTitle": "{measure} por {dim}",
     "chartSummary": { "one": "{measure} por {dim}: {k} grupo, con su rango de ±2 errores estándar.", "other": "{measure} por {dim}: {k} grupos, cada uno con su rango de ±2 errores estándar." },
     "chartTop": "El gráfico muestra los primeros {n} de {total} grupos en el orden de la lista.",
-    "axisEv": "EV vs cierre",
+    "axisEv": "Precio vs cierre",
     "axisYield": "yield a 1u",
     "groupsTitle": "Grupos por {dim}",
     "groupsSub": "Toca un grupo para ver todas sus cifras y abrir sus picks en el Explorador.",
@@ -111,12 +111,12 @@
   },
   "cl": {
     "title": "Precio contra el cierre",
-    "sub": "EV vs cierre: la cuota tomada contra la probabilidad del cierre sin margen. Es la medida que no depende de la suerte del resultado.",
+    "sub": "Precio vs cierre: la cuota tomada contra la probabilidad del cierre sin margen. Es la medida que no depende de la suerte del resultado.",
     "range": "Rango probable",
     "rangeSub": "±2 errores estándar",
     "beat": "Le ganan al cierre",
     "beatShort": "{v} le ganan",
-    "histSummary": { "one": "Distribución del EV vs cierre: {n} pick, media {mean}.", "other": "Distribución del EV vs cierre: {n} picks, media {mean}. A la derecha de la línea, picks que le ganaron al cierre sin margen." },
+    "histSummary": { "one": "Distribución del precio vs cierre: {n} pick, media {mean}.", "other": "Distribución del precio vs cierre: {n} picks, media {mean}. A la derecha de la línea, picks que le ganaron al cierre sin margen." },
     "clvTitle": "CLV bruto (contexto)",
     "clvSummary": { "one": "Distribución del CLV bruto: {n} pick, media {mean}.", "other": "Distribución del CLV bruto: {n} picks, media {mean}." },
     "bin": "Tramo",
@@ -129,7 +129,7 @@
     "flat": "Igual",
     "drifted": "Subió",
     "meanClv": "CLV medio",
-    "movesNote": "«Bajó» quiere decir que el mercado se movió hacia el pick (la cuota cerró más baja que la que se tomó). El CLV bruto todavía lleva el margen de la casa: el EV vs cierre es la medida que manda.",
+    "movesNote": "«Bajó» quiere decir que el mercado se movió hacia el pick (la cuota cerró más baja que la que se tomó). El CLV bruto todavía lleva el margen de la casa: el precio vs cierre es la medida que manda.",
     "pinTitle": "Pinnacle: ¿hacia el pick o en contra?",
     "pinSub": "Picks de resultado con id de Pinnacle: el 1X2 de Pinnacle desde la apertura hasta la última lectura, sin margen.",
     "towards": "Hacia el pick",
@@ -222,7 +222,7 @@
     "pinMoves": "Pinnacle se movió hacia el pick en {towards}, en contra en {away} y no se movió en {flat}.",
     "pinFew": "Son muy pocos para sacar conclusiones.",
     "brief": "{record} ({units}, {yield}, n {n}), {ev}",
-    "briefEv": "EV vs cierre {ev} (n {n})",
+    "briefEv": "precio vs cierre {ev} (n {n})",
     "briefNoEv": "sin cierres con los dos lados",
     "grokAll": "Grok va {brief}.",
     "grokPriced": "Los que nuestro script cotizó van {py} (n {pn}); los que no pudo cotizar, {ny} (n {nn}).",
@@ -230,7 +230,7 @@
     "grokShared": { "one": "Coinciden en 1 partido: mismo pick {same}, lados contrarios {opposite}.", "other": "Coinciden en {m} partidos: mismo pick {same}, lados contrarios {opposite}." },
     "grokNoShared": "Todavía no coinciden en ningún partido.",
     "grokCautionSmall": "Son muestras pequeñas: ninguna diferencia de aquí prueba que uno elija mejor que el otro.",
-    "grokCaution": "Aun con más de 100 picks por lado, una diferencia de pocos puntos de yield puede ser varianza; el EV vs cierre es la mejor pista.",
+    "grokCaution": "Aun con más de 100 picks por lado, una diferencia de pocos puntos de yield puede ser varianza; el precio vs cierre es la mejor pista.",
     "grokNone": "No hay picks de Grok con estos filtros."
   }
 }

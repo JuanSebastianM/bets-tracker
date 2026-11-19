@@ -12,11 +12,13 @@ loadAllStrings('es');
 test('spokenRecord says each part with its noun and leaves out the zeros', () => {
   setLocale('es');
   assert.equal(spokenRecord({ won: 7, lost: 10, void: 2 }), '7 ganadas, 10 perdidas, 2 nulas');
-  assert.equal(spokenRecord({ won: 15, lost: 19, void: 0, halfWon: 1, halfLost: 0 }), '15 ganadas, 19 perdidas, 1 media');
+  assert.equal(spokenRecord({ won: 15, lost: 19, void: 0, halfWon: 1, halfLost: 0 }), '15 ganadas, 19 perdidas, 1 medio ganada');
   assert.equal(spokenRecord({ won: 1, lost: 0, void: 0 }), '1 ganada, 0 perdidas');
   assert.equal(spokenRecord({ won: 0, lost: 0, void: 0 }), 'sin picks calificados');
   setLocale('en');
-  assert.equal(spokenRecord({ won: 6, lost: 12, void: 2, halfWon: 1, halfLost: 1 }), '6 won, 12 lost, 2 void, 2 half results');
+  assert.equal(spokenRecord({ won: 6, lost: 12, void: 2, halfWon: 1, halfLost: 1 }), '6 won, 12 lost, 2 void, 1 half won, 1 half lost');
+  setLocale('es');
+  assert.equal(spokenRecord({ won: 6, lost: 12, void: 0, halfWon: 0, halfLost: 3 }), '6 ganadas, 12 perdidas, 3 medio perdidas');
   setLocale('es');
 });
 

@@ -47,3 +47,14 @@ export function leftOutLine(tt) {
   return parts.join(' ');
 }
 
+/**
+ * The chance range of the headline, or why there is none: under two picks, or no variation at all
+ * (every pick returned the same per unit, standard error 0), where "from +2.52u to +2.52u" would read
+ * as a certainty (round 2).
+ * @param {SimResult['totals']} tt
+ */
+export function chanceText(tt) {
+  if (tt.n < 2 || tt.profitSe == null) return t('simulator.chanceNone');
+  if (!tt.profitSe || tt.chanceLo == null || tt.chanceHi == null) return t('simulator.chanceFlat');
+  return t('simulator.chance', { lo: formatUnits(tt.chanceLo), hi: formatUnits(tt.chanceHi) });
+}

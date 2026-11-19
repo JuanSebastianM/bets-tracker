@@ -177,3 +177,8 @@
 
 /* Accessibility pass: 44 px touch area. */
 .tests .tests-ov-link { min-height: var(--tap); }
+
+/* Round 2: the price-first tests do not share one measure, so each row keeps its measure's name on wide screens too. */
+@media (min-width: 720px) {
+  .tests .tests-cell-k.tests-cell-k-keep { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; }
+}

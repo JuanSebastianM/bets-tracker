@@ -25,9 +25,19 @@ export const REASON_SLUGS = /** @type {Record<string, string>} */ ({
 
 /** Glossary entry of each market family (src/data/tags.js MARKET_FAMILIES). */
 export const MARKET_SLUGS = /** @type {Record<string, string>} */ ({
-  result: '1x2', goals: 'totals', corners_total: 'corners', corners_team: 'corners', cards_total: 'cards', cards_team: 'cards',
+  result: '1x2', goals: 'totals', corners_total: 'corners', corners_team: 'corners-team', cards_total: 'cards', cards_team: 'cards-team',
   shots: 'shots', combo: 'builder', other: 'other-markets',
 });
+
+/**
+ * Old glossary slugs that still open an entry (deep links and bookmarks keep working): `fair-close-ev`
+ * described price vs close until round 2, when the two measures against the close got an entry each
+ * (`price-vs-close`, `fair-ev-review`).
+ */
+export const GLOSSARY_ALIASES = /** @type {Record<string, string>} */ ({ 'fair-close-ev': 'price-vs-close' });
+
+/** The slug an old or current glossary slug opens. @param {string} slug */
+export const resolveGlossarySlug = (slug) => GLOSSARY_ALIASES[slug] || slug;
 
 /** Glossary slug of a betting-analyst rule number. @param {number | string} n */
 export const ruleSlug = (n) => `rule-${parseInt(String(n), 10)}`;

@@ -47,7 +47,7 @@ test('accordion: one open at a time, in the URL, keyboard operable, kept on relo
   await expect(btn).toHaveAttribute('aria-expanded', 'true');
   await expect(page.getByTestId('detail-corner_rejects')).toBeVisible();
   await expect(cr.getByRole('region')).toContainText('No se decide nada hasta 100 calificadas');
-  await expect(cr.getByRole('img')).toHaveAttribute('aria-label', /EV contra el cierre/);
+  await expect(cr.getByRole('img')).toHaveAttribute('aria-label', /Precio vs cierre/);
   await expect(page).toHaveURL(/#\/tests\?date=30d&open=corner_rejects$/);
 
   const tc = page.getByTestId('frozen-team_corners').getByRole('button');
@@ -89,7 +89,7 @@ test('links: explorer filter, decisions, glossary, stopped categories', async ({
   const d = page.getByTestId('detail-corner_rejects');
   await expect(d.getByRole('link', { name: 'Decisiones fila 106' })).toHaveAttribute('href', '#/decisions/106');
   await page.getByText('Cómo leer esta pantalla').click();
-  await expect(page.getByRole('link', { name: 'EV contra el cierre' })).toHaveAttribute('href', '#/glossary/fair-close-ev');
+  await expect(page.getByRole('link', { name: 'precio vs cierre' })).toHaveAttribute('href', '#/glossary/price-vs-close');
   await expect(page.getByRole('link', { name: 'error estándar' })).toHaveAttribute('href', '#/glossary/standard-error');
   await expect(page.getByRole('link', { name: 'Decisiones fila 111' })).toHaveAttribute('href', '#/decisions/111');
 

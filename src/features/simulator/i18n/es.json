@@ -150,7 +150,7 @@
     "actual": "Ganancia en esos picks",
     "expected": "Lo que valía el precio",
     "range": "de {lo} a {hi}",
-    "meanEv": "EV vs cierre medio",
+    "meanEv": "Precio vs cierre medio",
     "chance": "Total ± rango por azar",
     "chanceNote": "Rango por azar: el total ± 2 errores estándar. Si incluye el cero, la muestra todavía no separa la habilidad de la suerte."
   },
@@ -227,5 +227,6 @@
     "empty": "Todavía no guardas ninguno.",
     "name": "Nombre del escenario",
     "save": "Guardar escenario"
-  }
+  },
+  "chanceFlat": "Todos los picks dieron lo mismo por unidad: sin variación todavía no hay rango por azar que estimar."
 }
