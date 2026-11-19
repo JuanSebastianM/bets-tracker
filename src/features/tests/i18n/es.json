@@ -35,7 +35,7 @@
     "once": "Si miras una prueba cada semana y decides cuando se ve bien, tarde o temprano alguna pasa por pura suerte. Por eso cada prueba se decide una vez, al llegar a su conteo, con una regla fijada antes de ver los datos. Yield y acierto se muestran como contexto: no deciden nada.",
     "barsTitle": "Las barras",
     "bars": "Cada prueba tiene dos barras: filas calificadas y filas con cierre de dos lados. Hacen falta las dos. La franja muestra la media con su intervalo de ±2 errores estándar contra la línea del cero.",
-    "termFairClose": "EV contra el cierre",
+    "termFairClose": "precio vs cierre",
     "termSe": "error estándar"
   },
   "review": {
@@ -74,7 +74,7 @@
       "one": "{n} pendiente",
       "other": "{n} pendientes"
     },
-    "measure": "EV del precio contra el cierre",
+    "measure": "Precio vs cierre",
     "measureValue": "{mean} (n {n})",
     "interval": "±2 EE: {lo} a {hi}",
     "z": "z {z}",
@@ -92,7 +92,7 @@
     "explorerHint": "Cada enlace al Explorador lleva el filtro de la prueba (Prueba: …) y muestra exactamente las filas que la prueba cuenta, pendientes incluidas.",
     "explorerN": {"one": "Ver la fila en el Explorador", "other": "Ver las {n} filas en el Explorador"},
     "decision": "Decisiones fila {row}",
-    "chart": "EV contra el cierre {mean}, intervalo de {lo} a {hi}, n {n}.",
+    "chart": "{measure} {mean}, intervalo de {lo} a {hi}, n {n}.",
     "chartNone": "Sin intervalo: hacen falta al menos dos partidos con cierre.",
     "what": {
       "rule30_pass_all": "Córners y tarjetas totales que pasaron todos los filtros y solo los frena la pausa de la regla 30.",
@@ -118,7 +118,7 @@
       "prop_near_value": "Córners y tarjetas totales entre 0% y 3% sobre el consenso, hasta 3 por slate."
     },
     "rule": {
-      "value": "Decidido antes de ver los datos (filas 79 y 80): la línea que decide es cuota 4.0 o menos. Pasa con 30+ calificadas con EV justo contra el cierre, media sobre cero y yield plano positivo. Si pasa se propone dinero real en ≤4.0, o solo en ≤3.0 si el tramo 3.0–4.0 tiene 10+ filas con media negativa. Si ≤4.0 no pasa pero ≤3.0 sí, se juzga ≤3.0 solo con filas desde el 30 oct. Si ninguna pasa, resultado y goles siguen en SHADOW. Siempre con stake pequeño y tu aprobación.",
+      "value": "Decidido antes de ver los datos (filas 79 y 80): la línea que decide es cuota 4.0 o menos. Pasa con 30+ calificadas con EV justo (revisión), media sobre cero y yield plano positivo. Si pasa se propone dinero real en ≤4.0, o solo en ≤3.0 si el tramo 3.0–4.0 tiene 10+ filas con media negativa. Si ≤4.0 no pasa pero ≤3.0 sí, se juzga ≤3.0 solo con filas desde el 30 oct. Si ninguna pasa, resultado y goles siguen en SHADOW. Siempre con stake pequeño y tu aprobación.",
       "near_value": "No tiene decisión propia: se reporta aparte de VALOR para ver si el umbral del 3% está bien puesto.",
       "prop_value": "Fijada el 6 nov antes de ver filas (fila 97): con {first} filas calificadas con cierre de bet365 de ambos lados, si es CLARA (intervalo de 95% entero sobre cero y yield plano positivo) se te propone dinero real a {stake}u; si la media es cero o menos, se propone parar; si no, sigue hasta {final}, donde CLARA se propone y cualquier otra cosa se para.",
       "prop_near_value": "No tiene decisión propia: se reporta aparte de VALOR PROP."
@@ -136,8 +136,8 @@
       "stop": "Se te propondría parar la categoría.",
       "extended": "Ni clara ni negativa a las {first}: sigue hasta {final} filas."
     },
-    "measureValue": "EV justo contra el cierre (apertura contra el cierre de su misma fuente)",
-    "measureProp": "EV contra el cierre de bet365 sin margen (método power)",
+    "measureValue": "EV justo (revisión): la apertura contra el cierre sin margen de su misma fuente",
+    "measureProp": "EV vs bet365 (power): tu cuota contra el cierre de bet365 sin margen, método power",
     "interval95": "IC 95%: {lo} a {hi}",
     "lines": "Por tramo de cuota",
     "books": "Por casa del precio",
@@ -159,9 +159,9 @@
     "perSlate": "{n} filas por slate en {slates} slates",
     "perSlateLow": "Menos de 1 por slate: la revisión lo reporta y te pregunta si ampliar a toda línea que compartan dos casas.",
     "contextOnly": "Contexto: yield {yield} (n {n}), récord {record}",
-    "valueCollecting": "Todavía no hay {total} filas con EV justo en la línea ≤4.0: no se decide nada.",
+    "valueCollecting": "Todavía no hay {total} filas con EV justo (revisión) en la línea ≤4.0: no se decide nada.",
     "linesAndBooks": "Por tramo de cuota y por casa",
-    "gateLabel": "Filas ≤4.0 con EV justo",
+    "gateLabel": "Filas ≤4.0 con EV justo (revisión)",
     "propLabel": "Con cierre de bet365 de ambos lados",
     "gateLineShort": "línea ≤4.0"
   },
@@ -169,7 +169,7 @@
     "title": "Categorías paradas o que no cuentan",
     "intro": "Ya no se registran (o sus filas nunca cuentan), pero siguen en la hoja. Aquí está cuándo y por qué pararon, con sus números finales.",
     "when": "Parada el {date}",
-    "final": "Récord {record}; yield {yield} (n {n}); EV contra el cierre {ev} (n {evn})",
+    "final": "Récord {record}; yield {yield} (n {n}); precio vs cierre {ev} (n {evn})",
     "span": "Filas del {first} al {last}",
     "empty": "Sin filas en los datos.",
     "why": {
@@ -187,8 +187,10 @@
   "list": {
     "graded": "Calificadas",
     "closes": "Con cierre",
-    "ev": "EV vs cierre",
+    "ev": "Precio vs cierre",
     "evValue": "{mean} n {n}",
-    "glossary": "{label} en el glosario"
+    "glossary": "{label} en el glosario",
+    "evProp": "EV vs bet365 (power)",
+    "evMeasure": "Su medida"
   }
 }

@@ -55,5 +55,6 @@
   "stakingTitle": "Reglas de stake (pestaña Reglas)",
   "stakingSub": "Tal como están en la hoja, con su propia numeración. Toca «Qué significa» para la explicación.",
   "sheetRuleN": "Regla {n} de la pestaña Reglas",
-  "whatItMeans": "Qué significa"
+  "whatItMeans": "Qué significa",
+  "monthPart": "{total} ({shown} en esta página)"
 }

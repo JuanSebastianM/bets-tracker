@@ -116,3 +116,12 @@
   .overview .ov-sources { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .overview .ov-sources .ov-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Round 2: the reviewer's fair-close EV under price vs close (Sombra tags), and the legend that names both. */
+.overview .ov-grev { grid-area: rev; justify-self: end; text-align: right; font-size: var(--fs-xs); color: var(--c-muted); }
+.overview .ov-grow { grid-template-areas: 'name verdict chev' 'meta meta chev' 'bar ev chev' 'rev rev chev'; }
+@media (min-width: 720px) {
+  .overview .ov-grow { grid-template-areas: 'name meta bar ev verdict chev' '. . . rev rev .'; }
+  .overview .ov-grev { justify-self: start; text-align: left; }
+}
+.overview .ov-legend { margin: 0 0 var(--sp-2); font-size: var(--fs-xs); color: var(--c-muted); }

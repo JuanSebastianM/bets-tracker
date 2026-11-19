@@ -413,3 +413,18 @@ export function parseSheetRule(/** @type {string} */ line) {
   const m = /^\s*(\d+)[.)]\s*(.*)$/s.exec(String(line || ''));
   return m ? { n: Number(m[1]), text: m[2].trim() } : { n: null, text: String(line || '').trim() };
 }
+
+/**
+ * How many decisions each month has in a list (the filtered list, before paging), so a month header
+ * says the month's count under the active filters and not only the part on the current page (round 2).
+ * @param {Decision[]} decisions
+ * @returns {Map<string, number>} 'YYYY-MM' (or '—' without a date) → count
+ */
+export function monthCounts(decisions) {
+  const m = new Map();
+  for (const d of decisions) {
+    const month = (d.date || '').slice(0, 7) || '—';
+    m.set(month, (m.get(month) || 0) + 1);
+  }
+  return m;
+}

@@ -2,7 +2,7 @@
 // what is pending, what changed since the last visit and the real-bets extras. Pure functions on
 // Pick[]; every rate and mean still comes from stats.js (summarize, measureStat, drawdown).
 
-import { summarize, groupBy, isCountable, isGraded, sheetProfit, flatProfit, drawdown, mean } from './stats.js';
+import { summarize, groupBy, isCountable, isGraded, sheetProfit, flatProfit, drawdown, mean, measureStat } from './stats.js';
 import { applyFilters, defaultFilters } from './filters.js';
 import { byDate } from './normalize.js';
 import { groupByLine } from './lines.js';
@@ -253,7 +253,9 @@ export function dailyUnits(picks) {
  */
 export function realBetsExtras(bets, bankrollU = null) {
   const days = dailyUnits(bets);
-  const cum = cumulativeUnits(bets).map((p) => p.cum);
+  // One series for the chart and the figures: the running total at the end of each day (round 2:
+  // the worst drop used to be measured bet by bet in sheet order, which the per-day chart cannot show).
+  const cum = days.map((d) => d.cum);
   const dd = drawdown(cum, bankrollU || undefined);
   const peak = Math.max(0, ...cum);
   const last = cum.length ? cum[cum.length - 1] : 0;
@@ -412,4 +414,55 @@ export function shadowTagLineRows(picks) {
     if (rows.length >= 2) out[g.key] = rows;
   }
   return out;
+}
+
+// ---------------------------------------------------------------- round 2 additions
+
+/**
+ * The reviewer's fair-close EV (Pick.openingFairEv: the opening price at the same source against the
+ * de-vigged close; milestone-reviewer's headline, "EV justo (revisión)") over the graded picks that
+ * summarize counts. Not the same measure as Summary.fairCloseEv (price vs close: the taken price against
+ * the close), which the frozen tests use.
+ * @param {Pick[]} picks
+ * @returns {MeanStat}
+ */
+export function reviewFairEv(picks) {
+  return measureStat(picks.filter((p) => isCountable(p) && isGraded(p) && p.price != null), (p) => p.openingFairEv);
+}
+
+/**
+ * reviewFairEv per Sombra tag (same picks as shadowTagRows), keyed by tag id.
+ * @param {Pick[]} picks
+ * @returns {Record<string, MeanStat>}
+ */
+export function shadowTagReviewEv(picks) {
+  const shadow = picks.filter((p) => p.source === 'shadow' && p.tag !== 'published_bet');
+  /** @type {Record<string, MeanStat>} */
+  const out = {};
+  for (const g of groupBy(shadow, (p) => p.tag)) out[g.key] = reviewFairEv(g.picks);
+  return out;
+}
+
+/**
+ * The shape of the real bets' stakes, for the sentence that says why their hit rate and their result can
+ * disagree: how many graded bets were free bets, and whether the stakes differ.
+ * @param {Pick[]} bets Apuestas picks
+ */
+export function realStakeShape(bets) {
+  const graded = bets.filter((p) => isCountable(p) && isGraded(p));
+  const freeBets = graded.filter((p) => p.extra && p.extra.freeBet).length;
+  const stakes = new Set(graded.filter((p) => p.stakeU != null).map((p) => p.stakeU));
+  return { freeBets, uneven: stakes.size > 1 };
+}
+
+/**
+ * The Explorer link of one pending slate and how many picks it shows, so the link can say it: every
+ * pending pick of that date (a pending PUBLICADA Y APOSTADA row too, which the slate's own list leaves
+ * out because it is the Apuestas row's twin). A short URL rather than a list of every other tag.
+ * @param {Pick[]} picks all picks @param {string} date
+ * @returns {{ filter: FilterState, count: number }}
+ */
+export function pendingSlateLink(picks, date) {
+  const filter = { ...defaultFilters(), slate: date, statuses: ['pending'] };
+  return { filter, count: applyFilters(picks, filter, { today: date }).length };
 }

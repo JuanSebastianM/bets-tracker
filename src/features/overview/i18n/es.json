@@ -14,7 +14,8 @@
     "last_slate": "Último slate",
     "slateOf": "Slate del {date}",
     "range": "Del {from} al {to}",
-    "allTime": "Desde el primer pick"
+    "allTime": "Desde el primer pick",
+    "rolling": "Del {from} en adelante, con los próximos slates incluidos"
   },
   "brief": {
     "title": "En pocas palabras",
@@ -31,16 +32,21 @@
   "evRange": "{lo} a {hi}",
   "tags": {
     "title": "Sombra por etiqueta",
-    "sub": "1u en cada pick. Ordenadas por su EV contra el cierre; sin {min} cierres el veredicto es «muy pronto».",
+    "sub": "1u en cada pick. Ordenadas por precio vs cierre; sin {min} cierres el veredicto es «muy pronto».",
     "markets": "Sombra por mercado",
     "marketsSub": "Las mismas cuentas, agrupadas por tipo de mercado.",
-    "rowLabel": "{label}: {verdict}. {record}, yield {yield}, n {n}. EV contra el cierre {ev}, n {nClose}. Ver en el Explorador.",
+    "rowLabel": "{label}: {verdict}. {record}, yield {yield}, n {n}. Precio vs cierre {ev}, n {nClose}.{review} {link}",
     "meta": "n {n} · {record} · yield {yield}",
-    "ev": "EV {ev}",
+    "ev": "{ev}",
     "evN": "n {n}",
     "noClose": "sin cierre",
     "empty": "No hay picks de Sombra calificados en este periodo.",
-    "axis": "Escala de {min} a {max}; la línea es el cero."
+    "axis": "Escala de {min} a {max}; la línea es el cero.",
+    "reviewLabel": "EV justo (revisión) {ev}, n {n}.",
+    "reviewShort": "EV justo (revisión) {ev} · n {n}",
+    "rowLink": {"one": "Abre su pick calificado en el Explorador.", "other": "Abre sus {n} picks calificados en el Explorador."},
+    "legendPrice": ": la cifra y la barra (media con su rango de ±2 errores estándar, contra el cierre de cada pick). ",
+    "legendReview": ": debajo, en gris, la cifra de las revisiones de Sombra (la apertura contra el cierre de su misma fuente)."
   },
   "pending": {
     "title": "Hoy y pendientes",
@@ -55,8 +61,8 @@
     "title": "Apuestas reales",
     "sub": "Con la ganancia que registra la hoja (sabe de apuestas gratis y liquidaciones raras).",
     "chart": "Unidades acumuladas por día de las apuestas reales: {total} al final, peor caída {dd}.",
-    "currentDd": "Bajo el pico",
-    "maxDd": "Peor caída",
+    "currentDd": "Bajo el pico (por día)",
+    "maxDd": "Peor caída (por día)",
     "ofBank": "{pct} de tu bank",
     "noBank": "Pon tu bank en Ajustes para verlo en %",
     "avgStake": "Stake medio",
@@ -72,7 +78,8 @@
     "title": "Seguir mirando",
     "picks": "Ver todos los picks",
     "simulate": "Simular",
-    "tests": "Tests"
+    "tests": "Tests",
+    "picksN": {"one": "Ver el pick", "other": "Ver los {n} picks"}
   },
   "lines": {
     "summary": {
@@ -80,8 +87,9 @@
       "other": "Por línea · {n} líneas"
     },
     "title": "Por línea en {label}",
-    "evN": "EV {ev} (n {n})",
+    "evN": "Precio vs cierre {ev} (n {n})",
     "noClose": "sin cierre",
     "rowLabel": "{line}: n {n}, {record}, yield {yield}, {ev}, {verdict}"
-  }
+  },
+  "seePicksN": {"one": "Ver su pick en el Explorador", "other": "Ver sus {n} picks en el Explorador"}
 }

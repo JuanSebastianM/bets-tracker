@@ -8,15 +8,15 @@ import { Card, Disclosure, Banner, Scoreboard, Icon } from '../../lib/ui/index.j
 import { formatPct, formatDate, formatUnits, formatRecord } from '../../lib/format.js';
 import { grokByVerdict, grokByMarket, grokTeamCorners, grokPricedSplit, GROK_TEAM_CORNERS_ONLY_FROM } from '../../data/analysis.js';
 import { summarize } from '../../data/stats.js';
-import { defaultFilters } from '../../data/filters.js';
+import { defaultFilters, exactSlice } from '../../data/filters.js';
 import { VerdictChip, explorerHref, evText, signClass, SummaryLine, hitText } from './parts.js';
 import { grokText } from './text.js';
 
 /** @typedef {import('../../data/types').Pick} Pick */
 /** @typedef {import('../../data/stats.js').Summary} Summary */
 
-/** @param {{ picks: Pick[], scopeNote: boolean, filters: import('../../data/filters.js').FilterState }} props */
-export function GrokVsClaude({ picks, scopeNote, filters }) {
+/** @param {{ picks: Pick[], all?: Pick[], today?: string, scopeNote: boolean, filters: import('../../data/filters.js').FilterState }} props */
+export function GrokVsClaude({ picks, all: allPicks, today, scopeNote, filters }) {
   const grok = useMemo(() => picks.filter((p) => p.source === 'grok'), [picks]);
   const all = useMemo(() => summarize(grok), [grok]);
   const kinds = useMemo(() => grokByVerdict(picks), [picks]);
@@ -110,7 +110,8 @@ export function GrokVsClaude({ picks, scopeNote, filters }) {
         ? html`<ul class="an-rows" data-testid="grok-markets">
             ${markets.map(
               (r) => html`<li key=${r.key} data-key=${r.key}>
-                <a class="an-row-name" href=${grokLink({ sources: ['grok'], markets: [r.key] })}>${t(`markets.${r.key}`)}</a>
+                <a class="an-row-name" data-count=${r.summary.n} data-testid="grok-market-link"
+                  href=${allPicks && today ? explorerHref(exactSlice(allPicks, filters, { sources: ['grok'], markets: [r.key] }, { today })) : grokLink({ sources: ['grok'], markets: [r.key] })}>${t(`markets.${r.key}`)}</a>
                 <${SummaryLine} s=${r.summary} />
               </li>`,
             )}

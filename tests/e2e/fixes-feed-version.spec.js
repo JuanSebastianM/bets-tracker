@@ -55,7 +55,8 @@ test('different version: calm banner on Overview and Settings only, data still s
   await expect(page.getByTestId('feed-script-expected')).toHaveText(EXPECTED);
   await expect(page.getByTestId('feed-script-state')).toContainText('La hoja está corriendo otra versión del script del feed');
   await expect(page.getByTestId('feed-script-todo')).toContainText('btFeedSelfTest');
-  await expect(box).toContainText('5 minutos');
+  // One cache note under the version box (round 2: the two similar notes were merged).
+  await expect(page.getByTestId('feed-cache-note')).toContainText('5 minutos');
   await expect(page.getByTestId('feed-script-docs')).toHaveAttribute('href', /#5-the-feed-script$/);
   await expectNoHorizontalScroll(page);
   // Dismiss: gone on Settings and on the Overview for the session, the state in Settings stays.
@@ -91,7 +92,7 @@ test('English: banner and Settings state', async ({ page }) => {
   await expect(banner.getByTestId('banner-script-version-settings')).toHaveText('Open Settings');
   await page.goto('/?feed=fixture#/settings');
   await expect(page.getByTestId('feed-script-state')).toContainText('The sheet is running a different version of the feed script');
-  await expect(page.getByTestId('feed-script')).toContainText('up to 5 minutes');
+  await expect(page.getByTestId('feed-cache-note')).toContainText('up to 5 minutes');
   await expect(page.getByTestId('feed-script-docs')).toHaveText('Steps in the README (section 5)');
   await page.getByTestId('banner-script-version-dismiss').click();
   await expect(banner).toHaveCount(0);

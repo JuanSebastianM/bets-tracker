@@ -351,3 +351,16 @@ mark.hl { background: var(--c-accent-soft); color: inherit; border-radius: 3px; 
 .card { grid-template-columns: minmax(0, 1fr); }
 .btn { max-width: 100%; white-space: normal; text-align: center; }
 .stat-value { overflow-wrap: anywhere; }
+
+/* Round 2: a button or chip that is disabled while it has focus stays focusable (aria-disabled) until
+   focus moves on (useFocusSafeDisabled in controls.js), and looks disabled meanwhile. */
+.btn[aria-disabled='true'] { opacity: 0.45; cursor: default; }
+
+/* Round 2: the range chart's axis label sits on its own line above the min and max, which overlapped
+   it on a 390 px phone (accessibility hand-off). */
+.range-axis { row-gap: 0; }
+.range-axis span:first-child, .range-axis span:last-child { grid-row: 2; }
+
+/* Round 2: half results are written in words ("+3 medias"), longer than "+3½": the figures may wrap. */
+.score-figures { flex-wrap: wrap; row-gap: 4px; }
+.score-half { white-space: nowrap; }

@@ -59,7 +59,7 @@ test('every slug in the code exists in the glossary (es and en)', () => {
   ];
   assert.ok(all.length > 60, `collected ${all.length}`);
   const literal = new Set(slugsInCode().map(([s]) => s));
-  for (const s of ['fair-close-ev', 'standard-error', 'decision-in-force', 'decision-replaced']) assert.ok(literal.has(s), `collector finds ${s}`);
+  for (const s of ['price-vs-close', 'standard-error', 'decision-in-force', 'decision-replaced']) assert.ok(literal.has(s), `collector finds ${s}`);
   for (const lang of ['es', 'en']) {
     for (const [slug, file] of all) {
       if (/^rule-\d+$/.test(slug)) assert.ok(rules[lang].has(slug), `${lang}: ${slug} (${file})`);

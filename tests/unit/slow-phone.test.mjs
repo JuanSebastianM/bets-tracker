@@ -19,6 +19,7 @@ const STATES = [
   'q=racing', 'q=tarjetas under', 'q=Córners&src=shadow', 'close=1', 'close=0', 'close2=1', 'pass=1', 'pass=0', 'side=under', 'line=cards:under:4.5',
   'mkt=cards_total&lg=Liga%20Austral', 'book=Betano', 'st=won,lost', 'ref=feed', 'sample=10%2B', 'fz=keeps', 'why=f4', 'evmin=0.02', 'prmin=0.5&prmax=0.6',
   'src=shadow&tag=value&price=le250&date=30d&close2=1&q=a',
+  'date=pending_slate', 'side=over&src=grok',
 ];
 /**
  * sha256 of the outputs computed with the filter code from before the slow-phone work. It was first taken
@@ -27,8 +28,11 @@ const STATES = [
  * that first digest for reasons unrelated to speed. The orchestrator recomputed it at the merge by
  * running the pre-merge `filters.js` (e7385ff) and the merged one side by side on the merged data layer:
  * identical on these 34 states and on three more with `test=`.
+ * Round 2 (19 Nov 2026) changed what three filters mean, on purpose: `last_slate` is the last graded
+ * slate, the rolling presets have no end date, a `pending_slate` preset exists (one more facet count),
+ * and the Over / Under filter skips picks without a line. Recomputed then, with two more states.
  */
-const DIGEST_BEFORE = '327136fc875dc13720160c7a669afcb1c1811d5e436b4aa2e72ee91897842b58';
+const DIGEST_BEFORE = 'ad2f699631f8db5f8ac9404fed63ad2d7060f435560e5bc72b0dcaf32023fc59';
 
 test('5,000 picks: filters and facet counts give exactly what they gave before the speed-ups', () => {
   const data = normalizeFeed(bigFeed(5000));

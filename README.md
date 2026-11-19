@@ -60,21 +60,27 @@ reloaded or shared. The filter keys are shared by the Explorer, the Simulator an
 
 **Overview** (`#/`, Resumen). A period switch (all, 30 days, 7 days, last graded slate; key `date`) that
 applies to the whole screen. Per source (Apuestas with the sheet's own profit, Sombra and Grok at 1u
-flat): record as a scoreboard, units, yield, hit rate against break-even, mean fair-close EV with its
-±2 SE range and n, pending, a sparkline and a paragraph about what the sample can say. "Sombra por
-etiqueta": one row per tag with a range bar of the fair-close EV and a verdict word chosen by a fixed
+flat): record as a scoreboard, units, yield, hit rate against break-even (not for real bets, whose
+stakes differ), mean **price vs close** ("Precio vs cierre": the taken price × the de-vigged closing
+probability − 1) with its ±2 SE range and n, for Sombra also the reviewer's **fair-close EV**
+("EV justo (revisión)": the opening at the same source against its close, the headline of the Sombra
+reviews) with its n, pending, a sparkline and a paragraph about what the sample can say. "Sombra por
+etiqueta": one row per tag with a range bar of price vs close, the review figure under it, and a verdict word chosen by a fixed
 rule (`closeVerdict` in `src/data/overview.js`: "sin cierres", "muy pronto" under 20 two-sided closes,
 "por encima / por debajo del cierre" when the whole ±2 SE range is on one side, otherwise "tirando a
 favor / en contra"); under tags with two or more lines, a collapsed "Por línea" list. The same by
 market family. "En pocas palabras" (last slate, pending today, best and worst tag, results vs price),
 today's pending picks by slate, "since your last visit" (a small snapshot in this browser), real-bet
-extras (units per day, worst drop, average stake) and quick links that carry the period.
+extras (units per day, worst drop by day, average stake) and quick links that carry the period. The
+rolling periods (7 and 30 days) have no end date, so picks logged for upcoming slates count. Every row
+links to exactly the picks it counts, and every link says how many it opens.
 
 **Explorer** (`#/explorer`, `#/explorer/:uid`). Every pick as cards on a phone and a sortable table from
 960 px, 50 per page, with a summary strip for the current filter (record, yield at 1u, hit rate vs
-break-even, fair-close EV ±2 SE with n, one sentence, sparkline, "Simular estos picks"). The pick detail
+break-even, price vs close ±2 SE with n, one sentence, sparkline, "Simular estos picks"). The pick detail
 shows everything the sheet and the parsed notes say: sheet row, tag and its meaning, every book's price
-and close with the other side, CLV and fair-close EV with one-line explanations, the probabilities,
+and close with the other side, CLV, price vs close and (Sombra) the review's fair-close EV with one-line
+explanations, for Grok whose price the quote is and at which book the close was measured, the probabilities,
 reference, sample, FUERZA, Pinnacle 1X2 open → last, raw notes, and previous / next inside the filtered
 list. Keys: the filter keys plus `sort`, `dir`, `page`.
 
@@ -85,7 +91,8 @@ by its own membership: the Tests links use it, so they are exact); **line and si
 the other filters, "Under 4.5 · 11", grouped by kind of market when they mix: TARJETAS UNDER + Under 4.5
 is two taps); league (searchable); book; status; price presets (`≤ 1.70`, `1.70–2.00`, `< 2.00`, `≤ 2.00`,
 `> 2.00, ≤ 2.50`, `≤ 2.50`, `> 2.50, ≤ 4.00`, `≤ 4.00`, `> 4.00`, each label built from its bounds) or a
-custom min/max; date presets (last slate, 7 days, 30 days, this month, since a date), a from/to range and
+custom min/max; date presets (last graded slate, newest slate with pending picks, 7 days, 30 days, this month
+— the rolling ones with no end date —, since a date; the panel says the dates), a from/to range and
 one slate date; has a closing price; has a two-sided close; reference; sample; FUERZA; filter reason and
 "passed every filter"; logged EV range; model probability range; free text. Every option shows how many
 picks it would give with the other filters as they are; options at zero are disabled or hidden. Saved
@@ -96,7 +103,7 @@ four staking modes: flat units, % of the bankroll (compounding, same-day picks s
 starting bankroll), "as staked" (the sheet's stake and profit for real bets, Grok's suggested stake),
 and fractional Kelly from the logged fair probability with a cap. Record, yield, the chance range (±2 SE
 of the summed profit), the cumulative curve with drawdown shading and the "expected by the close" line
-(Σ stake × fair-close EV), worst drop, streaks, best and worst day, time under water, month by month,
+(Σ stake × price vs close), worst drop, streaks, best and worst day, time under water, month by month,
 breakdown by tag / market / price band / line with exact links to the Explorer, pending stakes, a
 scenario B on the same chart and saved scenarios. Money appears only when a unit value is set in
 Settings. Keys: the filter keys plus `mode`, `stake`, `pct`, `bank`, `kf`, `kcap`, and `b` (scenario B's
@@ -114,7 +121,7 @@ rows included, the same count the Explorer shows). Key: `open` (the expanded tes
 **Analysis** (`#/analysis/:part`, parts `breakdown`, `calibration`, `close`, `grok`). Breakdown by 16
 dimensions (tag, market, raw market, league, book, price band, month, weekday, model-probability band,
 logged-EV band, reference, sample, FUERZA, reason, source, line) with n, record, hit rate vs break-even,
-yield ±2 SE, fair-close EV ±2 SE and the verdict word; a range chart; a minimum-n slider; an optional
+yield ±2 SE, price vs close ±2 SE and the verdict word; a range chart; a minimum-n slider; an optional
 second dimension; every row links to exactly its picks in the Explorer (or has no link when that is
 impossible, e.g. weekday). Calibration of the model, blend, consensus and Sofascore AI probabilities
 with Brier scores beside the market's. Price against the close: histogram, share above zero, raw CLV as
@@ -176,7 +183,7 @@ src/features/    one folder per section: overview, explorer, simulator, tests, a
 src/i18n/, src/content/   shared strings (es, en); glossary and rules content
 src/styles/      tokens.css (light and dark), base.css, components.css, filter-panel.css
 scripts/         serve, build-site, check-i18n, make-fixture, make-icons, vendor-build, bin
-tests/unit/, tests/e2e/, tests/fixtures/  31 unit test files, 14 e2e specs (3 of them screenshots), the synthetic feed
+tests/unit/, tests/e2e/, tests/fixtures/  39 unit test files, 21 e2e specs (4 of them screenshots), the synthetic feed
 docs/            ARCHITECTURE, DATA_CONTRACT, FEATURE_GUIDE, BUILD_LOG, briefs/, screenshots/
 ```
 
@@ -202,8 +209,10 @@ read at" (`generatedAt`). A feed with a newer schema is refused with a message i
 section 4): source, sheet row, match date, league, match, raw and normalized market (`result`, `goals`,
 `corners_total`, `corners_team`, `cards_total`, `cards_team`, `shots`, `combo`, `other`), review class,
 selection, line and `lineKey` (`cards:under:4.5`, `ah:+0.25`), side, price, close, status, tag, books,
-stake and profit (real bets), probabilities, logged EV, raw CLV at the same source, fair-close EV
-(price × de-vigged close − 1, own book first, else the bet365 feed), and `parsed`, the notes read into
+stake and profit (real bets), probabilities, logged EV, raw CLV at the same source, price vs close
+(`fairCloseEv`: price × de-vigged close − 1, own book first, else the bet365 feed; the frozen tests'
+measure), the reviewer's fair-close EV (`openingFairEv`: the opening at the same source × its de-vigged
+close − 1; the Sombra reviews' headline and the VALOR tests' measure), and `parsed`, the notes read into
 fields. Every screen works on this array.
 
 ### Tags and parsed notes
@@ -389,8 +398,9 @@ SCREENSHOT_DIR=/tmp/shots npm run screenshots   # every route: phone and desktop
 npm run screenshots:readme          # the four images in docs/screenshots/
 ```
 
-- **Tests.** At the time of writing: 242 unit tests in 31 files (`node --test`) and 119 Playwright tests
-  in 11 specs (a 390 px phone by default; wide-screen tests set their viewport). E2E runs on the fixture
+- **Tests.** At the time of writing (19 Nov 2026): 285 unit tests in 39 files (`node --test`) and 190
+  Playwright tests in 17 specs, 8 of them skipped by design (a 390 px phone by default; wide-screen
+  tests set their viewport); `npm run check` runs them all in about 4 minutes. E2E runs on the fixture
   only and never calls the real script; a test that needs "today" fixes the browser clock. Set
   `E2E_PORT` when several checkouts run at once: the config reuses any server on the port.
 - **The fixture.** `scripts/make-fixture.mjs` writes `tests/fixtures/feed.json` from a seeded random

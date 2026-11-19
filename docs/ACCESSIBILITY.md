@@ -120,7 +120,7 @@ the spoken form goes next to it in `sr-only` text or in the name of the control.
 
 | Visible | Spoken | Where |
 |---|---|---|
-| `73–87–4`, `15–19 +1½` (the scoreboard) | "73 ganadas, 87 perdidas, 4 nulas", "15 ganadas, 19 perdidas, 1 media" (zero parts left out) | `spokenRecord` |
+| `73–87–4`, `15–19 +1 media` (the scoreboard; halves in words since round 2, "+1½" read as one and a half) | "73 ganadas, 87 perdidas, 4 nulas", "15 ganadas, 19 perdidas, 1 medio ganada" (zero parts left out; halves by kind) | `spokenRecord` |
 | a bare section count `2` | ", 2 activos" | filter sections |
 | `3.94` on a pick card | "cuota 3.94" | `PickCard` |
 | a field's unit `u` | "…, en unidades" in the label | `NumberField` |
@@ -143,7 +143,9 @@ real minus sign (`format.js` does) so it is read as "menos", not "guion".
 - A count or result that changes with a filter goes in an element with `aria-live="polite"` that is
   already on the page before it changes.
 - A button that can disable itself while focused must hand focus to something else (see `Pagination`,
-  `PickDetail`), or use `aria-disabled`.
+  `PickDetail`), or use `aria-disabled`. The kit's `Button` and `FilterChip` do this on their own since
+  round 2 (`useFocusSafeDisabled`): focused when they become disabled, they stay focusable and
+  `aria-disabled` until focus moves on.
 - Colours only from tokens. Text on a surface: `--c-ink`, `--c-ink-2`, `--c-muted` or a result colour;
   never lower the opacity of text to make it secondary (use `--c-muted`). Field borders:
   `--c-control-line`.
@@ -195,7 +197,7 @@ Known gaps, not fixed here:
 - Records inside generated sentences ("Sombra: 73-87-4…", `src/data/summaries.js`) and in some table
   cells are still digits with hyphens; their spoken form would change text that tests and the auditor
   read. A screen-reader-only twin of each sentence is the next step.
-- Test names of the Tests section come from `src/data/tests-config.js` in Spanish and are not marked
-  `lang="es"` in the English UI.
+- Test names of the Tests section come from `src/data/tests-config.js` in Spanish; since round 2 they
+  are marked `lang="es"` in the English UI on the Tests screen (not yet in the filter panel's test chips).
 - "u" after a figure is not expanded to "unidades" outside fields; the stake chips are named "2u".
 - Charts have a caption and a "Ver como tabla" table; the curve's points are not explorable one by one.

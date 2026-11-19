@@ -20,6 +20,7 @@ import { APP_TIMEZONE } from '../../config.js';
 import {
   defaultFilters, facetCounts, filterOptions, activeEntries, removeEntry, countActive, toQueryString, fromQueryString,
   PRICE_PRESETS, DATE_PRESETS, BUILTIN_PRESETS, builtinPreset,
+  ROLLING_DATE_PRESETS, resolveDates, lastSlate, pendingSlate,
 } from '../../data/filters.js';
 import { TAG_GROUPS, tagLabel } from '../../data/tags.js';
 import { LINE_SCOPES, lineLabel, lineScopeLabel, parseLineKey } from '../../data/lines.js';
@@ -235,6 +236,20 @@ function TriState({ label, value, counts, onValue }) {
   />`;
 }
 
+/**
+ * What the active date preset means in dates, said under the chips: the rolling periods run from a day
+ * on with no end (upcoming slates included), "Último slate" is the last graded slate and "Slate
+ * pendiente" the newest slate with pending picks. '' with no preset (or 'since', which shows its field).
+ * @param {FilterState} f @param {{ today: string, lastSlate: string | null, pendingSlate: string | null }} ctx
+ */
+export function dateNote(f, ctx) {
+  if (!f.datePreset || f.datePreset === 'since' || f.slate) return '';
+  const [from] = resolveDates(f, ctx);
+  if (ROLLING_DATE_PRESETS.includes(f.datePreset)) return t('filters.dateNote.rolling', { from: formatDate(/** @type {string} */ (from), 'medium') });
+  if (!from) return t(`filters.dateNote.${f.datePreset}None`);
+  return t(`filters.dateNote.${f.datePreset}`, { date: formatDate(from, 'medium') });
+}
+
 // ---------------------------------------------------------------- the panel
 
 /**
@@ -247,6 +262,8 @@ export function FilterPanel({ picks, filters: f, onChange, hide = [], today, tes
   const qs = toQueryString(f);
   const options = useMemo(() => memoLast('filters.options', [picks], () => filterOptions(picks)), [picks]);
   const counts = useMemo(() => memoLast('filters.counts', [picks, qs, day], () => facetCounts(picks, f, { today: day })), [picks, qs, day]);
+  const slates = useMemo(() => memoLast('filters.slates', [picks], () => ({ lastSlate: lastSlate(picks), pendingSlate: pendingSlate(picks) })), [picks]);
+  const note = dateNote(f, { today: day, ...slates });
   const [open, setOpen] = useState(() => {
     /** @type {Record<string, boolean>} */
     const o = {};
@@ -331,6 +348,7 @@ export function FilterPanel({ picks, filters: f, onChange, hide = [], today, tes
             onToggle=${() => set({ datePreset: on ? null : id, slate: null, dateTo: null, dateFrom: id === 'since' ? f.dateFrom || null : null })} />`;
         })}
       </div>
+      ${note ? html`<p class="fp-note" data-testid="fp-date-note">${note}</p>` : null}
       ${f.datePreset === 'since'
         ? html`<${DateField} label=${t('filters.since')} value=${f.dateFrom} testId="fp-since" onValue=${(/** @type {string | null} */ dateFrom) => set({ dateFrom })} />`
         : html`<fieldset class="field fp-range">

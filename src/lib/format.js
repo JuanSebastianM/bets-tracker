@@ -6,7 +6,7 @@
 //   formatRecord(summary)         '31-22-3'
 //   formatMoney(2.5, settings)    units times the user's own unit value plus their currency label, or ''
 //   formatDate('2026-11-15')      '15 nov 2026'
-import { formatDate as i18nFormatDate, formatNumber, getLocale } from './i18n.js';
+import { formatDate as i18nFormatDate, formatNumber, getLocale, t } from './i18n.js';
 
 export { i18nFormatDate as formatDate };
 
@@ -64,13 +64,14 @@ export function formatPct(x, opts = {}) {
 export const formatProb = (x) => formatPct(x, { sign: false });
 
 /**
- * Win-loss-void record: '31-22-3'; half results add a suffix: '31-22-3 (+2½)'.
+ * Win-loss-void record: '31-22-3'; half results add a suffix in words: '31-22-3 (+2 medias)' /
+ * '31-22-3 (+2 halves)' ('+2½' read like two and a half; round 2).
  * @param {{ won: number, lost: number, void: number, halfWon?: number, halfLost?: number }} s
  */
 export function formatRecord(s) {
   const base = `${s.won}-${s.lost}${s.void ? `-${s.void}` : ''}`;
   const halves = (s.halfWon || 0) + (s.halfLost || 0);
-  return halves ? `${base} (+${halves}½)` : base;
+  return halves ? `${base} (+${t('record.halves', { count: halves, n: halves })})` : base;
 }
 
 /** An integer count with locale grouping. @param {number} n */

@@ -86,7 +86,7 @@ function Analysis({ data, query, part, bare }) {
         ${part === 'calibration' ? html`<${Calibration} picks=${list} view=${view} setView=${setView} />` : null}
         ${part === 'close' ? html`<${CloseQuality} picks=${list} pinnacle=${data.pinnacle} />` : null}
         ${part === 'grok'
-          ? html`<${GrokVsClaude} picks=${grokList} filters=${grokFilters} scopeNote=${filters.sources.length > 0 || filters.tags.length > 0} />`
+          ? html`<${GrokVsClaude} picks=${grokList} all=${data.picks} today=${today} filters=${grokFilters} scopeNote=${filters.sources.length > 0 || filters.tags.length > 0} />`
           : null}
       </div>
     </div>

@@ -31,7 +31,7 @@
     "price": "Cuota",
     "close": "Cierre",
     "ev": "EV registrado",
-    "fairCloseEv": "EV vs cierre",
+    "fairCloseEv": "Precio vs cierre",
     "clv": "CLV",
     "status": "Estado"
   },
@@ -44,7 +44,7 @@
     "price": "Cuota",
     "close": "Cierre",
     "ev": "EV",
-    "fairCloseEv": "EV vs cierre",
+    "fairCloseEv": "Precio vs cierre",
     "status": "Estado"
   },
   "tagMeaning": {
@@ -88,8 +88,8 @@
     "closeMissing": "Sin cierre",
     "clv": "CLV",
     "clvHint": "Cuánto mejor fue tu cuota que la de cierre, en la misma fuente.",
-    "fairCloseEv": "EV vs cierre sin margen",
-    "fairCloseEvHint": "Lo que vale tu cuota contra la probabilidad del cierre quitándole el margen de la casa.",
+    "fairCloseEv": "Precio vs cierre",
+    "fairCloseEvHint": "Tu cuota por la probabilidad del cierre sin el margen de la casa, menos 1. Es la medida de las pruebas congeladas.",
     "oneSided": "Cierre de un solo lado: no se puede medir",
     "minPrice": "Cuota mínima de Grok",
     "booksCaption": "Cuota de cada casa, su cierre y el otro lado",
@@ -124,6 +124,14 @@
     "pinRead": "Última lectura",
     "pinMins": "Antes del inicio",
     "minutes": "{n} min",
-    "pinNoted": "Anotado en las notas"
+    "pinNoted": "Anotado en las notas",
+    "grokQuote": "Cuota de Grok",
+    "grokQuoteBook": "{price}: la cuota que dio Grok; coincide con {book}",
+    "grokQuoteNoBook": "{price}: la cuota que dio Grok; no coincide con ninguna casa anotada",
+    "grokClose": "Contra el cierre",
+    "grokCloseAt": "Medido en {book}: su apertura {open} contra su cierre {close}, no la cuota de Grok",
+    "grokCloseNone": "Sin cierre de dos lados en una casa con su apertura anotada: no se mide",
+    "closeAtBook": "en {book}",
+    "openingFairEvHint": "La apertura contra el cierre sin margen de su misma fuente: la cifra de las revisiones de Sombra."
   }
 }

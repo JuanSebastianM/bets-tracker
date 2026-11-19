@@ -35,7 +35,7 @@
     "once": "If you look at a test every week and decide when it looks good, sooner or later one passes by pure luck. So each test is decided once, when it reaches its count, by a rule fixed before the data was seen. Yield and hit rate are shown as context: they decide nothing.",
     "barsTitle": "The bars",
     "bars": "Each test has two bars: graded rows and rows with a two-sided close. It needs both. The strip shows the mean with its ±2 standard error interval against the zero line.",
-    "termFairClose": "EV against the close",
+    "termFairClose": "price vs close",
     "termSe": "standard error"
   },
   "review": {
@@ -74,7 +74,7 @@
       "one": "{n} pending",
       "other": "{n} pending"
     },
-    "measure": "EV of the price against the close",
+    "measure": "Price vs close",
     "measureValue": "{mean} (n {n})",
     "interval": "±2 SE: {lo} to {hi}",
     "z": "z {z}",
@@ -92,7 +92,7 @@
     "explorerHint": "Each Explorer link carries the test's own filter (Test: …) and shows exactly the rows the test counts, pending ones included.",
     "explorerN": {"one": "See the row in the Explorer", "other": "See the {n} rows in the Explorer"},
     "decision": "Decisions row {row}",
-    "chart": "EV against the close {mean}, interval {lo} to {hi}, n {n}.",
+    "chart": "{measure} {mean}, interval {lo} to {hi}, n {n}.",
     "chartNone": "No interval: it needs at least two matches with a close.",
     "what": {
       "rule30_pass_all": "Match-total corners and cards that passed every filter and are held back only by the rule 30 pause.",
@@ -118,7 +118,7 @@
       "prop_near_value": "Match-total corners and cards 0% to 3% over the consensus, up to 3 per slate."
     },
     "rule": {
-      "value": "Decided before the data (rows 79 and 80): the deciding line is price 4.0 or less. It passes with 30+ graded rows with fair-close EV, a mean above zero and positive flat yield. If it passes, real money is proposed on ≤4.0, or only on ≤3.0 if the 3.0–4.0 band has 10+ rows with a negative mean. If ≤4.0 fails but ≤3.0 passes, ≤3.0 is judged only on rows from 30 Oct. If neither passes, results and goals stay SHADOW. Always at a small stake and with your approval.",
+      "value": "Decided before the data (rows 79 and 80): the deciding line is price 4.0 or less. It passes with 30+ graded rows with fair-close EV (review), a mean above zero and positive flat yield. If it passes, real money is proposed on ≤4.0, or only on ≤3.0 if the 3.0–4.0 band has 10+ rows with a negative mean. If ≤4.0 fails but ≤3.0 passes, ≤3.0 is judged only on rows from 30 Oct. If neither passes, results and goals stay SHADOW. Always at a small stake and with your approval.",
       "near_value": "No decision of its own: reported apart from VALOR to see whether the 3% threshold is right.",
       "prop_value": "Fixed on 6 Nov before any rows (row 97): at {first} graded rows with a two-sided bet365 close, if it is CLEAR (the whole 95% interval above zero and positive flat yield) you are offered real money at {stake}u; if the mean is zero or less, stopping is proposed; otherwise it goes on to {final}, where CLEAR is proposed and anything else stops.",
       "prop_near_value": "No decision of its own: reported apart from VALOR PROP."
@@ -136,8 +136,8 @@
       "stop": "Stopping the category would be proposed.",
       "extended": "Neither clear nor negative at {first}: it goes on to {final} rows."
     },
-    "measureValue": "Fair-close EV (opening against the close at the same source)",
-    "measureProp": "EV against the bet365 close without the margin (power method)",
+    "measureValue": "Fair-close EV (review): the opening against the margin-free close at the same source",
+    "measureProp": "EV vs bet365 (power): your price against the margin-free bet365 close, power method",
     "interval95": "95% CI: {lo} to {hi}",
     "lines": "By price band",
     "books": "By the price's book",
@@ -159,9 +159,9 @@
     "perSlate": "{n} rows per slate over {slates} slates",
     "perSlateLow": "Fewer than 1 per slate: the review reports it and asks whether to widen to any line two books share.",
     "contextOnly": "Context: yield {yield} (n {n}), record {record}",
-    "valueCollecting": "Not yet {total} rows with fair-close EV on the ≤4.0 line: nothing is decided.",
+    "valueCollecting": "Not yet {total} rows with fair-close EV (review) on the ≤4.0 line: nothing is decided.",
     "linesAndBooks": "By price band and by book",
-    "gateLabel": "Rows ≤4.0 with fair-close EV",
+    "gateLabel": "Rows ≤4.0 with fair-close EV (review)",
     "propLabel": "With a two-sided bet365 close",
     "gateLineShort": "≤4.0 line"
   },
@@ -169,7 +169,7 @@
     "title": "Stopped categories and rows that don't count",
     "intro": "No longer logged (or their rows never count), but still in the sheet. When and why they stopped, with their final numbers.",
     "when": "Stopped on {date}",
-    "final": "Record {record}; yield {yield} (n {n}); EV against the close {ev} (n {evn})",
+    "final": "Record {record}; yield {yield} (n {n}); price vs close {ev} (n {evn})",
     "span": "Rows from {first} to {last}",
     "empty": "No rows in the data.",
     "why": {
@@ -187,8 +187,10 @@
   "list": {
     "graded": "Graded",
     "closes": "With a close",
-    "ev": "EV vs close",
+    "ev": "Price vs close",
     "evValue": "{mean} n {n}",
-    "glossary": "{label} in the glossary"
+    "glossary": "{label} in the glossary",
+    "evProp": "EV vs bet365 (power)",
+    "evMeasure": "Its measure"
   }
 }

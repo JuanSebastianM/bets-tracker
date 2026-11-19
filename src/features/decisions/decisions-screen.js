@@ -11,7 +11,7 @@ import { formatDate, formatMonth, formatCount } from '../../lib/format.js';
 import { sheetLang } from '../../lib/spoken.js';
 import {
   DECISION_STATUSES, THEME_IDS, decisionStatusKind, decisionTheme, decisionFiltersFromQuery, decisionFiltersToQuery,
-  filterDecisions, newestFirst, groupByMonth, groupByTheme, decisionCounts, decisionGraph, decisionMatches, parseSheetRule,
+  filterDecisions, newestFirst, groupByMonth, groupByTheme, decisionCounts, decisionGraph, decisionMatches, parseSheetRule, monthCounts,
 } from '../../data/decisions.js';
 
 /** @typedef {import('../../data/types').Decision} Decision */
@@ -154,17 +154,23 @@ function Timeline({ decisions, f, known, onPage }) {
   const ordered = useMemo(() => newestFirst(decisions), [decisions]);
   const { items, page, pageCount } = pageOf(ordered, f.page, PAGE);
   const months = groupByMonth(items);
+  // A month split across pages still says its whole count under the filters (round 2).
+  const totals = useMemo(() => monthCounts(ordered), [ordered]);
+  const countOf = (/** @type {{ month: string, items: Decision[] }} */ m) => {
+    const total = totals.get(m.month) || m.items.length;
+    return total === m.items.length ? String(total) : t('decisions.monthPart', { shown: m.items.length, total });
+  };
   return html`
     ${months.length > 1
       ? html`<nav class="djump" aria-label=${t('decisions.jumpMonth')}>
           ${months.map((m) => html`<button type="button" class="chip djump-btn"
-            onClick=${() => document.getElementById(`dm-${m.month}`)?.scrollIntoView({ block: 'start' })}>${m.month.length === 7 ? formatMonth(m.month) : m.month} · ${m.items.length}</button>`)}
+            onClick=${() => document.getElementById(`dm-${m.month}`)?.scrollIntoView({ block: 'start' })}>${m.month.length === 7 ? formatMonth(m.month) : m.month} · ${totals.get(m.month) || m.items.length}</button>`)}
         </nav>`
       : null}
     <div class="dtimeline" data-testid="decisions-timeline">
       ${months.map(
         (m) => html`<section class="dmonth" aria-labelledby=${`dm-${m.month}`}>
-          <h2 class="dmonth-h" id=${`dm-${m.month}`}>${m.month.length === 7 ? formatMonth(m.month) : m.month} <span class="muted small num">· ${m.items.length}</span></h2>
+          <h2 class="dmonth-h" id=${`dm-${m.month}`} data-count=${totals.get(m.month) || m.items.length}>${m.month.length === 7 ? formatMonth(m.month) : m.month} <span class="muted small num">· ${countOf(m)}</span></h2>
           <ol class="ditems">${m.items.map((d) => html`<li><${DecisionCard} d=${d} q=${f.q} known=${known} /></li>`)}</ol>
         </section>`,
       )}

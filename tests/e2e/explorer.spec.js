@@ -52,8 +52,13 @@ test('date preset "last slate" and a single slate date', async ({ page }) => {
   await page.getByTestId('filter-button').click();
   await page.getByTestId('fchip-date-last_slate').click();
   await expect(page).toHaveURL(/date=last_slate/);
+  // "Último slate" is the last slate with a graded pick (round 2), not the newest date, which is all pending.
+  await expect(page.getByTestId('fp-date-note')).toHaveText('Último slate calificado: 14 nov 2026.');
+  await expect(page.getByTestId('filter-live-count')).toHaveText('8 picks con estos filtros');
+  await page.getByTestId('fchip-date-pending_slate').click();
+  await expect(page).toHaveURL(/date=pending_slate/);
   await expect(page.getByTestId('filter-live-count')).toHaveText('20 picks con estos filtros');
-  await page.getByTestId('fchip-date-last_slate').click();
+  await page.getByTestId('fchip-date-pending_slate').click();
   await page.getByTestId('fp-slate').selectOption('2026-11-15');
   await expect(page).toHaveURL(/slate=2026-11-15/);
   await expect(page.getByTestId('filter-live-count')).toHaveText('20 picks con estos filtros');

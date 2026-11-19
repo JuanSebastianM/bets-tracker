@@ -82,7 +82,7 @@ export function PriceBlock({ sim }) {
           <dt>${t('simulator.price.meanEv')}</dt>
           <dd>${formatPct(tt.fairCloseEv.mean)} · n ${tt.fairCloseEv.n}</dd>
           <dt>${t('simulator.price.chance')}</dt>
-          <dd>${tt.profitSe != null ? `${formatUnits(tt.profit)} ± ${formatUnits(2 * tt.profitSe, { sign: false })}` : '–'}</dd>
+          <dd>${tt.profitSe ? `${formatUnits(tt.profit)} ± ${formatUnits(/** @type {number} */ (tt.chanceHi) - tt.profit, { sign: false })}` : t(tt.n < 2 ? 'simulator.chanceNone' : 'simulator.chanceFlat')}</dd>
         </dl>`
       : null}
     <p class=${`sim-verdict sim-verdict-${kind} small`}>${closeSentenceFor(tt)}</p>

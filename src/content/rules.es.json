@@ -259,7 +259,7 @@
       "why": "Betano al registrar contra bet365 al cierre mostraba +19.7% de «CLV» en una línea que nunca se movió. En la auditoría del 22 oct el CLV bruto daba +2.5% pero el EV justo −5.0%.",
       "state": "in_force", "since": "2026-10-15",
       "stateNote": "La medida principal (34e) es del 22 oct 2026; la puerta de líneas que casi no se mueven, del 8 nov 2026.",
-      "decisions": [27, 41, 59, 60, 102], "terms": ["clv", "fair-close-ev", "feed-price", "feed-close", "gate", "barely-moving-lines"]
+      "decisions": [27, 41, 59, 60, 102], "terms": ["clv", "fair-ev-review", "price-vs-close", "feed-price", "feed-close", "gate", "barely-moving-lines"]
     },
     {
       "n": 35, "slug": "rule-35", "title": "El escaneo de valor lee las tres casas",

@@ -39,11 +39,11 @@ test('sample size sentences', () => {
 test('results against the close: luck, bad run, both good, nothing when too early', () => {
   const lucky = summarize(sample(30, 20, 2, -0.04));
   const s = both(() => describeResultsVsClose(lucky, 'below'));
-  assert.equal(s.es, 'Gana en resultados pero pierde contra el cierre: probablemente suerte.');
-  assert.equal(s.en, 'Winning on results but losing against the close: probably luck.');
+  assert.equal(s.es, 'Gana en resultados pero pierde en precio vs cierre: probablemente suerte.');
+  assert.equal(s.en, 'Winning on results but losing on price vs close: probably luck.');
   const unlucky = summarize(sample(30, 10, 2, 0.04));
-  assert.equal(describeResultsVsClose(unlucky, 'lean_above'), 'Pierde en resultados pero le gana al cierre: probablemente mala racha.');
-  assert.equal(describeResultsVsClose(lucky, 'above'), 'Gana en resultados y también le gana al cierre.');
+  assert.equal(describeResultsVsClose(unlucky, 'lean_above'), 'Pierde en resultados pero gana en precio vs cierre: probablemente mala racha.');
+  assert.equal(describeResultsVsClose(lucky, 'above'), 'Gana en resultados y también en precio vs cierre.');
   assert.equal(describeResultsVsClose(lucky, 'too_early'), '');
   assert.equal(describeResultsVsClose(unlucky, 'below'), '');
   assert.equal(describeResultsVsClose(summarize([]), 'none'), '');
@@ -54,7 +54,7 @@ test('source paragraph is built from the summary and never promises profit', () 
   const p = both(() => describeSource('Sombra', s, 'below'));
   assert.match(p.es, /^Sombra: 20-10 a cuota media 2\.00, \+10\.00u \(\+33\.3%\) en 30 calificadas\./);
   assert.match(p.es, /Acierta 66\.7%, por encima del 50\.0%/);
-  assert.match(p.es, /Contra el cierre sin margen: −4\.0% de media \(n 30\)/);
+  assert.match(p.es, /Precio vs cierre: −4\.0% de media \(n 30\)/);
   assert.match(p.es, /probablemente suerte\.$/);
   assert.match(p.en, /^Sombra: 20-10 at an average price of 2\.00/);
   assert.match(p.en, /probably luck\.$/);
@@ -72,8 +72,8 @@ test('best and worst tag with n', () => {
   const row = (key, mean, n) => ({ key, summary: { fairCloseEv: { mean, n } } });
   const label = (k) => ({ near_value: 'VALOR CASI', corner_rejects: 'CÓRNERS RECHAZO' })[k];
   const s = both(() => describeBestWorst({ best: row('near_value', 0.021, 45), worst: row('corner_rejects', -0.034, 31), qualified: 2 }, label, 20));
-  assert.equal(s.es, 'Mejor contra el cierre: VALOR CASI (+2.1%, n 45). Peor: CÓRNERS RECHAZO (−3.4%, n 31).');
-  assert.equal(s.en, 'Best against the close: VALOR CASI (+2.1%, n 45). Worst: CÓRNERS RECHAZO (−3.4%, n 31).');
+  assert.equal(s.es, 'Mejor en precio vs cierre: VALOR CASI (+2.1%, n 45). Peor: CÓRNERS RECHAZO (−3.4%, n 31).');
+  assert.equal(s.en, 'Best on price vs close: VALOR CASI (+2.1%, n 45). Worst: CÓRNERS RECHAZO (−3.4%, n 31).');
   assert.match(describeBestWorst({ best: row('near_value', 0.021, 45), worst: null, qualified: 1 }, label, 20), /única con 20 cierres/);
   assert.equal(describeBestWorst({ best: null, worst: null, qualified: 0 }, label, 20), 'Ninguna etiqueta tiene todavía 20 cierres con los dos lados: muy pronto para compararlas.');
 });

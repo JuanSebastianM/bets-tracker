@@ -1,19 +1,46 @@
 // Controls: buttons, chips, segmented control, select, number range, search, number field.
 // Every input takes a visible `label` (or `aria-label` via `label` + `hideLabel`) and reports values
 // with `onValue`. Touch targets are at least 44 px.
-import { html, useId, useState, useEffect } from '../../../vendor/preact.js';
+import { html, useId, useState, useEffect, useRef } from '../../../vendor/preact.js';
 import { Icon } from './icons.js';
 import { t } from '../i18n.js';
+
+/**
+ * A control that becomes disabled while it has focus (a "Quitar todos" that empties the filters, a
+ * refresh that runs, a chip whose count drops to 0 when it is turned off) would drop focus to the page
+ * body: from there Tab starts over, or leaves an open dialog. While focused it stays enabled and is
+ * marked aria-disabled (clicks do nothing); it becomes really disabled once focus moves on (round 2).
+ * @param {boolean | undefined} disabled
+ * @returns {{ ref: any, disabled: boolean | undefined, ariaDisabled: 'true' | undefined, onBlur: () => void, held: boolean }}
+ */
+export function useFocusSafeDisabled(disabled) {
+  const ref = useRef(/** @type {HTMLElement | null} */ (null));
+  const [held, setHeld] = useState(false);
+  const focused = !!disabled && typeof document !== 'undefined' && !!ref.current && ref.current === document.activeElement;
+  const hold = !!disabled && (focused || held);
+  useEffect(() => {
+    if (hold !== held) setHeld(hold);
+  }, [hold]);
+  return { ref, disabled: hold ? undefined : disabled, ariaDisabled: hold ? 'true' : undefined, onBlur: () => held && setHeld(false), held: hold };
+}
 
 /**
  * @param {{ children?: any, onClick?: (e: Event) => void, variant?: 'primary' | 'secondary' | 'ghost' | 'danger',
  *   icon?: string, type?: string, disabled?: boolean, href?: string, class?: string, [k: string]: any }} props
  */
-export function Button({ children, variant = 'secondary', icon, type = 'button', href, class: cls = '', ...rest }) {
+export function Button({ children, variant = 'secondary', icon, type = 'button', href, class: cls = '', disabled, onClick, ...rest }) {
   const c = `btn btn-${variant} ${cls}`;
   const inner = html`${icon ? html`<${Icon} name=${icon} size=${18} />` : null}<span>${children}</span>`;
-  if (href) return html`<a class=${c} href=${href} ...${rest}>${inner}</a>`;
-  return html`<button type=${type} class=${c} ...${rest}>${inner}</button>`;
+  const safe = useFocusSafeDisabled(disabled);
+  if (href) return html`<a class=${c} href=${href} onClick=${onClick} ...${rest}>${inner}</a>`;
+  return html`<button type=${type} class=${c} ref=${safe.ref} disabled=${safe.disabled} aria-disabled=${safe.ariaDisabled} onBlur=${safe.onBlur}
+    onClick=${(/** @type {Event} */ e) => {
+      if (safe.held) {
+        e.preventDefault();
+        return;
+      }
+      if (onClick) onClick(e);
+    }} ...${rest}>${inner}</button>`;
 }
 
 /** Icon-only button; `label` is its accessible name and tooltip. */
@@ -36,12 +63,16 @@ export function Chip({ children, tone = 'neutral', class: cls = '', title }) {
  * @param {{ label: any, selected: boolean, onToggle: () => void, count?: number, disabled?: boolean, testId?: string }} props
  */
 export function FilterChip({ label, selected, onToggle, count, disabled, testId }) {
+  const safe = useFocusSafeDisabled(disabled);
   return html`<button
     type="button"
     class=${`fchip${selected ? ' fchip-on' : ''}`}
     aria-pressed=${selected ? 'true' : 'false'}
-    onClick=${onToggle}
-    disabled=${disabled}
+    onClick=${() => !safe.held && onToggle()}
+    ref=${safe.ref}
+    disabled=${safe.disabled}
+    aria-disabled=${safe.ariaDisabled}
+    onBlur=${safe.onBlur}
     data-testid=${testId}
   >
     ${selected ? html`<${Icon} name="check" size=${14} />` : null}

@@ -31,7 +31,7 @@
     "price": "Price",
     "close": "Close",
     "ev": "Logged EV",
-    "fairCloseEv": "EV vs close",
+    "fairCloseEv": "Price vs close",
     "clv": "CLV",
     "status": "Status"
   },
@@ -44,7 +44,7 @@
     "price": "Price",
     "close": "Close",
     "ev": "EV",
-    "fairCloseEv": "EV vs close",
+    "fairCloseEv": "Price vs close",
     "status": "Status"
   },
   "tagMeaning": {
@@ -88,7 +88,7 @@
     "closeMissing": "No close",
     "clv": "CLV",
     "clvHint": "How much better your price was than the close, at the same source.",
-    "fairCloseEv": "EV vs the margin-free close",
+    "fairCloseEv": "Price vs close",
     "fairCloseEvHint": "What your price is worth against the closing probability with the book's margin taken out.",
     "oneSided": "One-sided close: cannot be measured",
     "minPrice": "Grok's minimum price",
@@ -124,6 +124,14 @@
     "pinRead": "Last read",
     "pinMins": "Before kickoff",
     "minutes": "{n} min",
-    "pinNoted": "Noted in the notes"
+    "pinNoted": "Noted in the notes",
+    "grokQuote": "Grok’s price",
+    "grokQuoteBook": "{price}: the price Grok gave; it matches {book}",
+    "grokQuoteNoBook": "{price}: the price Grok gave; it matches no noted book",
+    "grokClose": "Against the close",
+    "grokCloseAt": "Measured at {book}: its opening {open} against its close {close}, not Grok’s price",
+    "grokCloseNone": "No two-sided close at a book with its opening noted: not measured",
+    "closeAtBook": "at {book}",
+    "openingFairEvHint": "The opening against the margin-free close at its own source: the figure of the Sombra reviews."
   }
 }

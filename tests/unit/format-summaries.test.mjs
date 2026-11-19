@@ -26,7 +26,8 @@ test('units, percentages, record', () => {
   assert.equal(formatPct(-0.052), '−5.2%');
   assert.equal(formatPct(0.55, { sign: false }), '55.0%');
   assert.equal(formatRecord({ won: 31, lost: 22, void: 3 }), '31-22-3');
-  assert.equal(formatRecord({ won: 3, lost: 2, void: 0, halfWon: 1, halfLost: 1 }), '3-2 (+2½)');
+  assert.equal(formatRecord({ won: 3, lost: 2, void: 0, halfWon: 1, halfLost: 1 }), '3-2 (+2 medias)');
+  assert.equal(formatRecord({ won: 3, lost: 2, void: 0, halfWon: 1 }), '3-2 (+1 media)');
 });
 
 test('money only with the user unit value', () => {
@@ -48,7 +49,7 @@ test('summaries in both languages', () => {
   const ps = [mkPick({ status: 'won', price: 2.1, fairCloseEv: 0.02, match: 'a' }), mkPick({ status: 'lost', price: 2.1, fairCloseEv: -0.01, match: 'b' }), mkPick({ status: 'pending' })];
   const s = summarize(ps);
   assert.equal(describeRecord('VALOR', s), 'VALOR: 1-1 a cuota media 2.10, +0.10u (+5.0%) en 2 calificadas. 1 pendiente.');
-  assert.match(describeCloseEv(s), /Contra el cierre sin margen: \+0\.5% de media \(n 2\)/);
+  assert.match(describeCloseEv(s), /Precio vs cierre: \+0\.5% de media \(n 2\)/);
   assert.equal(describeHitRate(s), '', 'no rate under 5 graded picks');
   assert.match(describe('VALOR', s), /Muestra pequeña \(n 2\)/);
   setLocale('en');

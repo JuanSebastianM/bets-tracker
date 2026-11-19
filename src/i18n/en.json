@@ -33,7 +33,8 @@
     "picks": { "one": "{n} pick", "other": "{n} picks" }
   },
   "record": {
-    "sr": "{won} won, {lost} lost, {void} void, {halves} half results"
+    "sr": "{won} won, {lost} lost, {void} void, {halves} half results",
+    "halves": {"one": "{n} half", "other": "{n} halves"}
   },
   "status": {
     "won": "Won",
@@ -65,10 +66,11 @@
     "yield": "Yield",
     "graded": "Graded",
     "nGraded": "n {n}",
-    "fairCloseEv": "EV vs close",
+    "fairCloseEv": "Price vs close",
     "nClose": "n {n} with a close",
     "pending": "Pending",
-    "maxDrawdown": "Worst drop"
+    "maxDrawdown": "Worst drop",
+    "openingFairEv": "Fair-close EV (review)"
   },
   "filters": {
     "source": "Source",
@@ -99,10 +101,10 @@
     "slate": "One slate (match date)",
     "anySlate": "Any date",
     "since": "Since",
-    "datePreset": { "last_slate": "Last slate", "7d": "7 days", "30d": "30 days", "this_month": "This month", "since": "Since a date" },
+    "datePreset": { "last_slate": "Last slate", "7d": "7 days", "30d": "30 days", "this_month": "This month", "since": "Since a date", "pending_slate": "Pending slate" },
     "close": "Close",
     "hasClose": "Has a closing price",
-    "twoSidedClose": "Two-sided close (EV vs close)",
+    "twoSidedClose": "Two-sided close (price vs close)",
     "any": "All",
     "yes": "Yes",
     "no": "No",
@@ -142,7 +144,8 @@
     "entry": { "price": "Price {range}", "date": "Date: {range}", "ev": "EV {range}", "prob": "Prob. {range}", "q": "“{q}”", "slate": "Slate {date}", "hasClose": "Close: {v}", "twoSidedClose": "Two-sided close: {v}", "sample": "Sample {v}", "fuerza": "FUERZA {v}", "test": "Test: {label}" },
     "rangeMin": "≥ {min}",
     "rangeMax": "≤ {max}",
-    "rangeBoth": "{min}–{max}"
+    "rangeBoth": "{min}–{max}",
+    "dateNote": {"rolling": "From {from} on, upcoming slates included.", "last_slate": "Last graded slate: {date}.", "last_slateNone": "No graded slate yet.", "pending_slate": "Newest slate with pending picks: {date}.", "pending_slateNone": "No pending picks."}
   },
   "feed": {
     "synced": "Synced {ago}",
@@ -183,8 +186,8 @@
   "pick": {
     "close": "Closing price",
     "closeShort": "close",
-    "fairCloseEv": "Expected value against the closing price without the margin",
-    "evShort": "EV"
+    "fairCloseEv": "Price vs close: your price times the margin-free closing probability, minus 1",
+    "evShort": "Price vs close"
   },
   "chart": {
     "showTable": "Show as table",
@@ -197,16 +200,16 @@
     "pending": { "one": "{pending} pending.", "other": "{pending} pending." },
     "hitAbove": "Hits {hit}, above the {be} it needs to break even.",
     "hitBelow": "Hits {hit}, below the {be} it needs to break even.",
-    "closeEv": "Against the close without the margin: {ev} on average (n {n}).",
+    "closeEv": "Price vs close: {ev} on average (n {n}).",
     "closeEvRange": "Likely range: {lo} to {hi}.",
-    "closeEvNone": "No closes with both sides to measure against the close.",
+    "closeEvNone": "No closes with both sides: no price vs close yet.",
     "smallSample": "Small sample (n {n}): it does not say much yet.",
     "sampleSmall": "With {n} graded it is still very early: the result may be pure variance.",
     "sampleMedium": "With {n} graded it gives a hint, but a good or bad run still moves it a lot.",
     "sampleLarge": "With {n} graded the sample is enough to see trends, not to take anything for granted.",
-    "luckyWin": "Winning on results but losing against the close: probably luck.",
-    "unluckyLoss": "Losing on results but beating the close: probably a bad run.",
-    "bothGood": "Winning on results and beating the close too.",
+    "luckyWin": "Winning on results but losing on price vs close: probably luck.",
+    "unluckyLoss": "Losing on results but winning on price vs close: probably a bad run.",
+    "bothGood": "Winning on results and on price vs close too.",
     "verdict": {
       "none": "no closes",
       "too_early": "too early",
@@ -216,7 +219,7 @@
       "lean_below": "leaning below"
     },
     "bestWorstNone": "No tag has {min} two-sided closes yet: too early to compare them.",
-    "bestTag": "Best against the close: {label} ({ev}, n {n}).",
+    "bestTag": "Best on price vs close: {label} ({ev}, n {n}).",
     "worstTag": "Worst: {label} ({ev}, n {n}).",
     "onlyOneQualified": "It is the only one with {min} closes or more.",
     "sourceRecord": "{source} {record}, {profit}",
@@ -235,7 +238,12 @@
     "realAtPeak": "Real bets stand at {total}, at their highest point.",
     "realBelowPeak": "Real bets stand at {total}, {dd} below their best point ({peak}).",
     "recordOne": "{label}: {record} at an average price of {price}, {profit} ({yield}) over 1 graded.",
-    "sampleSmallOne": "With 1 graded it is still very early: the result may be pure variance."
+    "sampleSmallOne": "With 1 graded it is still very early: the result may be pure variance.",
+    "reviewEv": "Fair-close EV (review), the figure of the Sombra reviews: {ev} (n {n}).",
+    "realHitOnly": "Hits {hit} (n {n}).",
+    "realWhyStakes": "With different stakes, the result in units does not follow from the hit rate alone: one big or long-priced bet weighs more than several small ones, so it is not compared with a break-even rate.",
+    "realWhyFree": {"one": "There was {n} free bet, which risks no stake, so the result in units does not follow from the hit rate alone and it is not compared with a break-even rate.", "other": "There were {n} free bets, which risk no stake, so the result in units does not follow from the hit rate alone and it is not compared with a break-even rate."},
+    "realWhyBoth": {"one": "With different stakes and {n} free bet (which risks no stake), the result in units does not follow from the hit rate alone: a big, long-priced or free bet weighs differently, so it is not compared with a break-even rate.", "other": "With different stakes and {n} free bets (which risk no stake), the result in units does not follow from the hit rate alone: a big, long-priced or free bet weighs differently, so it is not compared with a break-even rate."}
   },
   "pwa": {
     "updateReady": "A new version of the app is ready.",
@@ -320,6 +328,8 @@
     "refreshed": "Data refreshed.",
     "refreshFailed": "Could not refresh: showing the saved copy.",
     "offline": "Offline: showing the saved copy.",
-    "inUnits": "in units"
+    "inUnits": "in units",
+    "halfWon": {"one": "{n} half won", "other": "{n} half won"},
+    "halfLost": {"one": "{n} half lost", "other": "{n} half lost"}
   }
 }

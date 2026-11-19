@@ -101,7 +101,8 @@ One array for the three bet tabs; full type in `src/data/types.d.ts`. The fields
 | `books` | Betano / Betsson / Stake named for the taken price |
 | `stakeU`, `profitU` | real stake and the sheet's profit (Apuestas); Grok's stake; null otherwise |
 | `probModel`, `probBlend`, `probAI`, `ev`, `fairOdds` | as logged (fractions) |
-| `fairCloseEv`, `closeSource` | F × de-vigged close − 1 (own book first, else bet365 feed) |
+| `fairCloseEv`, `closeSource` | F × de-vigged close − 1 (own book first, else bet365 feed); label it "Precio vs cierre" / "Price vs close" (`t('stats.fairCloseEv')`) |
+| `openingFairEv` | the opening at the same source × its de-vigged close − 1 (the Sombra reviews' fair-close EV); label it "EV justo (revisión)" / "Fair-close EV (review)" (`t('stats.openingFairEv')`); never the same label as `fairCloseEv` |
 | `clv`, `clvSource` | raw CLV at the same source |
 | `hasTwoSidedClose` | a fair-close EV exists |
 | `parsed` | the notes, parsed: `feedPrice`, `feedOpen`, `ref`, `sample`, `fuerza`, `pin`, `close`, `bookCloses`, `bookPrices`, `filters`, `passedAll`… |
@@ -176,7 +177,8 @@ const opts = filterOptions(data.picks);                      // { tags: [{ value
 
 State fields: `sources, tags, markets, marketsRaw, leagues, books, statuses` (lists), `pricePreset`
 (`le170, 170_200, lt200, le200, 200_250, le250, 250_400, le400, gt400`) or `price {min,max}`,
-`datePreset` (`last_slate, 7d, 30d, this_month, since`) with `dateFrom/dateTo`, `slate`, `hasClose`,
+`datePreset` (`last_slate, 7d, 30d, this_month, since, pending_slate`; `last_slate` is the last graded slate,
+`pending_slate` the newest with pending picks, the rolling three have no end date: round 2) with `dateFrom/dateTo`, `slate`, `hasClose`,
 `twoSidedClose`, `refs`, `samples`, `fuerza`, `reasons`, `ev {min,max}`, `prob {min,max}`, `q`. Added with the line filter:
 `sides` (`over`, `under`: `Pick.side`; URL `side`), `lines` (lineKeys, `cards:under:4.5`; URL `line`) and
 `passedAll` (`true`/`false`/`null`: `parsed.passedAll`; URL `pass`). Added with the fixes pass: `tests`
@@ -367,7 +369,9 @@ test('explorer filters by tag', async ({ page }) => {
 
 - Do take every number from `src/data/`; don't re-derive yield, EV, drawdown or a hit rate in a screen.
 - Do show `n` next to every rate and mean; don't show a rate on fewer than 5 graded picks without it.
-- Do say "against the close without the margin" (fair-close EV) and keep raw CLV as context.
+- Do name the measure: "Precio vs cierre" (`fairCloseEv`) or "EV justo (revisión)" (`openingFairEv`), never a
+  bare "EV vs cierre"; keep raw CLV as context.
+- Do link to exactly what a row counts (`exactSlice`), or say in the link how many picks it opens.
 - Do keep money out: units everywhere; money only via `formatMoney` with the user's own Settings.
 - Don't write to the sheet, call Google APIs, or add a CDN or a library (vendored libs go through the
   vendor workflow).
@@ -383,7 +387,7 @@ the helpers in `src/lib/glossary-links.js` (never build these URLs by hand):
 import { glossaryHref, tagSlug, ruleSlug, decisionHref, sheetRuleSlug } from '../../lib/glossary-links.js';
 import { Term, RefText, TagBadge } from '../../lib/ui/index.js';
 
-glossaryHref('fair-close-ev');                 // '#/glossary/fair-close-ev'
+glossaryHref('price-vs-close');                // '#/glossary/price-vs-close' (old 'fair-close-ev' still opens it)
 html`<${TagBadge} tag=${p.tag} href=${glossaryHref(tagSlug(p.tag))} />`;   // near_value -> #/glossary/near-value
 html`<${Term} slug="clv">CLV</${Term}>`;        // inline link (dotted underline)
 html`<a href=${glossaryHref(ruleSlug(29))}>regla 29</a>`;                   // #/glossary/rule-29
@@ -394,7 +398,8 @@ html`<${RefText} text=${p.notes} known=${{ decisionRows, ruleNumbers }} q=${quer
 - Slugs are stable kebab-case English. Tag entries are the kebab-case of the TagId (`prop_near_value` →
   `prop-near-value`); the 36 betting-analyst rules are `rule-1` … `rule-36`; market families, statuses,
   filter reasons and note fields each have an entry (the `covers` field in `src/content/glossary.*.json`
-  says which). Useful slugs: `fair-close-ev`, `clv`, `de-vig`, `yield`, `hit-rate`, `break-even`,
+  says which). Useful slugs: `price-vs-close` ("Precio vs cierre", `Pick.fairCloseEv`), `fair-ev-review`
+  ("EV justo (revisión)", `Pick.openingFairEv`), `clv`, `de-vig`, `yield`, `hit-rate`, `break-even`,
   `standard-error`, `two-se`, `brier`, `calibration`, `frozen-tests`, `gate`, `unit`, `stake`, `kelly`,
   `drawdown`, `blend`, `consensus`, `shadow-tab`, `bets-tab`, `grok-tab`, `decisions-tab`.
 - More helpers in `glossary-links.js`: `tagHref(tag)`, `REASON_SLUGS` (filter reason → entry),

@@ -49,7 +49,8 @@ test('line alone: grouped by kind of market; side chips; scoped chip labels when
   await expect(lines.locator('[data-scope="ah"]')).toBeVisible();
   await lines.getByTestId('fchip-sides-under').click();
   await expect(page).toHaveURL(/side=under/);
-  await expect(page.getByTestId('filter-live-count')).toHaveText('99 picks con estos filtros');
+  // Only picks with a line (round 2: three-way markets and other line-less picks keep their side for review.py).
+  await expect(page.getByTestId('filter-live-count')).toHaveText('95 picks con estos filtros');
   await lines.getByTestId('fchip-lines-cards:under:4.5').click();
   await lines.getByTestId('fchip-lines-corners:under:9.5').click();
   await page.getByTestId('filter-show').click();

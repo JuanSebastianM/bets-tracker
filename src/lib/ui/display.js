@@ -54,7 +54,7 @@ export function Scoreboard({ won, lost, void: voids, halfWon = 0, halfLost = 0, 
       <span class="score-won">${won}</span><span class="score-sep">–</span><span class="score-lost">${lost}</span>${voids
         ? html`<span class="score-sep">–</span><span class="score-void">${voids}</span>`
         : null}
-      ${halfWon + halfLost ? html`<span class="score-half">+${halfWon + halfLost}½</span>` : null}
+      ${halfWon + halfLost ? html`<span class="score-half">+${t('record.halves', { count: halfWon + halfLost, n: halfWon + halfLost })}</span>` : null}
     </div>
     <span class="sr-only">${spokenRecord({ won, lost, void: voids, halfWon, halfLost })}</span>
     <div class="score-bar" aria-hidden="true">

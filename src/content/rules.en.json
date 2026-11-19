@@ -259,7 +259,7 @@
       "why": "Betano at logging against bet365 at the close showed +19.7% “CLV” on a line that never moved. At the 22 Oct audit raw CLV was +2.5% but fair-close EV −5.0%.",
       "state": "in_force", "since": "2026-10-15",
       "stateNote": "The headline measure (34e) dates from 22 Oct 2026; the gate for lines that barely move from 8 Nov 2026.",
-      "decisions": [27, 41, 59, 60, 102], "terms": ["clv", "fair-close-ev", "feed-price", "feed-close", "gate", "barely-moving-lines"]
+      "decisions": [27, 41, 59, 60, 102], "terms": ["clv", "fair-ev-review", "price-vs-close", "feed-price", "feed-close", "gate", "barely-moving-lines"]
     },
     {
       "n": 35, "slug": "rule-35", "title": "The value scan reads all three books",

@@ -21,7 +21,7 @@ import { summarize } from '../../data/stats.js';
 import { useSettings, bankrollUnits } from '../../data/settings.js';
 import { simulate, defaultStaking, scenariosFromQuery, simulatorQueryString } from '../../data/simulate.js';
 import { StakingControls } from './staking-controls.js';
-import { headlineLead, closeSentenceFor, leftOutLine } from './sentences.js';
+import { headlineLead, closeSentenceFor, leftOutLine, chanceText } from './sentences.js';
 import { RiskBlock, PriceBlock, MonthsBlock, PendingBlock, BreakdownBlock } from './sim-blocks.js';
 import { CompareBlock, ScenariosBlock } from './sim-compare.js';
 
@@ -97,7 +97,7 @@ function Headline({ sim, staking, settings }) {
       <p class=${`sim-big num sim-${tone(tt.profit)}`} data-testid="sim-profit">${formatUnits(tt.profit)}</p>
       ${money ? html`<p class="sim-money num" data-testid="sim-money">${t('simulator.money', { money })}</p>` : null}
       <p class="sim-chance small num" data-testid="sim-chance">
-        ${tt.chanceLo != null ? t('simulator.chance', { lo: formatUnits(tt.chanceLo), hi: formatUnits(tt.chanceHi) }) : t('simulator.chanceNone')}
+        ${chanceText(tt)}
       </p>
     </div>
     <div class="sim-record">
