@@ -2355,7 +2355,7 @@
    ],
    "category": "reviews",
    "short": "What the price you took was worth according to the margin-free close: price taken × margin-free closing probability − 1. Positive means your price beat the market.",
-   "inSheet": "It is the reviews' “price-vs-close EV” and the measure the frozen tests are decided on (row 111). It uses the same book's two-sided close when the notes have it; otherwise the bet365 feed's, even when the price is from another book. In the app it is the figure of the Overview, Explorer, Simulator, Analysis and the frozen tests. It is not the same as fair-close EV (review).",
+   "inSheet": "It is the reviews' “price-vs-close EV” and the measure the frozen tests are decided on (row 111). It uses the same book's two-sided close when the notes have it; otherwise the bet365 feed's, even when the price is from another book. In the app it is the figure of the Overview, Explorer, Simulator, Analysis and the frozen tests. On Grok rows the price is Grok's own quote, so it is measured with the book's opening price against that book's close. It is not the same as fair-close EV (review).",
    "example": "You took 2.10 at Betano and Betano closed 1.95 / 1.95 → 50% without margin: 2.10 × 0.50 − 1 = +5%.",
    "related": [
     "fair-ev-review",
@@ -2377,8 +2377,8 @@
    ],
    "category": "reviews",
    "short": "The headline figure of the Sombra reviews: the opening price at one source × the margin-free probability of that same source's close − 1. It never mixes one book with another's close.",
-   "inSheet": "The headline measure since 22 Oct 2026 (rule 34e; Decisiones rows 60 and 77): first the pick's book against its own close; without one, the feed opening (“feed X” in the notes) against the feed close. It is clv-logger's “EV justa” and the measure of VALOR and VALOR CASI. The app shows it for Sombra next to price vs close, so it matches your reviews.",
-   "example": "You took 2.10 at Betano, but there is only a bet365 feed close: 1.95 / 1.95 (50% without margin), and the feed opened at 2.00. Fair-close EV (review): 2.00 × 0.50 − 1 = 0%. Price vs close: 2.10 × 0.50 − 1 = +5%.",
+   "inSheet": "The headline measure since 22 Oct 2026 (rule 34e; Decisiones rows 60 and 77): first the pick's book against its own close; without one, the feed's price when the row was logged (“feed X” in the notes, not the “apertura feed” note) against the feed close; on IA-WATCH rows, the noted book price against that book's close. It is clv-logger's “EV justa” and the measure of VALOR and VALOR CASI. The app shows it for Sombra next to price vs close, so it matches your reviews.",
+   "example": "You took 2.10 at Betano, but there is only a bet365 feed close: 1.95 / 1.95 (50% without margin), and the feed stood at 2.00 when the row was logged (“feed 2.00”). Fair-close EV (review): 2.00 × 0.50 − 1 = 0%. Price vs close: 2.10 × 0.50 − 1 = +5%.",
    "related": [
     "price-vs-close",
     "clv",

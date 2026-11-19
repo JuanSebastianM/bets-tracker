@@ -36,3 +36,14 @@ test('rule 16 says the Sofascore AI is read for shortlisted picks only (lean run
   assert.match(en.says, /15 Nov 2026/);
   assert.ok(es.decisions.includes(125) && en.decisions.includes(125));
 });
+
+test('audit 3: the review fair-EV entry says the feed leg uses "feed X" at logging (not the feed opening) and names the IA-WATCH source', () => {
+  for (const l of ['es', 'en']) {
+    const e = JSON.parse(readFileSync(new URL(`../../src/content/glossary.${l}.json`, import.meta.url), 'utf8')).entries.find((x) => x.slug === 'fair-ev-review');
+    assert.match(e.inSheet, /feed X/);
+    assert.match(e.inSheet, /IA-WATCH/);
+    assert.doesNotMatch(e.example, /feed opened|apertura del feed era/);
+    const pvc = JSON.parse(readFileSync(new URL(`../../src/content/glossary.${l}.json`, import.meta.url), 'utf8')).entries.find((x) => x.slug === 'price-vs-close');
+    assert.match(pvc.inSheet, /Grok/);
+  }
+});
