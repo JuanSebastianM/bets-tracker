@@ -8,6 +8,7 @@ import { href, navigate } from '../../lib/router.js';
 import { Card, FilterChip, SegmentedControl, SearchInput, EmptyState, Button, Icon, Pagination, pageOf, FeedGate, RefText, Highlight } from '../../lib/ui/index.js';
 import { glossaryHref, decisionHref, ruleSlug, sheetRuleSlug } from '../../lib/glossary-links.js';
 import { formatDate, formatMonth, formatCount } from '../../lib/format.js';
+import { sheetLang } from '../../lib/spoken.js';
 import {
   DECISION_STATUSES, THEME_IDS, decisionStatusKind, decisionTheme, decisionFiltersFromQuery, decisionFiltersToQuery,
   filterDecisions, newestFirst, groupByMonth, groupByTheme, decisionCounts, decisionGraph, decisionMatches, parseSheetRule,
@@ -89,7 +90,7 @@ function DecisionsHome({ data, query }) {
       />
       <${SearchInput} label=${t('decisions.searchLabel')} placeholder=${t('decisions.searchPlaceholder')} value=${f.q} onValue=${(v) => set({ q: v })} clearLabel=${t('decisions.clearSearch')} />
       <div class="spread">
-        <button type="button" class="link-btn dfilter-toggle" aria-expanded=${showFilters ? 'true' : 'false'} aria-controls="decision-filters" onClick=${() => setShowFilters(!showFilters)}>
+        <button type="button" class="link-btn dfilter-toggle" aria-expanded=${showFilters ? 'true' : 'false'} aria-controls=${showFilters ? 'decision-filters' : undefined} onClick=${() => setShowFilters(!showFilters)}>
           <${Icon} name="filter" size=${16} /> ${active ? t('decisions.filtersActive', { n: active }) : t('decisions.filters')}
         </button>
         ${active ? html`<button type="button" class="link-btn" onClick=${() => set({ statuses: [], themes: [], from: '', to: '' })}>${t('decisions.clearFilters')}</button>` : null}
@@ -182,9 +183,9 @@ function InForceView({ decisions, q, known }) {
         <ul class="dnow">
           ${g.items.map(
             (d) => html`<li class="dnow-item">
-              <div class="dmeta"><a class="drow" href=${decisionHref(d.row)}>${t('decisions.rowShort', { row: d.row })}</a><span class="num">${formatDate(d.date)}</span><${StatusChip} status=${d.status} /></div>
-              <a class="dtopic-link" href=${decisionHref(d.row)}><${Highlight} text=${d.topic} q=${q} /></a>
-              <p class="small dtext"><${RefText} text=${d.decision} q=${q} known=${known} /></p>
+              <div class="dmeta"><a class="drow" href=${decisionHref(d.row)} tabindex="-1" aria-hidden="true">${t('decisions.rowShort', { row: d.row })}</a><span class="num">${formatDate(d.date)}</span><${StatusChip} status=${d.status} /></div>
+              <a class="dtopic-link" href=${decisionHref(d.row)} lang=${sheetLang(getLocale())}><${Highlight} text=${d.topic} q=${q} /></a>
+              <p class="small dtext" lang=${sheetLang(getLocale())}><${RefText} text=${d.decision} q=${q} known=${known} /></p>
             </li>`,
           )}
         </ul>
@@ -208,7 +209,7 @@ function LongText({ text, q, known }) {
   return html`${String(text || '')
     .split(/\n+/)
     .filter(Boolean)
-    .map((p) => html`<p class="dlong"><${RefText} text=${p} q=${q} known=${known} /></p>`)}`;
+    .map((p) => html`<p class="dlong" lang=${sheetLang(getLocale())}><${RefText} text=${p} q=${q} known=${known} /></p>`)}`;
 }
 
 /** @param {{ d: Decision, q: string, known: any }} props */
@@ -218,13 +219,13 @@ function DecisionCard({ d, q, known }) {
   const theme = decisionTheme(d);
   return html`<article class="card dcard" data-row=${d.row} aria-labelledby=${`d-${d.row}`}>
     <div class="dmeta">
-      <a class="drow" href=${decisionHref(d.row)}>${t('decisions.rowShort', { row: d.row })}</a>
+      <a class="drow" href=${decisionHref(d.row)} tabindex="-1" aria-hidden="true">${t('decisions.rowShort', { row: d.row })}</a>
       <span class="num">${formatDate(d.date)}</span>
       <${StatusChip} status=${d.status} />
       <span class="dtheme-label">${t(`decisions.themes.${theme}`)}</span>
     </div>
-    <h3 class="dtopic" id=${`d-${d.row}`}><a href=${decisionHref(d.row)}><${Highlight} text=${d.topic} q=${q} /></a></h3>
-    <p class=${`dtext${q ? '' : ' dtext-clamp'}`}><${RefText} text=${d.decision} q=${q} known=${known} /></p>
+    <h3 class="dtopic" id=${`d-${d.row}`} lang=${sheetLang(getLocale())}><a href=${decisionHref(d.row)}><${Highlight} text=${d.topic} q=${q} /></a></h3>
+    <p class=${`dtext${q ? '' : ' dtext-clamp'}`} lang=${sheetLang(getLocale())}><${RefText} text=${d.decision} q=${q} known=${known} /></p>
     ${d.evidence || d.review
       ? html`<${LazyDisclosure} key=${`e${inEvidence || inReview}`} open=${inEvidence || inReview} testId=${`decision-evidence-${d.row}`}
           summary=${inEvidence || inReview ? t('decisions.moreMatch') : d.evidence && d.review ? t('decisions.more') : d.evidence ? t('decisions.evidence') : t('decisions.review')}>
@@ -261,7 +262,7 @@ function DecisionPage({ data, row }) {
         <${StatusChip} status=${d.status} link />
         <a class="dtheme-label" href=${href(`/decisions?th=${decisionTheme(d)}`)}>${t(`decisions.themes.${decisionTheme(d)}`)}</a>
       </div>
-      <h2 class="ddetail-title" id="d-title"><${RefText} text=${d.topic} known=${known} /></h2>
+      <h2 class="ddetail-title" id="d-title" lang=${sheetLang(getLocale())}><${RefText} text=${d.topic} known=${known} /></h2>
       <section class="dsec"><h3>${t('decisions.decision')}</h3><${LongText} text=${d.decision} known=${known} /></section>
       ${d.evidence ? html`<section class="dsec"><h3>${t('decisions.evidence')}</h3><${LongText} text=${d.evidence} known=${known} /></section>` : null}
       ${d.review ? html`<section class="dsec"><h3>${t('decisions.review')}</h3><${LongText} text=${d.review} known=${known} /></section>` : null}

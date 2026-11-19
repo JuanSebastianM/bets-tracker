@@ -1,8 +1,9 @@
 // Pick detail (#/explorer/:uid): everything the sheet and the parsed notes say about one pick, in
 // readable form, with previous / next inside the current filtered list. A sheet on phones, a dialog
 // on wide screens.
-import { html } from '../../../vendor/preact.js';
-import { t } from '../../lib/i18n.js';
+import { html, useEffect } from '../../../vendor/preact.js';
+import { t, getLocale } from '../../lib/i18n.js';
+import { sheetLang } from '../../lib/spoken.js';
 import { BottomSheet, Button, EmptyState, StatusBadge, TagBadge, Icon, RefText, Term, useGlossaryLinks } from '../../lib/ui/index.js';
 import { formatDate, formatPct, formatPrice, formatProb, formatUnits } from '../../lib/format.js';
 import { formatDateTime } from '../../lib/i18n.js';
@@ -66,16 +67,32 @@ function BooksTable({ pick: p }) {
   </div>`;
 }
 
+/** Which footer button should have focus after previous / next re-mounts the sheet. @type {'prev' | 'next' | null} */
+let refocus = null;
+
 /**
  * @param {{ pick: Pick | null, pinnacle: import('../../data/types').PinnacleRow[], position: { index: number, total: number },
  *   onPrev: (() => void) | null, onNext: (() => void) | null, onClose: () => void }} props
  */
 export function PickDetail({ pick: p, pinnacle, position, onPrev, onNext, onClose }) {
   const gl = useGlossaryLinks();
+  // Previous / next open another route, so the sheet mounts again: put focus back on the button the
+  // user pressed (or the other one when that end of the list disables it) instead of the close button.
+  useEffect(() => {
+    const want = refocus;
+    refocus = null;
+    if (!want) return;
+    requestAnimationFrame(() => {
+      const el = /** @type {HTMLButtonElement | null} */ (document.querySelector(`[data-testid="pick-${want}"]`));
+      const other = /** @type {HTMLButtonElement | null} */ (document.querySelector(`[data-testid="pick-${want === 'next' ? 'prev' : 'next'}"]`));
+      (el && !el.disabled ? el : other)?.focus();
+    });
+  }, [p?.uid]);
+  const step = (/** @type {'prev' | 'next'} */ dir, /** @type {(() => void) | null} */ fn) => (fn ? () => { refocus = dir; fn(); } : undefined);
   const footer = html`<div class="ex-detail-nav">
-    <${Button} variant="secondary" icon="chevron-left" onClick=${onPrev || undefined} disabled=${!onPrev} data-testid="pick-prev">${t('explorer.d.prev')}</${Button}>
+    <${Button} variant="secondary" icon="chevron-left" onClick=${step('prev', onPrev)} disabled=${!onPrev} data-testid="pick-prev">${t('explorer.d.prev')}</${Button}>
     <span class="muted small num" data-testid="pick-position">${position.index >= 0 ? t('explorer.d.position', { i: position.index + 1, n: position.total }) : ''}</span>
-    <${Button} variant="secondary" onClick=${onNext || undefined} disabled=${!onNext} data-testid="pick-next" class="ex-next">${t('explorer.d.next')}<${Icon} name="chevron-right" size=${18} /></${Button}>
+    <${Button} variant="secondary" onClick=${step('next', onNext)} disabled=${!onNext} data-testid="pick-next" class="ex-next">${t('explorer.d.next')}<${Icon} name="chevron-right" size=${18} /></${Button}>
   </div>`;
   if (!p) {
     return html`<${BottomSheet} open title=${t('explorer.d.missingTitle')} onClose=${onClose} testId="pick-sheet" size="lg">
@@ -176,7 +193,7 @@ export function PickDetail({ pick: p, pinnacle, position, onPrev, onNext, onClos
         : null}
 
       <${Block} title=${t('explorer.notes')} testId="pick-notes">
-        <p class="small explorer-notes">${p.notes || '–'}</p>
+        <p class="small explorer-notes" lang=${sheetLang(getLocale())}>${p.notes || '–'}</p>
       </${Block}>
     </div>
   </${BottomSheet}>`;

@@ -12,6 +12,7 @@
 // Option counts are "how many picks this option would show with the other filters as they are"
 // (facetCounts); options that would show nothing are disabled, or hidden in the long lists.
 import { html, useMemo, useState, useEffect, useId } from '../../../vendor/preact.js';
+import { memoLast } from '../../data/memo.js';
 import { t, getLocale } from '../i18n.js';
 import { formatDate, formatPct, todayIn } from '../format.js';
 import { toast } from '../toast.js';
@@ -151,9 +152,9 @@ function Section({ id, title, active = 0, open, onToggle, children }) {
   const bodyId = useId();
   return html`<section class=${`fp-section${open ? ' fp-open' : ''}`} data-section=${id}>
     <h3 class="fp-section-head">
-      <button type="button" class="fp-toggle" aria-expanded=${open ? 'true' : 'false'} aria-controls=${bodyId} onClick=${onToggle}>
+      <button type="button" class="fp-toggle" aria-expanded=${open ? 'true' : 'false'} aria-controls=${open ? bodyId : undefined} onClick=${onToggle}>
         <span class="fp-section-title">${title}</span>
-        ${active ? html`<span class="fp-badge num" aria-label=${t('filters.openCount', { count: active })}>${active}</span>` : null}
+        ${active ? html`<span class="fp-badge num" aria-hidden="true">${active}</span><span class="sr-only">, ${t('a11y.sectionActive', { count: active })}</span>` : null}
         <${Icon} name="chevron-down" size=${16} />
       </button>
     </h3>
@@ -242,8 +243,10 @@ function TriState({ label, value, counts, onValue }) {
  */
 export function FilterPanel({ picks, filters: f, onChange, hide = [], today, testId = 'filter-panel' }) {
   const day = today || todayIn(APP_TIMEZONE);
-  const options = useMemo(() => filterOptions(picks), [picks]);
-  const counts = useMemo(() => facetCounts(picks, f, { today: day }), [picks, toQueryString(f), day]);
+  // Kept across openings of the sheet (memoLast): the counts of an unchanged filter are not redone.
+  const qs = toQueryString(f);
+  const options = useMemo(() => memoLast('filters.options', [picks], () => filterOptions(picks)), [picks]);
+  const counts = useMemo(() => memoLast('filters.counts', [picks, qs, day], () => facetCounts(picks, f, { today: day })), [picks, qs, day]);
   const [open, setOpen] = useState(() => {
     /** @type {Record<string, boolean>} */
     const o = {};
@@ -537,7 +540,7 @@ export function SavedFilters({ filters: f, onApply, testId = 'saved-filters' }) 
   };
   return html`<div class="saved-filters" data-testid=${testId}>
     <div class="stack-sm">
-      <h4 class="fp-group-title">${t('filters.saved')}</h4>
+      <h3 class="fp-group-title">${t('filters.saved')}</h3>
       ${s.presets.length
         ? html`<ul class="sf-list">
             ${s.presets.map(
@@ -559,7 +562,7 @@ export function SavedFilters({ filters: f, onApply, testId = 'saved-filters' }) 
       </form>
     </div>
     <div class="stack-sm">
-      <h4 class="fp-group-title">${t('filters.starting')}</h4>
+      <h3 class="fp-group-title">${t('filters.starting')}</h3>
       <p class="muted xs">${t('filters.startingHint')}</p>
       <div class="fp-chips">
         ${BUILTIN_PRESETS.map((b) => {

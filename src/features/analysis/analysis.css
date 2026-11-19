@@ -135,3 +135,17 @@ a.an-row-name { color: var(--c-accent); text-decoration: none; }
   .analysis .an-side-panel .disclosure summary { padding: 0 var(--sp-3); font-size: var(--fs-sm); }
   .analysis .an-side-panel .disclosure-body { padding: 0 var(--sp-3) var(--sp-3); }
 }
+
+/* Accessibility pass: small-sample groups are greyed with the muted ink (4.5:1 or more) instead of
+   opacity (which fell to about 2:1 and came back only on hover). Their text still says "n pequeño". */
+.analysis .an-small, .analysis .an-small:focus-within, .analysis .an-small:hover { opacity: 1; }
+.analysis .an-small :is(.an-gname, .an-gmeta, .an-gmeta span, .pos, .neg, dd, dt, a, .an-note, .an-sub) { color: var(--c-muted); }
+.analysis td.an-small, .analysis tr.an-small td { color: var(--c-muted); }
+.analysis .an-small .chip { color: var(--c-ink-2); background: var(--c-surface-2); }
+.analysis .an-sort .select-wrap select { min-height: var(--tap); }
+.analysis a.an-row-name { position: relative; }
+.analysis a.an-row-name::after { content: ''; position: absolute; inset: -13px -4px; }
+.analysis label:has(> input[type='checkbox']) { min-height: var(--tap); }
+/* Reflow at large text: the part links wrap to a second line instead of hiding off screen. */
+.analysis .an-tabs { flex-wrap: wrap; }
+.analysis .an-range-val { white-space: normal; }

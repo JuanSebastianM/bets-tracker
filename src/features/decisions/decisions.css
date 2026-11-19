@@ -89,3 +89,14 @@
 .decisions .djump::-webkit-scrollbar { display: none; }
 .decisions .djump-btn { flex: none; min-height: 36px; padding: 0 var(--sp-3); border: 1px solid var(--c-line-strong); background: var(--c-surface); color: var(--c-ink-2); cursor: pointer; font: inherit; font-size: var(--fs-sm); font-weight: 600; }
 .decisions .dmonth { scroll-margin-top: var(--header-h); }
+
+/* Accessibility pass: 44 px touch areas without changing the look. The "Fila N" link beside each
+   topic is out of the tab order and hidden from screen readers (the topic link goes to the same
+   page); the topic link's area reaches over the meta line. */
+.decisions .dtopic a, .decisions .dtopic-link { position: relative; }
+.decisions .dtopic a::after, .decisions .dtopic-link::after { content: ''; position: absolute; inset: -13px 0; }
+.decisions .djump-btn, .decisions .drule-link, .decisions a.dchip { position: relative; }
+.decisions .djump-btn::after, .decisions .drule-link::after { content: ''; position: absolute; inset: -5px 0; }
+.decisions a.dchip::after { content: ''; position: absolute; inset: -13px 0; }
+.decisions a.dtheme-label { position: relative; }
+.decisions a.dtheme-label::after { content: ''; position: absolute; inset: -14px 0; }

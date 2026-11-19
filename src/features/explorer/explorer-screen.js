@@ -13,6 +13,7 @@ import {
 } from '../../lib/ui/index.js';
 import { applyFilters, fromQuery, toQueryString, countActive, defaultFilters } from '../../data/filters.js';
 import { sortPicks, SORT_KEYS, SORT_DEFAULT_DIR, neighbours } from '../../data/explore.js';
+import { memoLast } from '../../data/memo.js';
 import { summarize } from '../../data/stats.js';
 import { simulate } from '../../data/simulate.js';
 import { todayIn } from '../../lib/format.js';
@@ -68,9 +69,13 @@ function Explorer({ data, query, uid }) {
   const tableMode = useMediaQuery(TABLE_QUERY);
   const [panelOpen, setPanelOpen] = useState(false);
 
-  const list = useMemo(() => sortPicks(applyFilters(data.picks, filters, { today }), view.sort, view.dir), [data, fqs, view.sort, view.dir, today]);
-  const summary = useMemo(() => summarize(list), [list]);
-  const curve = useMemo(() => simulate(list, { mode: 'flat', stake: 1 }).points.map((p) => p.cum), [list]);
+  // memoLast: opening a pick or coming back remounts the screen; the list and its figures are kept.
+  const list = useMemo(
+    () => memoLast('explorer.list', [data, fqs, view.sort, view.dir, today], () => sortPicks(applyFilters(data.picks, filters, { today }), view.sort, view.dir)),
+    [data, fqs, view.sort, view.dir, today],
+  );
+  const summary = useMemo(() => memoLast('explorer.summary', [list], () => summarize(list)), [list]);
+  const curve = useMemo(() => memoLast('explorer.curve', [list], () => simulate(list, { mode: 'flat', stake: 1 }).points.map((p) => p.cum)), [list]);
   const paged = pageOf(list, view.page, PAGE_SIZE);
   const active = countActive(filters);
 

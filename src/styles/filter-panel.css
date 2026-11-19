@@ -97,3 +97,8 @@
 /* "Prueba" section (fixes): test labels are long and differ at the end, so they wrap instead of being cut. */
 .fp-groups[data-testid="fp-tests"] .fchip { padding-top: 6px; padding-bottom: 6px; border-radius: 18px; text-align: left; }
 .fp-groups[data-testid="fp-tests"] .fchip > span:not(.fchip-count) { white-space: normal; overflow: visible; }
+
+/* Accessibility pass (docs/ACCESSIBILITY.md): field boundaries at 3:1 and 44 px chip tap areas. */
+.filter-panel input[type='date'] { border-color: var(--c-control-line); }
+.af-chip::after { inset: -5px 0; }
+.fp-seg-n { opacity: 1; }

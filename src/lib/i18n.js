@@ -195,6 +195,22 @@ const DATE_STYLES = {
  */
 export function formatDate(dateStr, style = 'medium', locale = getLocale()) {
   if (!dateStr) return '';
+  // The same few hundred dates are formatted thousands of times (lists, tables, chart labels): Intl
+  // is slow on a phone, so each (locale, style, date) is formatted once.
+  const key = `${locale}|${style}|${dateStr}`;
+  const hit = dateCache.get(key);
+  if (hit !== undefined) return hit;
+  const out = formatDateUncached(dateStr, style, locale);
+  if (dateCache.size > 5000) dateCache.clear();
+  dateCache.set(key, out);
+  return out;
+}
+
+/** @type {Map<string, string>} */
+const dateCache = new Map();
+
+/** @param {string} dateStr @param {keyof typeof DATE_STYLES} style @param {Locale} locale */
+function formatDateUncached(dateStr, style, locale) {
   const [y, m, d] = dateStr.slice(0, 10).split('-').map(Number);
   const date = new Date(Date.UTC(y, m - 1, d));
   const f = dtf(locale, { ...DATE_STYLES[style], timeZone: 'UTC' });

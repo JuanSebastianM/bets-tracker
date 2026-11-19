@@ -85,3 +85,8 @@
 .explorer .ex-pin-move { color: var(--c-ink-2); }
 .explorer .ex-detail-nav { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: var(--sp-2); }
 .explorer .ex-next > span { display: inline-flex; align-items: center; gap: var(--sp-2); }
+
+/* Accessibility pass: 44 px touch areas. */
+.explorer .ex-sort .select-wrap select { min-height: var(--tap); }
+.explorer a.tag { position: relative; }
+.explorer a.tag::after { content: ''; position: absolute; inset: -12px 0; }

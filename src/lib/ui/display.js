@@ -6,6 +6,8 @@ import { t } from '../i18n.js';
 import { formatCount } from '../format.js';
 import { tagLabel } from '../../data/tags.js';
 import { verdictLabel } from '../../data/summaries.js';
+import { spokenRecord, sheetLang } from '../spoken.js';
+import { getLocale } from '../i18n.js';
 
 /**
  * A slab of content. `title` renders an h2 (or `level` 3); `action` sits at the right of the title.
@@ -54,7 +56,7 @@ export function Scoreboard({ won, lost, void: voids, halfWon = 0, halfLost = 0, 
         : null}
       ${halfWon + halfLost ? html`<span class="score-half">+${halfWon + halfLost}½</span>` : null}
     </div>
-    <span class="sr-only">${t('record.sr', { won, lost, void: voids, halves: halfWon + halfLost })}</span>
+    <span class="sr-only">${spokenRecord({ won, lost, void: voids, halfWon, halfLost })}</span>
     <div class="score-bar" aria-hidden="true">
       <i class="sb-won" style=${{ width: pct(won + halfWon) }}></i>
       <i class="sb-void" style=${{ width: pct(voids) }}></i>
@@ -83,7 +85,8 @@ export function StatusBadge({ status, raw }) {
  */
 export function TagBadge({ tag, href }) {
   const label = tagLabel(tag);
-  return href ? html`<a class="tag" href=${href}>${label}</a>` : html`<span class="tag">${label}</span>`;
+  const lang = sheetLang(getLocale());
+  return href ? html`<a class="tag" href=${href} lang=${lang}>${label}</a>` : html`<span class="tag" lang=${lang}>${label}</span>`;
 }
 
 /**

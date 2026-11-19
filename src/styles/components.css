@@ -313,3 +313,41 @@ mark.hl { background: var(--c-accent-soft); color: inherit; border-radius: 3px; 
 @media (min-width: 960px) {
   .app { background: linear-gradient(to right, var(--c-surface) calc(var(--rail-w) - 1px), var(--c-line) calc(var(--rail-w) - 1px), var(--c-line) var(--rail-w), transparent var(--rail-w)); }
 }
+
+/* ---------------------------------------------------------------- accessibility pass (docs/ACCESSIBILITY.md)
+   Boundaries of fields and controls at 3:1 against every surface, placeholders at 4.5:1, the selected
+   segment told apart by more than a faint fill, and 44 px touch areas that keep the look (an absolutely
+   placed ::after extends the area without changing the layout, as `.fchip::after` already did). */
+.input-wrap input, .select-wrap select, .search, .btn-secondary, .fchip:not(.fchip-on), .filter-panel input[type='date'] { border-color: var(--c-control-line); }
+.segmented { border-color: var(--c-control-line); }
+.seg-on { box-shadow: inset 0 0 0 1px var(--c-control-line), 0 1px 2px rgba(0, 0, 0, 0.12); font-weight: 750; }
+::placeholder { color: var(--c-muted); opacity: 1; }
+.score-sep { color: var(--c-muted); }
+.fchip-on .fchip-count { opacity: 1; }
+.seg { position: relative; }
+.seg::after { content: ''; position: absolute; inset: -3px 0; }
+.link-btn { position: relative; }
+.link-btn::after { content: ''; position: absolute; inset: -6px 0; }
+.tag-gloss .term { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0; white-space: normal; }
+/* Small-sample rows of the range chart are greyed with colour, not opacity: faded text fell to 2:1. */
+.range-muted { opacity: 1; }
+.range-muted :is(.bar-name, .bar-value) { color: var(--c-muted); }
+.range-muted .range-band { background: var(--c-surface-2); border-color: var(--c-muted); border-style: dashed; }
+.range-muted .range-dot { background: var(--c-muted); }
+/* The kit's chip tap areas measured 42 px (the ::after is placed on the padding box): 5 px each side. */
+.fchip::after { inset: -5px 0; }
+.tag-gloss .term { position: relative; }
+.tag-gloss .term::after { content: ''; position: absolute; inset: 0 -6px; }
+/* A control that is busy stays focusable (aria-disabled, not disabled), so focus is not lost to the page. */
+.icon-btn[aria-disabled='true'] { opacity: 0.4; cursor: default; }
+/* Reflow at 200% text: a card's title and its chip share a line only when they fit, and a segment's
+   label wraps instead of pushing the control wider than the screen. */
+.card-head { flex-wrap: wrap; }
+.seg { min-width: 0; overflow-wrap: anywhere; }
+.chip { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.verdict-chip { white-space: normal; }
+.kv { grid-template-columns: fit-content(50%) minmax(0, 1fr); }
+.kv dt { overflow-wrap: anywhere; }
+.card { grid-template-columns: minmax(0, 1fr); }
+.btn { max-width: 100%; white-space: normal; text-align: center; }
+.stat-value { overflow-wrap: anywhere; }

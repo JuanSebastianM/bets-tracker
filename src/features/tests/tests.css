@@ -174,3 +174,6 @@
 .tests .tests-stopped-body { display: grid; gap: var(--sp-1); padding-bottom: var(--sp-3); }
 .tests .tests-stopped-body p { font-size: var(--fs-sm); color: var(--c-ink-2); }
 .tests .tests-review-more .disclosure { min-width: 0; }
+
+/* Accessibility pass: 44 px touch area. */
+.tests .tests-ov-link { min-height: var(--tap); }

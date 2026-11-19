@@ -11,7 +11,7 @@ export function Toaster() {
   const toasts = useStore(toastStore);
   return html`<div class="toaster" aria-live="polite">
     ${toasts.map(
-      (x) => html`<div class=${`toast toast-${x.tone}`} role=${x.tone === 'error' ? 'alert' : 'status'} key=${x.id}>
+      (x) => html`<div class=${`toast toast-${x.tone}`} role=${x.tone === 'error' ? 'alert' : undefined} key=${x.id}>
         <${Icon} name=${ICONS[x.tone]} size=${20} />
         <span class="toast-msg">${x.message}</span>
         ${x.action

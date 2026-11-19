@@ -125,3 +125,14 @@ img, svg { display: block; }
 @media (max-width: 719px) {
   .grid-3 { display: grid; gap: var(--sp-3); }
 }
+
+/* Reflow (accessibility pass): a one-column stack never grows wider than the screen because one child
+   has a wide minimum (a long word at 200% text, a row of chips); the child wraps or scrolls in its box. */
+.stack, .stack-sm { grid-template-columns: minmax(0, 1fr); }
+.tabbar ul { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.tab span { max-width: 100%; overflow-wrap: anywhere; text-align: center; line-height: 1.15; }
+/* At large text the sync stamp goes under the title instead of squeezing it to nothing. */
+.app-header-inner { flex-wrap: wrap; }
+.app-title { min-width: min(20%, 6em); }
+.sync-stamp { min-width: 0; }
+.sync-stamp .stamp-lines { min-width: 0; overflow-wrap: anywhere; }

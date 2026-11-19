@@ -1,6 +1,6 @@
 // App shell: header (title, sync stamp, refresh), feed banners, route outlet, bottom bar on phones,
 // side rail on wide screens, the "Más" page, toasts.
-import { html, useEffect, useRef } from '../vendor/preact.js';
+import { html, useEffect, useRef, useState } from '../vendor/preact.js';
 import { t, useLocale } from './lib/i18n.js';
 import { useLocation, resolveRoute, navigate, href } from './lib/router.js';
 import { features, routes as featureRoutes } from './features/registry.js';
@@ -46,6 +46,32 @@ const TABS = [
 ];
 const MORE_IDS = new Set(['more', ...features.filter((f) => f.nav === 'more').map((f) => f.id)]);
 
+/** Set when the user taps "Actualizar": only then is a successful refresh announced. */
+let userRefresh = false;
+
+/**
+ * One polite live region, always in the page, that says what the sync did: a refresh the user asked
+ * for ("Actualizando…", "Datos actualizados.") and any failure (offline or stale). A live region must
+ * exist before its text changes to be read, which the banners (inserted when the error appears) are not.
+ */
+function SyncAnnouncer() {
+  const s = useFeed();
+  useLocale();
+  const [msg, setMsg] = useState('');
+  const prev = useRef({ refreshing: s.refreshing, error: s.error });
+  useEffect(() => {
+    const p = prev.current;
+    if (s.refreshing && !p.refreshing && userRefresh) setMsg(t('a11y.refreshing'));
+    if (!s.refreshing && p.refreshing) {
+      if (s.error) setMsg(s.error.code === 'offline' ? t('a11y.offline') : t('a11y.refreshFailed'));
+      else if (userRefresh) setMsg(t('a11y.refreshed'));
+      userRefresh = false;
+    } else if (s.error && !p.error && !s.refreshing) setMsg(s.error.code === 'offline' ? t('a11y.offline') : t('a11y.refreshFailed'));
+    prev.current = { refreshing: s.refreshing, error: s.error };
+  }, [s.refreshing, s.error]);
+  return html`<div class="sr-only" role="status" aria-live="polite" data-testid="sync-announcer">${msg}</div>`;
+}
+
 /** "Sincronizado hace 2 min · hoja leída 10:05" plus the refresh button. */
 function SyncStamp() {
   const s = useFeed();
@@ -61,8 +87,12 @@ function SyncStamp() {
           icon="refresh"
           label=${t('feed.refresh')}
           class=${s.refreshing ? 'is-refreshing' : ''}
-          onClick=${() => refreshFeed()}
-          disabled=${s.refreshing}
+          onClick=${() => {
+            if (s.refreshing) return;
+            userRefresh = true;
+            refreshFeed();
+          }}
+          aria-disabled=${s.refreshing ? 'true' : undefined}
           data-testid="refresh"
         />`
       : null}
@@ -203,5 +233,6 @@ export function App() {
     </main>
     <${TabBar} activeId=${route.featureId} />
     <${Toaster} />
+    <${SyncAnnouncer} />
   </div>`;
 }
