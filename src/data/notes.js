@@ -502,6 +502,34 @@ export function measure(row, parsed) {
 }
 
 /**
+ * A book's opening for a Grok pick (review.py v1.1 book_open_grok): a note segment before the close that
+ * starts with the book, else the book's price in our verdict (column K). null when neither has it.
+ * @param {string} n notes @param {string} verdict @param {string} book
+ */
+export function grokBookOpen(n, verdict, book) {
+  const pre = String(n || '').split(/\|\s*[Cc]ierr[ea]:?\s+(?:Betano|Betsson|Stake)/)[0];
+  for (const seg of pre.split(' | ')) {
+    const m = new RegExp(String.raw`^\s*${book}\s+@?(${NUM})(?!\d|[.,]\d)`).exec(seg);
+    if (m) return fnum(m[1]);
+  }
+  const m = new RegExp(String.raw`${book}\s+(${NUM})(?!\d|[.,]\d)`).exec(verdict || '');
+  return m ? fnum(m[1]) : null;
+}
+
+/**
+ * The books whose own price for a Grok pick equals Grok's price G (DATA_CONTRACT: Grok's books are the
+ * book whose price equals Cuota). Empty when G is no book's price (Kambi, or Grok's own quote).
+ * @param {string} n @param {string} verdict @param {number | null} price
+ */
+export function grokPriceBooks(n, verdict, price) {
+  if (price == null) return [];
+  return BOOKS.filter((b) => {
+    const o = grokBookOpen(n, verdict, b);
+    return o != null && Math.abs(o - price) < 0.006;
+  });
+}
+
+/**
  * A Grok pick's same-book figures (review.py v1.1's load_grok): the opening is the book's own price in
  * the notes (a segment that starts with the book) or in our verdict, never Grok's price in G, which is
  * often another book's (Kambi) or Grok's own quote. Among the books with a two-sided close whose
@@ -512,15 +540,7 @@ export function measure(row, parsed) {
  * @returns {{ book: string, open: number, close: number, clv: number, fev: number, margin: number } | null}
  */
 export function grokSameBook(n, verdict, parsed, need, sel) {
-  const pre = String(n || '').split(/\|\s*[Cc]ierr[ea]:?\s+(?:Betano|Betsson|Stake)/)[0];
-  const openOf = (/** @type {string} */ book) => {
-    for (const seg of pre.split(' | ')) {
-      const m = new RegExp(String.raw`^\s*${book}\s+@?(${NUM})(?!\d|[.,]\d)`).exec(seg);
-      if (m) return fnum(m[1]);
-    }
-    const m = new RegExp(String.raw`${book}\s+(${NUM})(?!\d|[.,]\d)`).exec(verdict || '');
-    return m ? fnum(m[1]) : null;
-  };
+  const openOf = (/** @type {string} */ book) => grokBookOpen(n, verdict, book);
   /** @type {{ pref: boolean, open: number, book: string, close: number, cp: [number, number] }[]} */
   const cands = [];
   for (const b of BOOKS) {

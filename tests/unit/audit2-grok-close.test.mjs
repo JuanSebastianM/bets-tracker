@@ -55,3 +55,18 @@ test('no book opening, an opening 30% away from the close, or only a feed close:
   assert.equal(f.fairCloseEv, null);
   assert.equal(f.clv, null);
 });
+
+test('audit 3: Grok books are only books whose own price equals G (no CLV-book fallback)', () => {
+  const kambi = grokPick({ market: 'Córners 1X2', selection: 'Uno con más córners', price: 4.2,
+    notes: 'Betano 5.50 (X 9.00, Dos 1.20) | Kambi 4.20 (X 9.0, Dos 1.22) | Cierre Betano 5.50 (X 9.00, Dos 1.20); 01 nov 09:50 10 min antes | CLV 0% vs Betano | EV justa -14.00%' });
+  assert.deepEqual(kambi.books, []);
+  assert.equal(kambi.parsed.priceSource, null);
+  assert.equal(kambi.extra.grokBook, 'Betano'); // the close is still measured at Betano, on Betano's opening
+  const stake = grokPick({ price: 2.14, notes: 'Cierre Stake 1.90 (O4.5 1.80); 29 oct 18:10 | CLV -2.63% vs Stake (apertura Stake 1.85, col. K)',
+    verdict: 'Cotizado: modelo 60% vs mercado 50% (mejor precio Stake 1.85) → SKIP: F-gap' });
+  assert.deepEqual(stake.books, []);
+  const same = grokPick({ price: 2.6, notes: 'Betano 2.60 (O4.5 1.50) | Betsson 2.50 (1.52) | Cierre Betano 2.40 (O4.5 1.60); 1 nov 9:50 | CLV +8.33% vs Betano' });
+  assert.deepEqual(same.books, ['Betano']);
+  const fromVerdict = grokPick({ price: 1.9, notes: '', verdict: 'Cotizado: … mejor precio Stake 1.90 (Betsson 1.88)' });
+  assert.deepEqual(fromVerdict.books, ['Stake']);
+});
