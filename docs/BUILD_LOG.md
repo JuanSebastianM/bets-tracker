@@ -702,3 +702,258 @@ figure from the sheet is in this file, the tests or the commits.
   repository's privacy test passes without being weakened.
 - The 5,000-pick speed test failed once (normalize 2.4 s against a 1.5 s budget) while the machine was
   running several agents (load about 10); it passed on every rerun.
+
+## Fixes: feed script version, exact Tests links (branch `feat/fixes`)
+
+Two items from the README's open list, both answered "fix it" by Juan.
+
+## 1. A missed redeploy of the feed script is visible
+
+- `apps-script/Feed.gs` has `BT_FEED_SCRIPT_VERSION`: the first 12 hex characters of the SHA-256 of the
+  file with that one value blanked (line endings as `\n`). It changes with any other edit, comments
+  included, and stamping it does not change it.
+- `scripts/stamp-feed.mjs` (`npm run feed:stamp`; `--check` writes nothing) computes it and writes it into
+  `Feed.gs`, `src/feed-version.js` (`FEED_SCRIPT_VERSION`, what the app expects) and the fixture's
+  `meta.scriptVersion`. `tests/unit/fixes-feed-version.test.mjs` recomputes it and fails when any of the
+  three is stale, so editing `Feed.gs` without restamping fails `npm run check`.
+- The script returns it as `meta.scriptVersion`, logs it first in `btFeedSelfTest`, and its cache prefix
+  is now `btFeed:s1:v<version>:`, so a redeployed script never serves the previous version's cached copy
+  (unit test with a fake cache shared by two versions). Nothing else in the script changed.
+- App: `validateFeed` sets a missing or empty value to `null`; `scriptVersionStatus(meta)` in
+  `src/data/feed.js` returns `current`, `different` or `missing`. Settings ("Datos de la hoja") shows both
+  versions, the state, and when they differ: the data is still valid, what to do (paste, self-test, new
+  version of the existing deployment), the five-minute cache, and a link to README section 5. A calm
+  info banner shows on the Overview and Settings only (as the missing-columns banner), with "Ver en
+  Ajustes" and "Ocultar por ahora"; dismissal is per session (`sessionStorage`, keyed on the pair
+  deployed → expected, so a new mismatch shows again).
+- The fixture generator imports the expected version, so ordinary e2e runs never show the banner; the
+  banner tests change the value in a route.
+- Decision: a missing field counts as "different" (the currently deployed script has none), worded as
+  "one from before the script reported its version". No schema bump: the shape did not change.
+- Problem: the privacy test greps the repo for a dollar sign next to a digit, which flagged regex
+  replacement strings (numbered group references). Fixed with replacer functions instead of touching the test.
+
+## 2. Every Tests link is exact
+
+- New filter field `tests` (URL `test`), ids of `TEST_FILTERS` in `src/data/tests-config.js`: the 8 frozen
+  tests, the 4 price-first tests and the 7 stopped categories (ids unique across kinds, unit-tested).
+  Each entry's `member` is the predicate the card counts with: `isCountable && match` for frozen tests
+  and stopped categories, `priceFirstMember(test)` (now also used by `priceFirstProgress`) for the
+  price-first ones. `testIdsOf(pick)` is memoised per pick in a `WeakMap`.
+- Decision: a link shows every member row, pending included (the card's `rows`), not only graded ones:
+  the Explorer is for looking at the rows, and the card already shows graded / pending separately. The
+  link says the count ("Ver las 12 filas en el Explorador", `data-rows`), which is the Explorer's count.
+- `filters.js` imports `tests-config.js`; `tests-config.js` only references `filters.js` in JSDoc types,
+  so there is no run-time cycle and no restructuring was needed.
+- Everything a list field has: URL round trip (unknown ids dropped), `filterOptions` (config order),
+  `facetCounts`, `activeEntries` right after source and tag ("Prueba: CÓRNERS EQUIPO (pasó todos los
+  filtros)"), removal, `countActive`, saved presets; old URLs parse as before.
+- Filter panel: a "Prueba" section after Tag, collapsed by default, three groups (frozen, price-first,
+  stopped) with counts; its chips wrap instead of being cut (the labels differ at the end). It works in
+  the Explorer, the Simulator and Analysis because they share the panel.
+- Every `explorer` in the config is now `{ tests: [id] }`; `explorerExact`, the approximation note and
+  its strings are gone, as are the field-filter constants only the old links used.
+
+## Tests
+
+- Unit: `fixes-feed-version.test.mjs` (7) and `fixes-test-filter.test.mjs` (7), including the link =
+  membership = card rows check for every test on the fixture, on synthetic rows that hit CÓRNERS EQUIPO's
+  "OR dated" branch (date only, passed-all only, neither, pending, published, not countable, Grok), and
+  through the URL. Two shared tests updated: `lines.test.mjs` (no `explorerExact`; every link exact) and
+  `tests-section.test.mjs` (links are `test=<id>`).
+- E2E: `fixes-feed-version.spec.js` (5), `fixes-test-filter.spec.js` (6); `tests.spec.js` expects the new
+  link URL. `fixes-screenshots.spec.js` (review only) shoots the banner, Settings, a Tests card, the
+  Explorer on `test=` and the panel section.
+
+## 2026-11-18: Second independent audit (what the screens show)
+
+*`feat/audit2`, by the audit agent.*
+
+Scope: whether anything the app shows is wrong on the real data of 18 Nov 2026. Real rows were read
+read-only (allowed ranges only) into `/tmp/audit2/`, the feed was built with this branch's `btFeedBuild`
+(sheet time zone America/Los_Angeles), and the app was run on it locally with Playwright (the feed URL
+intercepted). Every figure was compared with an independent Python recomputation from the raw rows and
+with `review.py` v1.1 (hash checked). No real row, figure or amount is in this file, the tests or the commits.
+
+### What changed
+
+- **`src/data/notes.js`, `src/data/normalize.js`: Grok against the close.** Grok's Cuota is Grok's quote,
+  often not the price of the book whose close is noted; and `Córners 1X2` / `Más córners` / `Tarjetas 1X2`
+  closes were de-vigged as two-way lines (the draw read as the only other side). On the real sheet that
+  turned Grok's mean EV against the close from about −6% into a positive figure with a "leaning for"
+  verdict and an Overview sentence saying Grok beats the close. Now: three-way corner and card markets
+  need two other outcomes (`outcomesNeeded`), and Grok's fair-close EV and CLV use the book's own opening
+  in the notes (review.py v1.1 `load_grok`: CLV book first, within 30% of its close, no bet365 fallback),
+  via the new `grokSameBook`. `extra.grokOpen` / `extra.grokBook` record what was used.
+- **`src/data/notes.js`: double-chance closes "(1X a / X2 b / 12 c)"** gave the pick's own price as its
+  other side in the pick sheet. Display only; measures unchanged.
+- **`src/data/summaries.js`, `src/i18n/*.json`:** "en 1 calificadas" → singular (`summaries.recordOne`,
+  `summaries.sampleSmallOne`, added at the end of the block).
+- **`src/content/rules.*.json`: rule 16** described the Sofascore AI as opened on every slate; since the
+  lean run (15 Nov 2026, Decisiones row 125) it is read only for shortlisted picks. Linked to row 125.
+- Tests: `tests/unit/audit2-grok-close.test.mjs`, `audit2-notes.test.mjs`, `audit2-content.test.mjs`.
+
+### Decisions
+
+- Grok follows review.py's definition instead of the contract's "price × close probability" because
+  review.py v1.1 states "Grok's price in G, never compared with a book's close" and rule 34 forbids
+  cross-source CLV. The Sombra measures are untouched and still equal review.py row by row.
+- Defects in `src/features` and `src/lib` (decisions month counts, "último slate" meaning, the label of
+  two different EV measures) are reported, not fixed (brief).
+
+### How it was checked
+
+Overview (all periods, both languages), 64 Explorer filter combinations, 4 pick sheets, Simulator in
+flat / percent / Kelly, every frozen and price-first test card, Analysis breakdown and calibration,
+Decisions counts and search, Settings, four browser time zones around Bogotá midnight, synthetic edge
+feeds (empty, one pick, all pending, no closes), URL injection and corrupt localStorage.
+
+## 2026-11-19: Accessibility and a slow phone
+
+*`feat/a11y`, by the accessibility and performance agent.*
+
+**What was asked.** Juan asked for two things nobody had tested: the app with a screen reader, and the
+app on a slow phone. Neither a screen reader nor a phone exists in the workspace, so the work is the
+most rigorous substitute available, plus an honest list of what a person still has to check by hand
+(`docs/ACCESSIBILITY.md` section 5).
+
+**Accessibility: how.** No rule engine (axe and the like) is installed or installable, so the checks
+were written by hand (`tests/e2e/a11y-audit.js`): names and states from Chrome's own accessibility tree
+through CDP (what a screen reader receives), DOM rules (one `main`, one `h1`, no skipped levels, ids,
+`aria-*` references, `lang`, tables, svg), contrast computed from the rendered colours of every text
+node over its composited background, non-text contrast of every field and control, 44 px touch areas
+that count `::after` tap areas, and a "speech stream" dump that reads each route the way browse mode
+would. The first run reported 400 to 1,300 issues per combination of size, language and theme; almost all
+were a handful of causes repeated.
+`tests/e2e/a11y.spec.js` runs the audit on every route and the open states (phone and desktop, Spanish
+and English, light and dark), the keyboard flows, reflow at 320 px and 200% text, and reduced motion.
+
+**Accessibility: what was found and fixed** (details and before/after ratios in ACCESSIBILITY.md):
+field and control borders at 1.6–1.9:1 (new `--c-control-line` token); pending chips 4.47:1 and void
+badges 4.03:1 (two tokens darkened); small-sample rows in Analysis faded with opacity to about 2:1 and
+restored only on hover (now greyed with the muted ink); chip tap areas that measured 42 px, not the 44
+the comment promised (the `::after` sits on the padding box); a dozen small targets (segments, link
+buttons, selects, decision topics 19 px tall); a filter section named "Tipo de mercado 2" (the
+`aria-label` on a `span` is ignored); `aria-controls` pointing at panels that do not exist while closed;
+radio groups with no arrow keys and every option a Tab stop; focus lost to the page body when
+pagination or a pick's previous / next disabled the pressed button, and when the refresh button
+disabled itself; the stale banner inserted together with its text (not announced) — now a permanent
+live region announces sync results; the record spoken with "0 nulas, 0 medias"; a stray "u" read
+before a field's label; Spanish sheet text unmarked in the English UI; at 200% text the page title
+squeezed to zero width and several rows pushed the page sideways (one chip by 186 px).
+
+**Decisions.** Spoken forms go next to the visible figure (sr-only text or the control's name), never
+replace it: many tests and the numbers auditor read the visible text, and the brief forbids changing
+the wording of data. So records inside the generated sentences still read as digits and hyphens; that
+is listed as the first thing to check with a real reader. Small targets were enlarged with an invisible
+`::after` wherever the look mattered, so the screenshots barely change. The "Fila N" link that
+duplicated every decision topic left the Tab order instead of growing.
+
+**Slow phone: how.** `scripts/perf/phone-lab.mjs` builds the real site (service worker on), replaces
+the fixture with 1,500 or 5,000 synthetic picks in the fixture's shapes, serves it gzipped over HTTP/2
+(as GitHub Pages and Apps Script do; a self-signed certificate) and drives Chrome at 4x and 6x CPU
+throttling with slow-4G and 3G network emulation. It measures every route cold and on a repeat open,
+when the cached and the live data reach the screen (User Timing marks added to `store.js`), long tasks,
+transfer sizes, the latency of nine interactions (from the action to the paint after the result,
+median of five) and memory after visiting every route. `npm run perf:phone` prints the whole table;
+`tests/e2e/slow-phone.spec.js` keeps five budgets in the check. The first runs over plain HTTP/1.1
+showed cold loads of 15 s on 3G, almost all of it six connections queuing 115 files; that is not how
+the site is served, so the lab moved to HTTP/2 and the HTTP/1.1 numbers are kept only as a note.
+
+**Slow phone: what was fixed** (numbers in `docs/PERFORMANCE.md`): the HTML now announces every module
+of the start-up import graph and the start-up strings (build step), so they download at once instead
+of one import level per round trip; the feed fetch starts with the strings, not after the first render;
+a fetched feed with the same sheet-read time as the one on screen is not rebuilt or redrawn; a new feed
+is built in a module worker while the cached one stays usable, and the cache is written after the new
+data is painted; facet counts reuse the full result for every filter that is not set (about 35 passes
+over all picks became 2–5), the last slate is no longer scanned on every pass, search text is folded
+once per pick; the Explorer's list, summary and curve and the panel's counts survive the remount that
+opening a pick causes (`memoLast`); the Simulator stopped re-filtering and re-counting on a stake
+change; formatted dates are cached. Every speed-up is checked to change nothing: a digest of the
+filter and facet outputs on 5,000 picks taken with the old code must match, and the worker's dataset
+must deep-equal the main thread's.
+
+**Problems.** Building the dataset in the worker made the *first* paint of a repeat open slower (the
+feed goes to the worker and the dataset comes back as two structured clones), so the cached copy is
+built on the main thread and only a live swap behind a screen already shown uses the worker. Screens
+remount on every path change, so a cache keyed on identity (`memoLast`) was simpler
+and safer than lifting state. The lab's own CPU noise is large on a 2-core machine shared with other
+agents: every number is a median, and the e2e budgets are about three times what the lab shows.
+
+## 2026-11-19: Round 2 (the second audit's screen findings and the accessibility hand-off)
+
+*`feat/round2`, by the round 2 agent.*
+
+### What changed
+
+1. **Two measures, two names.** `fairCloseEv` is "Precio vs cierre" / "Price vs close" everywhere
+   (Overview, Explorer, Simulator, Analysis, frozen tests); `openingFairEv` is "EV justo (revisión)" /
+   "Fair-close EV (review)" (VALOR and VALOR CASI, and beside price vs close for Sombra on the Overview's
+   source card and tag table, with its n: `reviewFairEv`, `shadowTagReviewEv`). VALOR PROP's own measure
+   is "EV vs bet365 (power)". The names follow milestone-reviewer and review.py: "price-vs-close EV"
+   (`pvc`, the frozen tests) and "fair-close EV" (`fev`, the headline). The Tests list names each row's
+   measure (the price-first group header says "Su medida", since its rows use two). Glossary:
+   `price-vs-close` and `fair-ev-review`, each with a worked example that shows how the two differ on
+   the same row; `fair-close-ev` (which described price vs close) is an alias that opens
+   `price-vs-close` (`GLOSSARY_ALIASES`, `resolveGlossarySlug`), so old links keep their meaning.
+2. **"Último slate"** is the last graded slate everywhere (`lastSlate` = the Overview's
+   `lastGradedSlate`); new preset `pending_slate` ("Slate pendiente"). Old URLs keep working.
+3. **Rolling periods** (7d, 30d, this month) have no end date; the Overview says "Del 9 nov en adelante,
+   con los próximos slates incluidos" and the filter panel says the dates of any preset (`dateNote`).
+   Consumers checked: Overview period and links, filter panel counts, Analysis month rows (the month end
+   is used when the period has none), Simulator and Explorer (same `applyFilters`).
+4. **Decisions** month headers and jump chips count the month under the filters (`monthCounts`); a
+   month split across pages says "44 (25 en esta página)". Paging by month was considered and left out:
+   November alone would be one 44-decision page that grows daily.
+5. **Real-bets paragraph**: no flat break-even when stakes differ or a free bet is in; the sentence says
+   why results and hit rate can disagree (`realStakeShape`, `describeRealHitRate`, `describeSourceFull`).
+   The source card's "necesita X%" goes too in that case.
+6. **Real-bets drawdown** on the chart's daily series, labelled "(por día)".
+7. **Simulator chance range**: "Todos los picks dieron lo mismo…" when the SE is 0, "Con tan pocos
+   picks…" under two (`chanceText`, now in `sentences.js`).
+8. **Grok pick detail**: "Cuota de Grok: 2.44, la cuota que dio Grok; coincide con Betsson" and
+   "Medido en Betsson: su apertura 2.44 contra su cierre 2.22, no la cuota de Grok".
+9. **Links**: Overview tag, line and market rows use `exactSlice`; source cards, the quick link and
+   pending slates say how many picks they open (`pendingSlateLink`); Analysis Grok-by-market links are
+   exact. `tests/e2e/round2.spec.js` follows every kind (Overview in three periods, Tests cards and
+   stopped categories, Analysis rows, cells and Grok markets, Simulator rows, glossary tag entries) and
+   compares both ends; it fails on the old Overview links (checked by reverting them).
+10. **Halves in words**: "3-2 (+2 medias)" / "(+2 halves)"; spoken "2 medio ganadas, 1 medio perdida".
+    The scoreboard figures may now wrap (the longer text overflowed at 390 px with 200% text).
+11. **Team markets** have their own glossary entries (`corners-team`, `cards-team`); `MARKET_SLUGS` no
+    longer maps two families to one slug, so "Sombra por mercado" lists both links.
+12. **Over / Under** reads `lineSide(p)`: the side only on picks with a line (DATA_CONTRACT section 4).
+13. Settings: one cache note (the deploy sentence is appended when the versions differ). README updated.
+14. **The intermittent keyboard test.** Reproduced under CPU load: the single test walking 16 routes
+    takes about a minute unloaded and timed out at 90 s loaded; it also opened each route by a hash
+    change, so the walk's start raced the new page's title taking focus. Probes that replaced the cached
+    feed with a newer one while each focusable control of every route had focus never lost focus. But a
+    real loss was found on the way: "Quitar todos" in the filter sheet, the Settings refresh and a chip
+    whose count falls to 0 disable themselves while focused, so focus fell to the body (and out of the
+    open dialog). `useFocusSafeDisabled` (kit `Button`, `FilterChip`) keeps such a control focusable and
+    aria-disabled until focus moves on; a new keyboard test fails without it. The Tab walk is now one
+    test per route on a fresh load.
+15. Analysis range chart: the axis label sits on its own line above min and max; Spanish test names are
+    `lang="es"` in the English UI on the Tests screen.
+
+### Shared files changed (all additive except where the brief named the behaviour)
+
+`src/data/filters.js` (presets, `lastSlate`/`pendingSlate`/`slateContext`/`lineSide`, rolling ends),
+`src/data/overview.js` (`realBetsExtras` daily series; new `reviewFairEv`, `shadowTagReviewEv`,
+`realStakeShape`, `pendingSlateLink`), `src/data/summaries.js` (new builders), `src/data/decisions.js`
+(`monthCounts`), `src/data/analysis.js` (pending slate in the exact-link context), `src/lib/format.js`
+(`formatRecord` halves), `src/lib/spoken.js`, `src/lib/glossary-links.js` (team slugs, aliases),
+`src/lib/ui/controls.js` (`useFocusSafeDisabled` in `Button` and `FilterChip`), `src/lib/ui/display.js`
+(scoreboard halves), `src/lib/ui/filter-panel.js` (date note), `src/styles/components.css`,
+`src/styles/filter-panel.css`, `src/i18n/*.json` (values of `stats.fairCloseEv`, `pick.*`, some
+`summaries.*`; new keys at the end of their blocks), `tests/unit/slow-phone.test.mjs` (digest recomputed:
+the filter meanings changed on purpose, two states added).
+
+### Not changed, reported
+
+- The fixture has `Córners 1X2 | Over 3.5` and `Más tarjetas (3 vías) | Over 4.5` Grok rows that
+  `lines.js` gives a line; the contract says three-way markets have none. Parsed values were left alone.
+- Grok's "por veredicto" links (cotizados / no cotizados) still open every pick of the tag (their kinds
+  split one tag in two); they do not show a count, so nothing contradicts.
+- The Simulator's breakdown links are exact in flat mode; in Kelly mode a pick without a probability is
+  skipped by the simulation but still in the Explorer slice.
