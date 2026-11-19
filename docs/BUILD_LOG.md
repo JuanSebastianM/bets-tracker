@@ -957,3 +957,62 @@ the filter meanings changed on purpose, two states added).
   split one tag in two); they do not show a count, so nothing contradicts.
 - The Simulator's breakdown links are exact in flat mode; in Kelly mode a pick without a probability is
   skipped by the simulation but still in the Explorer slice.
+
+## 2026-11-19: Third audit pass (regression on the merged build)
+
+*`feat/audit3`, by the audit agent.*
+
+Real data re-checked read-only (the sheet had not changed since 18 Nov), feed rebuilt with this build's
+`btFeedBuild` under `/tmp/audit2/`. Nothing from the sheet is in this file, the tests or the commits.
+`apps-script/Feed.gs` unchanged.
+
+### What changed
+
+- **`src/data/lines.js`:** three-way corner and card markets (`Córners 1X2`, `Más córners…`, `Tarjetas 1X2`,
+  `Más tarjetas…`) get no line even when the selection has a number (DATA_CONTRACT section 4). No real row
+  has that shape; the fixture has two. `tests/unit/slow-phone.test.mjs` digest recomputed for this parse
+  change only (the previous code still gives the previous digest); `tests/e2e/lines.spec.js` expects 93.
+- **`src/data/notes.js`, `src/data/normalize.js`:** a Grok pick's book is only a book whose own noted price
+  equals G (`grokBookOpen`, `grokPriceBooks`, review.py's `book_open_grok`); the CLV-book fallback made the
+  pick sheet say Grok's price "coincide con Betano" when it was Kambi's or Grok's own (40 real rows).
+- **`src/content/glossary.*.json`:** "EV justo (revisión)" said its feed leg is the feed's opening; review.py
+  uses "feed X" (the feed price when the row was logged). Added the IA-WATCH source; "Precio vs cierre"
+  says that Grok rows are measured on the book's opening.
+- Tests added to `audit2-grok-close`, `audit2-notes`, `audit2-content`.
+
+### How it was checked
+
+Per-row parity with review.py (price vs close and the review's fair-close EV, 728 rows); Overview in four
+periods; 89 Explorer filter combinations including every `test=` id and `pending_slate`; Simulator in three
+modes; every Tests card against review.py; Analysis (breakdown, Brier, histogram bins, Pinnacle direction);
+worker vs main-thread dataset (deep equal); old vs new filter code on the same picks; offline, error, two
+tabs and update flows on the built site; scroll restoration; since-last-visit with and without snapshot;
+script-version states; English pass of every route.
+
+## 2026-11-19: merges, two failed deploys and the script redeploy (orchestrator)
+
+- **Merged in this order:** `feat/fixes`, `feat/audit2`, `feat/a11y`, `feat/round2`, `feat/audit3`. Two
+  conflicts, both in appended CSS (kept both sides). At the accessibility merge the digest that pins the
+  filter and facet outputs on 5,000 picks no longer matched for reasons unrelated to speed (the new filter
+  by test adds a facet; the Grok close fix changes which Grok picks have a two-sided close). The
+  orchestrator ran the pre-merge `filters.js` and the merged one side by side on the merged data layer
+  (34 states plus three with `test=`): identical, and the constant was updated with that explanation.
+- **Three more tests that read before the page had rendered** (`evaluateAll`, a section list, and two
+  tests whose default 20 s was not enough on a machine loaded by other agents) were made to wait or given
+  room. The pattern is always the same: a read that does not wait, passing on an idle machine.
+- **CI runs 18 and 19 failed and nothing deployed for about eight hours.** One test: at 200% text the
+  Explorer scrolled sideways by 23 px with the runner's wider fallback font, because the pick card's
+  one-line rows set the width of the list. The orchestrator could not see the result at the time (the
+  owner's browser was not connected and the public Actions page needed an approval nobody was there to
+  give), so two more merges were pushed on top of a red build. Fix (`ea0c55a`): every list and card grid
+  has one shrinkable column, pick-card rows wrap, the tab bar cuts a label that does not fit, the
+  simulator headline and glossary groups wrap; and a new test repeats the 320 px and 200% checks with a
+  wider font, so the workspace now catches what the runner catches. A probe with that font found five
+  more places that would have failed at 320 px on a phone without the UI font; all fixed.
+- **Feed script redeployed as version 4** (script `9d17005378a3`), same URL, with the same pinned-commit
+  and hash check as before. A Gemini promotion dialog in the Apps Script editor was swallowing clicks
+  (the content guard refused to paste into the wrong file three times until it was closed). Self-test on
+  the real sheet: all headers found, four redactions, no money marker.
+- **Lesson repeated:** read the CI result after every push to `main`. When it cannot be read, say so and
+  do not stack merges on an unverified build.
+
