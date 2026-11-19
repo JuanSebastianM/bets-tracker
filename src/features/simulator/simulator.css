@@ -116,3 +116,8 @@
 /* Filter sheet (phones) */
 .simulator .sim-sheet-foot { display: flex; width: 100%; gap: var(--sp-2); justify-content: space-between; }
 .simulator .sim-sheet-foot .btn-primary { flex: 1; max-width: 22rem; }
+
+/* Accessibility pass: the quick stake chips are at least 44 px wide ("2u" was 42). */
+.simulator .sim-quick .fchip { min-width: var(--tap); justify-content: center; }
+/* Reflow at large text: the staking modes wrap inside their segment. */
+.simulator .sim-staking .seg { white-space: normal; }

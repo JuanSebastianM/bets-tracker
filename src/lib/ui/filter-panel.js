@@ -146,9 +146,9 @@ function Section({ id, title, active = 0, open, onToggle, children }) {
   const bodyId = useId();
   return html`<section class=${`fp-section${open ? ' fp-open' : ''}`} data-section=${id}>
     <h3 class="fp-section-head">
-      <button type="button" class="fp-toggle" aria-expanded=${open ? 'true' : 'false'} aria-controls=${bodyId} onClick=${onToggle}>
+      <button type="button" class="fp-toggle" aria-expanded=${open ? 'true' : 'false'} aria-controls=${open ? bodyId : undefined} onClick=${onToggle}>
         <span class="fp-section-title">${title}</span>
-        ${active ? html`<span class="fp-badge num" aria-label=${t('filters.openCount', { count: active })}>${active}</span>` : null}
+        ${active ? html`<span class="fp-badge num" aria-hidden="true">${active}</span><span class="sr-only">, ${t('a11y.sectionActive', { count: active })}</span>` : null}
         <${Icon} name="chevron-down" size=${16} />
       </button>
     </h3>
@@ -502,7 +502,7 @@ export function SavedFilters({ filters: f, onApply, testId = 'saved-filters' }) 
   };
   return html`<div class="saved-filters" data-testid=${testId}>
     <div class="stack-sm">
-      <h4 class="fp-group-title">${t('filters.saved')}</h4>
+      <h3 class="fp-group-title">${t('filters.saved')}</h3>
       ${s.presets.length
         ? html`<ul class="sf-list">
             ${s.presets.map(
@@ -524,7 +524,7 @@ export function SavedFilters({ filters: f, onApply, testId = 'saved-filters' }) 
       </form>
     </div>
     <div class="stack-sm">
-      <h4 class="fp-group-title">${t('filters.starting')}</h4>
+      <h3 class="fp-group-title">${t('filters.starting')}</h3>
       <p class="muted xs">${t('filters.startingHint')}</p>
       <div class="fp-chips">
         ${BUILTIN_PRESETS.map((b) => {

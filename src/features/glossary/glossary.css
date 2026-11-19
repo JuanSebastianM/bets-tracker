@@ -100,3 +100,10 @@
 .glossary .gl-item-short { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .glossary .gl-item-cat:empty { display: none; }
 .glossary .gl-list:has(> .gl-group) { gap: var(--sp-2); }
+
+/* Accessibility pass: 44 px touch areas without changing the look. */
+.glossary .gl-link, .glossary .gl-decisions a, .glossary .gl-entry-head a.chip { position: relative; }
+.glossary .gl-link::after { content: ''; position: absolute; inset: -5px 0; }
+.glossary .gl-decisions a { display: inline-block; }
+.glossary .gl-decisions a::after { content: ''; position: absolute; inset: -12px 0; }
+.glossary .gl-entry-head a.chip::after { content: ''; position: absolute; inset: -12px -2px; }

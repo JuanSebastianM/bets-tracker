@@ -25,12 +25,14 @@
   --c-won-soft: #dcf0e3;
   --c-lost: #b0302a;
   --c-lost-soft: #f7e0de;
-  --c-void: #66737c;
+  --c-void: #5d6a73;
   --c-void-soft: #e6eaec;
-  --c-pending: #94600c;
+  --c-pending: #8a5a0b;
   --c-pending-soft: #f6ead2;
   --c-info: #2a5d9c;
   --c-info-soft: #e0e9f5;
+  /* Boundary of a field or a control: at least 3:1 against every surface (WCAG 1.4.11). */
+  --c-control-line: #778690;
 
   /* Charts */
   --c-chart-line: var(--c-accent);
@@ -103,6 +105,7 @@
   --c-pending-soft: #3a2f17;
   --c-info: #86b2ec;
   --c-info-soft: #1b2a3e;
+  --c-control-line: #5e7280;
 
   --c-chart-area: rgba(76, 181, 177, 0.14);
   --c-chart-dd: rgba(240, 125, 114, 0.16);

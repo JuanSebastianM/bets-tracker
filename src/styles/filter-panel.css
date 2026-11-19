@@ -94,3 +94,8 @@
 .filter-panel :where(input, select), .saved-filters :where(input, select) { min-width: 0; max-width: 100%; }
 .filter-panel :where(.fp-group-title, .field-label, .muted), .saved-filters :where(.fp-group-title, .field-label, .muted) { overflow-wrap: anywhere; }
 .saved-filters .btn { max-width: 100%; white-space: normal; text-align: left; }
+
+/* Accessibility pass (docs/ACCESSIBILITY.md): field boundaries at 3:1 and 44 px chip tap areas. */
+.filter-panel input[type='date'] { border-color: var(--c-control-line); }
+.af-chip::after { inset: -5px 0; }
+.fp-seg-n { opacity: 1; }

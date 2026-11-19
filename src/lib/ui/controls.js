@@ -3,6 +3,7 @@
 // with `onValue`. Touch targets are at least 44 px.
 import { html, useId, useState, useEffect } from '../../../vendor/preact.js';
 import { Icon } from './icons.js';
+import { t } from '../i18n.js';
 
 /**
  * @param {{ children?: any, onClick?: (e: Event) => void, variant?: 'primary' | 'secondary' | 'ghost' | 'danger',
@@ -50,6 +51,23 @@ export function FilterChip({ label, selected, onToggle, count, disabled, testId 
 }
 
 /**
+ * Arrow keys in a radio group (the ARIA radio pattern: one Tab stop, arrows move and select, Home /
+ * End jump), with focus following the new choice once it has rendered.
+ * @param {KeyboardEvent} e @param {Array<{ value: string }>} options @param {string} value @param {(v: string) => void} onValue
+ */
+export function onRadioKey(e, options, value, onValue) {
+  const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1, Home: 'first', End: 'last' };
+  const k = /** @type {Record<string, any>} */ (keys)[e.key];
+  if (k == null || !options.length) return;
+  e.preventDefault();
+  const at = Math.max(0, options.findIndex((o) => o.value === value));
+  const next = k === 'first' ? 0 : k === 'last' ? options.length - 1 : (at + k + options.length) % options.length;
+  const group = /** @type {HTMLElement} */ (e.currentTarget);
+  onValue(options[next].value);
+  requestAnimationFrame(() => /** @type {HTMLElement | undefined} */ (group.querySelectorAll('[role="radio"]')[next])?.focus());
+}
+
+/**
  * One choice among a few (radio group).
  * @param {{ label: string, value: string, options: Array<{ value: string, label: any }>, onValue: (v: string) => void, hideLabel?: boolean, name?: string }} props
  */
@@ -57,12 +75,13 @@ export function SegmentedControl({ label, value, options, onValue, hideLabel = f
   const id = useId();
   return html`<div class="field">
     <span class=${hideLabel ? 'sr-only' : 'field-label'} id=${id}>${label}</span>
-    <div class="segmented" role="radiogroup" aria-labelledby=${id} data-name=${name}>
+    <div class="segmented" role="radiogroup" aria-labelledby=${id} data-name=${name} onKeyDown=${(/** @type {KeyboardEvent} */ e) => onRadioKey(e, options, value, onValue)}>
       ${options.map(
-        (o) => html`<button
+        (o, i) => html`<button
           type="button"
           role="radio"
           aria-checked=${o.value === value ? 'true' : 'false'}
+          tabindex=${o.value === value || (!options.some((x) => x.value === value) && i === 0) ? '0' : '-1'}
           class=${o.value === value ? 'seg seg-on' : 'seg'}
           onClick=${() => onValue(o.value)}
         >
@@ -111,7 +130,7 @@ export function NumberField({ label, value, onValue, unit, hint, placeholder, te
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
   return html`<div class="field">
-    <label class="field-label" for=${id}>${label}</label>
+    <label class="field-label" for=${id}>${label}${unit ? html`<span class="sr-only">, ${unit === 'u' ? t('a11y.inUnits') : unit}</span>` : null}</label>
     <div class="input-wrap">
       <input
         id=${id}
@@ -126,7 +145,7 @@ export function NumberField({ label, value, onValue, unit, hint, placeholder, te
           onValue(parseNumberInput(e.currentTarget.value));
         }}
       />
-      ${unit ? html`<span class="input-unit">${unit}</span>` : null}
+      ${unit ? html`<span class="input-unit" aria-hidden="true">${unit}</span>` : null}
     </div>
     ${hint ? html`<p class="field-hint" id=${`${id}-hint`}>${hint}</p>` : null}
   </div>`;

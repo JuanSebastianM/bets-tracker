@@ -300,7 +300,7 @@ function TestRow({ m, open, onToggle }) {
   const frac = (/** @type {{ n: number, total: number | null }} */ c) => (c.total ? `${c.n}/${c.total}` : String(c.n));
   return html`<li class=${`tests-row${open ? ' is-open' : ''}`} id=${`test-${m.id}`} data-testid=${`${m.group === 'frozen' ? 'frozen' : 'price-first'}-${m.id}`} data-state=${m.state}>
     <h3 class="tests-row-h">
-      <button type="button" class="tests-row-btn" id=${btnId} aria-expanded=${open ? 'true' : 'false'} aria-controls=${panelId} onClick=${() => onToggle(m.id)}>
+      <button type="button" class="tests-row-btn" id=${btnId} aria-expanded=${open ? 'true' : 'false'} aria-controls=${open ? panelId : undefined} onClick=${() => onToggle(m.id)}>
         <span class="tests-cell tests-cell-label">${m.label}</span>
         <span class="tests-cell tests-cell-state"><${StateChip} state=${m.state} /></span>
         <span class="tests-cell tests-cell-graded num" data-testid=${`graded-${m.id}`}>

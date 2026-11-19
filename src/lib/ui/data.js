@@ -1,5 +1,5 @@
 // Data components: DataTable (sortable, scrolls sideways inside its own box), Pagination, PickCard.
-import { html, useState, useMemo } from '../../../vendor/preact.js';
+import { html, useState, useMemo, useRef } from '../../../vendor/preact.js';
 import { Icon } from './icons.js';
 import { StatusBadge, TagBadge } from './display.js';
 import { t } from '../i18n.js';
@@ -78,13 +78,22 @@ export function DataTable({ columns, rows, caption, rowKey = (r) => r.uid || r.k
  * @param {{ page: number, pageCount: number, onPage: (p: number) => void, total?: number }} props page is 1-based
  */
 export function Pagination({ page, pageCount, onPage, total }) {
+  const prev = useRef(/** @type {HTMLButtonElement | null} */ (null));
+  const next = useRef(/** @type {HTMLButtonElement | null} */ (null));
   if (pageCount <= 1) return null;
+  // Reaching the first or last page disables the button that has focus: move focus to the other one,
+  // or it would fall to the page body.
+  const go = (/** @type {number} */ p) => {
+    onPage(p);
+    const other = p <= 1 ? next : p >= pageCount ? prev : null;
+    if (other) requestAnimationFrame(() => other.current?.focus());
+  };
   return html`<nav class="pager" aria-label=${t('pager.label')}>
-    <button type="button" class="btn btn-secondary" disabled=${page <= 1} onClick=${() => onPage(page - 1)} aria-label=${t('pager.prev')}>
+    <button type="button" class="btn btn-secondary" ref=${prev} disabled=${page <= 1} onClick=${() => go(page - 1)} aria-label=${t('pager.prev')}>
       <${Icon} name="chevron-left" size=${18} />
     </button>
     <span class="pager-info num">${t('pager.info', { page, pages: pageCount })}${total != null ? html` · ${t('common.picks', { count: total, n: total })}` : null}</span>
-    <button type="button" class="btn btn-secondary" disabled=${page >= pageCount} onClick=${() => onPage(page + 1)} aria-label=${t('pager.next')}>
+    <button type="button" class="btn btn-secondary" ref=${next} disabled=${page >= pageCount} onClick=${() => go(page + 1)} aria-label=${t('pager.next')}>
       <${Icon} name="chevron-right" size=${18} />
     </button>
   </nav>`;
@@ -115,7 +124,7 @@ export function PickCard({ pick: p, onOpen, tagHref }) {
         <div class="pc-league">${p.league}</div>
       </div>
       <div class="pc-price">
-        <span class="pc-odds num">${formatPrice(p.price)}</span>
+        <span class="sr-only">${t('a11y.price')} </span><span class="pc-odds num">${formatPrice(p.price)}</span>
         ${p.closePrice != null ? html`<span class="pc-close num" title=${t('pick.close')}>${t('pick.closeShort')} ${formatPrice(p.closePrice)}</span>` : null}
       </div>
     </div>

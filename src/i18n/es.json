@@ -281,5 +281,35 @@
     "tagMeanings": "Qué significa cada etiqueta",
     "whatIs": "Qué es {term}",
     "dateHint": "Día del partido; toca el campo para elegirlo en el calendario."
+  },
+  "a11y": {
+    "won": {
+      "one": "{n} ganada",
+      "other": "{n} ganadas"
+    },
+    "lost": {
+      "one": "{n} perdida",
+      "other": "{n} perdidas"
+    },
+    "void": {
+      "one": "{n} nula",
+      "other": "{n} nulas"
+    },
+    "halves": {
+      "one": "{n} media",
+      "other": "{n} medias"
+    },
+    "recordEmpty": "sin picks calificados",
+    "price": "cuota",
+    "profit": "resultado",
+    "sectionActive": {
+      "one": "{count} activo",
+      "other": "{count} activos"
+    },
+    "refreshing": "Actualizando los datos…",
+    "refreshed": "Datos actualizados.",
+    "refreshFailed": "No se pudo actualizar: se ve la copia guardada.",
+    "offline": "Sin conexión: se ve la copia guardada.",
+    "inUnits": "en unidades"
   }
 }

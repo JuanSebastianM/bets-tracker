@@ -281,5 +281,35 @@
     "tagMeanings": "What each tag means",
     "whatIs": "What {term} means",
     "dateHint": "Match day; tap the field to pick it from the calendar."
+  },
+  "a11y": {
+    "won": {
+      "one": "{n} won",
+      "other": "{n} won"
+    },
+    "lost": {
+      "one": "{n} lost",
+      "other": "{n} lost"
+    },
+    "void": {
+      "one": "{n} void",
+      "other": "{n} void"
+    },
+    "halves": {
+      "one": "{n} half result",
+      "other": "{n} half results"
+    },
+    "recordEmpty": "no graded picks",
+    "price": "price",
+    "profit": "result",
+    "sectionActive": {
+      "one": "{count} active",
+      "other": "{count} active"
+    },
+    "refreshing": "Refreshing the data…",
+    "refreshed": "Data refreshed.",
+    "refreshFailed": "Could not refresh: showing the saved copy.",
+    "offline": "Offline: showing the saved copy.",
+    "inUnits": "in units"
   }
 }
