@@ -42,13 +42,26 @@
  *   Then Implementar > Nueva implementación (same settings as INSTALL step 4), put the new /exec URL in
  *   src/config.js and push. The installed app keeps showing its cached copy meanwhile.
  *
+ * SCRIPT VERSION
+ *   BT_FEED_SCRIPT_VERSION is the first 12 hex characters of the SHA-256 of this file with that one
+ *   value left empty. It is stamped by `npm run feed:stamp` (scripts/stamp-feed.mjs), which writes the
+ *   same value into src/feed-version.js, the version the app expects; a unit test fails when either is
+ *   stale. The feed returns it as meta.scriptVersion and the cache keys carry it, so a redeployed script
+ *   never serves a copy cached by the previous one. The app's Settings ("Datos de la hoja") compares the
+ *   two and says whether the sheet runs the expected version. Never edit the value by hand.
+ *
  * REDEPLOY (after changing this file)
+ *   Paste the whole file over Feed.gs and save. Run btFeedSelfTest first (its log shows the version).
  *   Implementar > Gestionar implementaciones > the existing one > editar (lápiz) >
- *   Versión: "Nueva versión" > Implementar. The /exec URL stays the same. Run btFeedSelfTest first.
+ *   Versión: "Nueva versión" > Implementar. The /exec URL stays the same.
  *   Bump BT_FEED_SCHEMA only when the JSON shape changes (the app refuses a newer schema).
+ *   Then open the app's Settings > "Datos de la hoja", refresh, and check that the script version says
+ *   it is up to date (the old cached response can take up to 5 minutes to turn over).
  */
 
 var BT_FEED_SCHEMA = 1;
+/** Stamped by scripts/stamp-feed.mjs from this file's own content (see SCRIPT VERSION above). */
+var BT_FEED_SCRIPT_VERSION = '9d17005378a3';
 var BT_FEED_HIDDEN = '[oculto]';
 
 /**
@@ -399,7 +412,7 @@ function btFeedBuild(tabValues, timeZone, now, formatDate) {
     schema: BT_FEED_SCHEMA,
     generatedAt: now.toISOString().replace(/\.\d{3}Z$/, 'Z'),
     timeZone: timeZone,
-    meta: { rows: rowsMeta, redactions: 0, missingHeaders: missing },
+    meta: { rows: rowsMeta, redactions: 0, missingHeaders: missing, scriptVersion: BT_FEED_SCRIPT_VERSION },
     tabs: tabs,
   };
   redactions += btFeedSelfCheck(feed);
@@ -449,15 +462,16 @@ function btFeedFromSpreadsheet() {
 // The web app URL is public. Every call runs under the owner's Apps Script quota, so doGet serves the
 // JSON from CacheService for BT_FEED_CACHE_TTL seconds and reads the sheet only on a miss. No request
 // parameter can bypass the cache. A cache value is limited to 100 KB, so the JSON is stored in chunks
-// plus an index entry; a missing chunk is a miss. Keys carry the schema so a new shape never serves an
-// old one. Cache or lock failures never break the response: they fall through to a fresh build.
+// plus an index entry; a missing chunk is a miss. Keys carry the schema and the script version, so a
+// new shape or a redeployed script never serves a copy cached by the previous one. Cache or lock
+// failures never break the response: they fall through to a fresh build.
 
 var BT_FEED_CACHE_TTL = 300;
 /** Characters per chunk: 30,000 chars stay under 100 KB even at 3 bytes per character. */
 var BT_FEED_CACHE_CHUNK = 30000;
 /** Above this many chunks the JSON is served but not cached. */
 var BT_FEED_CACHE_MAX_CHUNKS = 80;
-var BT_FEED_CACHE_PREFIX = 'btFeed:s' + BT_FEED_SCHEMA + ':';
+var BT_FEED_CACHE_PREFIX = 'btFeed:s' + BT_FEED_SCHEMA + ':v' + BT_FEED_SCRIPT_VERSION + ':';
 var BT_FEED_LOCK_WAIT_MS = 3000;
 
 function btFeedCacheIndexKey() {
@@ -598,6 +612,7 @@ function btFeedClearCache() {
 function btFeedSelfTest() {
   var feed = btFeedFromSpreadsheet();
   var json = JSON.stringify(feed);
+  Logger.log('script version: ' + feed.meta.scriptVersion);
   Logger.log('rows: ' + JSON.stringify(feed.meta.rows));
   Logger.log('meta.redactions: ' + feed.meta.redactions);
   Logger.log('meta.missingHeaders: ' + JSON.stringify(feed.meta.missingHeaders));

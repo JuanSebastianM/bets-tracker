@@ -49,5 +49,16 @@
   "schema": "Formato de datos",
   "feedUrl": "Script de la hoja",
   "feedUrlSet": "Configurado",
-  "feedUrlUnset": "Sin configurar"
+  "feedUrlUnset": "Sin configurar",
+  "scriptVersion": "Script de la hoja",
+  "scriptDeployed": "Versión en la hoja",
+  "scriptExpected": "Versión que espera la app",
+  "scriptNone": "sin versión (script anterior)",
+  "scriptCurrent": "Al día: la hoja corre la versión del script que espera la app.",
+  "scriptDifferent": "La hoja está corriendo otra versión del script del feed.",
+  "scriptMissing": "La hoja está corriendo otra versión del script del feed: una de antes de que el script dijera su versión.",
+  "scriptStillValid": "Los datos se siguen viendo normal: un script anterior también entrega un feed válido y sin dinero.",
+  "scriptWhatToDo": "Qué hacer: copia el Feed.gs del repositorio sobre el archivo Feed del proyecto de Apps Script de la hoja, corre btFeedSelfTest e implementa una versión nueva de la implementación que ya existe (Implementar › Gestionar implementaciones › editar › Nueva versión). La dirección /exec no cambia.",
+  "scriptCacheNote": "Después de implementar, el script puede seguir entregando su copia guardada hasta {minutes} minutos. Actualiza los datos pasado ese tiempo y vuelve a mirar aquí.",
+  "scriptDocs": "Pasos en el README (sección 5)"
 }

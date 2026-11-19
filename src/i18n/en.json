@@ -156,6 +156,12 @@
     "unconfiguredBody": "The address of the sheet's script (FEED_URL in src/config.js) is still empty. Meanwhile you can see the app with example data.",
     "openFixture": "See it with example data",
     "errorTitle": "The data could not be loaded",
+    "scriptVersion": {
+      "bannerTitle": "The sheet runs another version of the feed script",
+      "bannerBody": "The data still shows normally. To bring it up to date, Feed.gs has to be redeployed in the sheet; Settings says how.",
+      "bannerOpen": "Open Settings",
+      "bannerDismiss": "Hide for now"
+    },
     "error": {
       "offline": "There is no connection and no saved copy yet.",
       "http": "The sheet's script answered with an error ({detail}).",

@@ -28,6 +28,8 @@ export interface Feed {
     cached?: boolean;
     /** How long the script keeps a read of the sheet (seconds). */
     cacheTtlSeconds?: number | null;
+    /** Version of apps-script/Feed.gs that built this JSON (null: a script deployed before it existed). */
+    scriptVersion?: string | null;
   };
   tabs: {
     bets: FeedTab; shadow: FeedTab; grok: FeedTab; decisions: FeedTab; pinnacle: FeedTab; rules: string[];

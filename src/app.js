@@ -10,6 +10,9 @@ import { formatAgo } from './lib/format.js';
 import { formatDateTime } from './lib/i18n.js';
 import { APP_TIMEZONE } from './config.js';
 import { APP_VERSION } from './version.js';
+import { scriptVersionStatus } from './data/feed.js';
+import { useStore } from './lib/store.js';
+import { scriptVersionDismissed, scriptVersionKey, dismissScriptVersion } from './lib/script-version.js';
 
 const DEFAULT_PATH = '/';
 
@@ -69,6 +72,28 @@ function SyncStamp() {
 /** Sections that show the "missing columns" banner (the others would only repeat it on every page). */
 const MISSING_BANNER_ON = new Set(['overview', 'settings']);
 
+/** Sections that show the "different feed script" banner (Settings says what to do). */
+const SCRIPT_BANNER_ON = new Set(['overview', 'settings']);
+
+/**
+ * A calm note when the sheet runs another version of apps-script/Feed.gs than this app expects (or one
+ * from before the version existed). The data keeps showing: an older script is still a valid, scrubbed
+ * feed. Dismissible for the session.
+ * @param {{ meta: any, featureId: string }} props
+ */
+function ScriptVersionBanner({ meta, featureId }) {
+  const dismissed = useStore(scriptVersionDismissed);
+  const v = scriptVersionStatus(meta);
+  if (v.state === 'current' || dismissed === scriptVersionKey(v)) return null;
+  return html`<${Banner} tone="info" testId="banner-script-version" title=${t('feed.scriptVersion.bannerTitle')}>
+    <p>${t('feed.scriptVersion.bannerBody')}</p>
+    <div class="row-wrap">
+      ${featureId !== 'settings' ? html`<${Button} variant="secondary" href=${href('/settings')} data-testid="banner-script-version-settings">${t('feed.scriptVersion.bannerOpen')}</${Button}>` : null}
+      <${Button} variant="ghost" onClick=${() => dismissScriptVersion(v)} data-testid="banner-script-version-dismiss">${t('feed.scriptVersion.bannerDismiss')}</${Button}>
+    </div>
+  </${Banner}>`;
+}
+
 /**
  * Fixture and offline / cached banners above every page; the missing-columns banner only on the
  * Overview and Settings.
@@ -89,6 +114,7 @@ function FeedBanners({ featureId }) {
   }
   const missing = s.data?.meta?.missingHeaders || [];
   if (missing.length && MISSING_BANNER_ON.has(featureId)) out.push(html`<${Banner} tone="warning" testId="banner-missing">${t('feed.missingHeaders', { list: missing.join(', ') })}</${Banner}>`);
+  if (s.data && SCRIPT_BANNER_ON.has(featureId)) out.push(html`<${ScriptVersionBanner} meta=${s.data.meta} featureId=${featureId} />`);
   return out.length ? html`<div class="stack-sm banners">${out}</div>` : null;
 }
 

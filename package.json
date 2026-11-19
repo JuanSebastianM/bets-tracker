@@ -13,6 +13,7 @@
     "check": "npm run typecheck && npm test && npm run check:i18n && npm run test:e2e",
     "build": "node scripts/build-site.mjs",
     "fixture": "node scripts/make-fixture.mjs",
+    "feed:stamp": "node scripts/stamp-feed.mjs",
     "icons": "node scripts/make-icons.mjs",
     "screenshots": "SCREENSHOT_DIR=${SCREENSHOT_DIR:-/home/claude/review/foundation} node scripts/bin.mjs playwright test --config playwright.screenshots.config.js",
     "screenshots:readme": "README_SHOTS=1 node scripts/bin.mjs playwright test --config playwright.screenshots.config.js tests/e2e/readme-screenshots.spec.js"

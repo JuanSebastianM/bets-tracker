@@ -138,7 +138,8 @@ inline elsewhere in the app. Content in `src/content/{glossary,rules}.{es,en}.js
 
 **Settings** (`#/settings`, also reachable from "Más" on phones). Language, theme (auto, light, dark),
 bankroll, unit value and currency label (on this device only), default simulator stake, saved filters,
-feed status (source, last sync, "sheet read at", rows per tab, redactions, missing columns), app status
+feed status (source, last sync, "sheet read at", rows per tab, redactions, missing columns, and whether
+the sheet runs the feed script version this app expects, with what to do when not), app status
 and update button, version and schema.
 
 ## 3. Architecture
@@ -348,14 +349,24 @@ Pinnacle script; an annotation in a new file narrows the scopes of the whole pro
 stopped the Pinnacle trigger until someone re-authorised it. The feed needs nothing beyond what was
 already granted. The next trigger run after the install completed normally.
 
-**Self-test.** In the editor, choose `btFeedSelfTest` and run it. The log shows rows per tab,
-`meta.redactions`, `meta.missingHeaders` (should be `[]`), the JSON size, and "money marker left: no".
-Run it before every deploy.
+**Self-test.** In the editor, choose `btFeedSelfTest` and run it. The log shows the script version,
+rows per tab, `meta.redactions`, `meta.missingHeaders` (should be `[]`), the JSON size, and "money marker
+left: no". Run it before every deploy.
+
+**Script version.** `BT_FEED_SCRIPT_VERSION` is derived from the file's own content (the first 12 hex
+characters of its SHA-256 with that value blanked). After any edit to `Feed.gs`, run `npm run feed:stamp`:
+it writes the new value into `Feed.gs`, `src/feed-version.js` (the version the app expects) and the
+fixture; `npm run check` fails until you do. The feed returns it as `meta.scriptVersion`, and the cache keys
+carry it. Settings → "Datos de la hoja" shows the version in the sheet, the version the app expects and
+whether they match; when they do not (or the sheet's script is older than the field), a calm banner on the
+Overview and Settings says so. The data keeps showing either way.
 
 **Redeploy after a change.** Paste the new file over `Feed.gs`, run `btFeedSelfTest`, then Implementar →
 Gestionar implementaciones → the existing deployment → edit → Versión: "Nueva versión" → Implementar.
 The `/exec` URL stays the same. Bump `BT_FEED_SCHEMA` (and the app's `FEED_SCHEMA`) only when the JSON
-shape changes. Run `btFeedClearCache` to drop the 5-minute cache at once.
+shape changes. Run `btFeedClearCache` to drop the 5-minute cache at once. Then check Settings → "Datos de
+la hoja": after a refresh the script version should say it is up to date (without `btFeedClearCache` the
+old cached response can take up to 5 minutes to turn over).
 
 **Rotate the URL (kill switch).** Implementar → Gestionar implementaciones → archive the deployment (the
 URL stops working at once) → Nueva implementación with the same settings → put the new `/exec` URL in
@@ -573,14 +584,11 @@ See section 8.
 - The Grok part of Analysis ignores the source and tag filters (a banner says so).
 - Decision themes are derived from the topic text by patterns; a new kind of topic can land in a
   debatable theme.
-- After any change to `Feed.gs`, the deployed script must be redeployed by hand; nothing checks that the
-  deployed version matches the repository. A "script version" field in `meta` would make that visible
-  in Settings.
 - Real-volume speed is tested on 5,000 synthetic picks; the time budgets can fail on a heavily loaded
   machine (seen once while several agents ran at once).
 - Not tried with a real screen reader.
-- Ideas: a weekday filter; a per-tag "what changed since the last review" view; showing the deployed
-  feed script version; exporting a filtered view as CSV (units only).
+- Ideas: a weekday filter; a per-tag "what changed since the last review" view; exporting a filtered
+  view as CSV (units only).
 
 ## 9. Resumen en español
 

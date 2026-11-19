@@ -85,7 +85,8 @@ as the audit read them; Settings shows the live counts):
   "meta": { "rows": { "bets": 19, "shadow": 710, "grok": 153, "decisions": 123, "pinnacle": 24, "rules": 10 },
             "redactions": 0, "missingHeaders": [],
             "cached": false,                // true when this JSON came from the script's response cache
-            "cacheTtlSeconds": 300 },       // how long a read of the sheet is reused
+            "cacheTtlSeconds": 300,         // how long a read of the sheet is reused
+            "scriptVersion": "0123456789ab" }, // the version of apps-script/Feed.gs that built it (below)
   "tabs": {
     "bets":      { "columns": ["row", "id", "date", ...], "rows": [[2, 1, "2026-10-02", ...], ...] },
     "shadow":    { "columns": [...], "rows": [...] },
@@ -141,6 +142,21 @@ time zone; time-only cells (Grok `Hora`) arrive as 1899 dates and become `HH:mm`
 numeric cell holding money text (`$…`, `COP`, `pesos`) becomes `null` and counts as a redaction.
 Pinnacle's `*_utc` cells stay ISO text (a `Date` becomes ISO UTC) and `kickoff_bogota` stays `YYYY-MM-DD HH:mm`.
 
+### Script version
+
+`meta.scriptVersion` is `BT_FEED_SCRIPT_VERSION` in `apps-script/Feed.gs`: the first 12 hex characters of
+the SHA-256 of the file with that one value left empty (line endings as `\n`). `npm run feed:stamp`
+(`scripts/stamp-feed.mjs`) computes it and writes it into `Feed.gs`, into `src/feed-version.js`
+(`FEED_SCRIPT_VERSION`, the version the app expects) and into the fixture's `meta.scriptVersion`;
+`tests/unit/fixes-feed-version.test.mjs` fails when any of the three is stale, so a change to `Feed.gs`
+without a restamp fails `npm run check`. The example above shows the format, not the current value.
+
+The app compares the two (`scriptVersionStatus` in `src/data/feed.js`: `current`, `different`, or
+`missing` for a script deployed before the field existed; `validateFeed` sets a missing or empty value to
+`null`). Settings shows both versions and the state; when they differ a calm banner shows on the Overview
+and Settings only (dismissible for the session) and the data keeps showing, because an older script still
+serves a valid, scrubbed feed. The field is not part of the shape, so it does not bump `schema`.
+
 ### Abuse and limits
 
 The web app URL is public ("anyone can access") and every call runs under the owner's Apps Script quota
@@ -149,7 +165,8 @@ reading the sheet over and over:
 
 - `doGet` answers from `CacheService` for `cacheTtlSeconds` (300 s) and reads the sheet only on a miss. The
   JSON is stored in chunks (30,000 characters each, under the 100 KB value limit) with an index entry; a
-  missing chunk is a miss; the cache keys carry the schema number. On a miss a script lock (`tryLock`,
+  missing chunk is a miss; the cache keys carry the schema number and the script version
+  (`btFeed:s1:v<version>:`), so a redeployed script never serves a copy cached by the previous one. On a miss a script lock (`tryLock`,
   3 s) lets one call build while the others wait and re-check the cache; a caller without the lock builds
   anyway. Any cache or lock failure falls through to a fresh build.
 - No request parameter bypasses the cache: `doGet` ignores them. So the app's refresh can return data up

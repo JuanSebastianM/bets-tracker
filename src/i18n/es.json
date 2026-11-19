@@ -156,6 +156,12 @@
     "unconfiguredBody": "La dirección del script de la hoja (FEED_URL en src/config.js) todavía está vacía. Mientras tanto puedes ver la app con datos de ejemplo.",
     "openFixture": "Ver con datos de ejemplo",
     "errorTitle": "No se pudieron cargar los datos",
+    "scriptVersion": {
+      "bannerTitle": "La hoja corre otra versión del script del feed",
+      "bannerBody": "Los datos se siguen viendo normal. Para ponerla al día hay que volver a implementar Feed.gs en la hoja; en Ajustes está cómo.",
+      "bannerOpen": "Ver en Ajustes",
+      "bannerDismiss": "Ocultar por ahora"
+    },
     "error": {
       "offline": "No hay conexión y todavía no hay una copia guardada.",
       "http": "El script de la hoja respondió con un error ({detail}).",

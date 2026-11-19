@@ -3,6 +3,7 @@
 // keeps its own cache entry, so fixture data never mixes with real data.
 
 import { FEED_SCHEMA, FEED_URL, FIXTURE_URL } from '../config.js';
+import { FEED_SCRIPT_VERSION } from '../feed-version.js';
 
 /** @typedef {import('./types').Feed} Feed */
 
@@ -35,7 +36,21 @@ export function validateFeed(json) {
   if (typeof j.meta.redactions !== 'number') j.meta.redactions = 0;
   if (typeof j.meta.cached !== 'boolean') j.meta.cached = false;
   if (typeof j.meta.cacheTtlSeconds !== 'number') j.meta.cacheTtlSeconds = null;
+  if (typeof j.meta.scriptVersion !== 'string' || !j.meta.scriptVersion) j.meta.scriptVersion = null;
   return { ok: true, feed: j };
+}
+
+/**
+ * Whether the sheet runs the feed script this app expects (meta.scriptVersion against the version
+ * stamped in src/feed-version.js). 'missing' is a script deployed before the version existed; an older
+ * script still serves a valid, scrubbed feed, so the app keeps showing the data either way.
+ * @param {{ scriptVersion?: string | null } | null | undefined} meta
+ * @param {string} [expected]
+ * @returns {{ state: 'current' | 'different' | 'missing', deployed: string | null, expected: string }}
+ */
+export function scriptVersionStatus(meta, expected = FEED_SCRIPT_VERSION) {
+  const v = meta && typeof meta.scriptVersion === 'string' && meta.scriptVersion ? meta.scriptVersion : null;
+  return { state: v == null ? 'missing' : v === expected ? 'current' : 'different', deployed: v, expected };
 }
 
 /** Which feed the page asked for: 'fixture' with ?feed=fixture, else 'live'. @param {string} [search] */

@@ -33,6 +33,7 @@ src/
   main.js, app.js       boot, router (hash routes), layout, nav
   config.js             FEED_URL, schema version
   version.js            stamped by the deploy
+  feed-version.js       the Feed.gs version the app expects (stamped by scripts/stamp-feed.mjs)
   data/                 feed.js, normalize.js, tags.js, notes.js, filters.js, stats.js, simulate.js,
                         summaries.js, store.js (signals/state), settings.js (localStorage),
                         tests-config.js (frozen tests, review schedule), types.d.ts
@@ -46,7 +47,8 @@ src/
   content/              glossary.es.json, glossary.en.json, rules.es.json, rules.en.json
   styles/               tokens.css (light + dark), base.css, components.css
 scripts/                bin.mjs, serve.mjs, build-site.mjs, check-i18n.mjs, make-icons.mjs, vendor-build.mjs,
-                        make-fixture.mjs (regenerates tests/fixtures/feed.json, deterministic)
+                        make-fixture.mjs (regenerates tests/fixtures/feed.json, deterministic),
+                        stamp-feed.mjs (npm run feed:stamp: the feed script version)
 tests/
   fixtures/             synthetic feed JSON (never real sheet data)
   unit/                 *.test.mjs
@@ -106,7 +108,9 @@ line` (lists), `price` (preset) or `pmin/pmax`, `date` (preset), `from`, `to`, `
 ### Banners
 
 The fixture banner and the offline / stale banner show on every page; the "missing columns" banner only
-on the Overview and Settings (Settings lists the columns).
+on the Overview and Settings (Settings lists the columns), and so does the "different feed script" banner
+(`meta.scriptVersion` is not the version in `src/feed-version.js`, or is missing; dismissible for the
+session; Settings shows both versions and what to do).
 
 ### Filters (shared by Explorer and Simulator)
 
@@ -154,5 +158,7 @@ orchestrator after review.
 ## Changing the feed
 
 `apps-script/Feed.gs` is copied by hand into the sheet's Apps Script project and redeployed (README has
-the steps). Bump `schema` when the shape changes; the app refuses a newer schema with a clear message
+the steps). After editing it run `npm run feed:stamp` (the script version, DATA_CONTRACT "Script
+version"; `npm run check` fails until you do); after redeploying, Settings shows whether the sheet runs
+that version. Bump `schema` when the shape changes; the app refuses a newer schema with a clear message
 instead of misreading it.
