@@ -92,7 +92,6 @@ function Presets() {
  */
 function ScriptVersion({ meta }) {
   const v = scriptVersionStatus(meta);
-  const minutes = Math.round((meta.cacheTtlSeconds || 300) / 60);
   const ok = v.state === 'current';
   return html`<div class=${`settings-script${ok ? ' is-current' : ''}`} data-testid="feed-script" data-state=${v.state}>
     <h3 class="settings-script-title">${t('settings.scriptVersion')}</h3>
@@ -110,9 +109,20 @@ function ScriptVersion({ meta }) {
       ? null
       : html`<p class="small">${t('settings.scriptStillValid')}</p>
           <p class="small" data-testid="feed-script-todo">${t('settings.scriptWhatToDo')}</p>
-          <p class="small muted">${t('settings.scriptCacheNote', { minutes })}</p>
           <p class="small"><a href=${FEED_SCRIPT_DOCS_URL} target="_blank" rel="noopener noreferrer" data-testid="feed-script-docs">${t('settings.scriptDocs')}</a></p>`}
   </div>`;
+}
+
+/**
+ * One note about the script's five-minute cache (round 2: when the versions differed there were two
+ * similar ones): how old a refresh can be and, when the script version differs, when to check again.
+ * @param {{ meta: any }} props
+ */
+function CacheNote({ meta }) {
+  const minutes = Math.round((meta.cacheTtlSeconds || 300) / 60);
+  const differs = scriptVersionStatus(meta).state !== 'current';
+  if (!meta.cacheTtlSeconds && !differs) return null;
+  return html`<p class="small muted" data-testid="feed-cache-note">${t('settings.cacheNote', { minutes })}${differs ? ` ${t('settings.scriptCacheNote', { minutes })}` : ''}</p>`;
 }
 
 function FeedStatus() {
@@ -136,7 +146,7 @@ function FeedStatus() {
       <dd data-testid="feed-missing">${meta ? (missing.length ? html`<span class="row-wrap kv-chips">${missing.map((m) => html`<${Chip} tone="pending">${m}</${Chip}>`)}</span>` : t('settings.none')) : '–'}</dd>
     </dl>
     ${meta ? html`<${ScriptVersion} meta=${meta} />` : null}
-    ${meta && meta.cacheTtlSeconds ? html`<p class="small muted">${t('settings.cacheNote', { minutes: Math.round(meta.cacheTtlSeconds / 60) })}</p>` : null}
+    ${meta ? html`<${CacheNote} meta=${meta} />` : null}
     ${meta && meta.redactions ? html`<${Banner} tone="warning">${t('settings.redactionsNote', { count: meta.redactions, n: meta.redactions })}</${Banner}>` : null}
     ${f.error ? html`<${Banner} tone="warning" title=${t('settings.lastError')}>${t(`feed.error.${f.error.code}`, { detail: f.error.detail })}</${Banner}>` : null}
     <div class="row-wrap">

@@ -219,8 +219,8 @@ function GroupTable({ rows, labelOf, linkOf, testId, compact = false, linesOf, l
             </span>
             <span class="ov-gev num">
               ${e.n ? html`<b>${t('overview.tags.ev', { ev: formatPct(e.mean) })}</b> <span>${t('overview.tags.evN', { n: e.n })}</span>` : html`<span>${t('overview.tags.noClose')}</span>`}
-              ${rv && rv.n ? html`<span class="ov-grev">${t('overview.tags.reviewShort', { ev: formatPct(rv.mean), n: rv.n })}</span>` : null}
             </span>
+            ${rv && rv.n ? html`<span class="ov-grev num">${t('overview.tags.reviewShort', { ev: formatPct(rv.mean), n: rv.n })}</span>` : null}
             <span class="ov-gverdict"><${VerdictChip} v=${r.verdict} /></span>
             <${Icon} name="chevron-right" size=${16} />
           </a>

@@ -75,10 +75,10 @@ docs/                   ARCHITECTURE.md, DATA_CONTRACT.md, FEATURE_GUIDE.md
 
 | Route | Feature folder | What it shows |
 |---|---|---|
-| `#/` | `features/overview` (Resumen) | Per source (Apuestas, Sombra, Grok): record, yield, units, CLV / fair-close EV, pending; trend sparklines; written summaries ("En Sombra, las VALOR van 31-22 a cuota media 2.10…"); what changed since the last visit |
+| `#/` | `features/overview` (Resumen) | Per source (Apuestas, Sombra, Grok): record, yield, units, price vs close (and, for Sombra, the review's fair-close EV), pending; trend sparklines; written summaries ("En Sombra, las VALOR van 31-22 a cuota media 2.10…"); what changed since the last visit |
 | `#/explorer` | `features/explorer` (Explorador) | Every pick as a list (cards on phones, table on wide screens) with the full filter panel, search, sort, and a detail sheet per pick with the parsed notes |
-| `#/simulator` | `features/simulator` (Simulador) | "If you had bet X on each": filters + stake (flat units or % of bankroll) + bankroll → curve, drawdown, streaks, yield, EV vs close, per-month table |
-| `#/tests` | `features/tests` (Tests) | Each frozen test: graded rows out of 100, rows with a two-sided close out of 50, mean fair-close EV ± 2 SE, decision rule in words; countdown to the next Sombra review (14 days and 150 graded rows) |
+| `#/simulator` | `features/simulator` (Simulador) | "If you had bet X on each": filters + stake (flat units or % of bankroll) + bankroll → curve, drawdown, streaks, yield, price vs close, per-month table |
+| `#/tests` | `features/tests` (Tests) | Each frozen test: graded rows out of 100, rows with a two-sided close out of 50, mean price vs close ± 2 SE, decision rule in words; the price-first tests with their own measure (fair-close EV (review) for VALOR / VALOR CASI); countdown to the next Sombra review (14 days and 150 graded rows) |
 | `#/analysis`, `#/analysis/:part` | `features/analysis` (Análisis) | Parts breakdown, calibration, close, grok. Breakdown by 16 dimensions (tag, market, raw market, league, book, price band, month, weekday, model-probability band, EV band, reference, sample, FUERZA, reason, source, line) with exact links to the Explorer, a two-way table, calibration with Brier, the price-vs-close distribution, Grok vs Claude |
 | `#/decisions` | `features/decisions` (Decisiones) | The decision log as a searchable timeline, with state chips, and the staking rules |
 | `#/glossary` | `features/glossary` (Glosario) | Betting terms, the sheet's own tags and abbreviations, and every betting-analyst rule in plain words; searchable, deep-linkable (`#/glossary/near-value`); terms elsewhere in the app link here |
@@ -93,7 +93,7 @@ column is painted on `.app`, so it runs the full height of long pages). Detail r
 
 | Section | Keys |
 |---|---|
-| Overview | `date` (`30d`, `7d`, `last_slate`; the filters' own date key) |
+| Overview | `date` (`30d`, `7d`, `last_slate`; the filters' own date key; `last_slate` is pinned to its date as `slate` in links) |
 | Explorer | the filter keys (below) + `sort`, `dir`, `page` |
 | Simulator | the filter keys + `mode`, `stake`, `pct`, `bank`, `kf`, `kcap`; scenario B in `b` (its own query string) |
 | Tests | `open` (the test whose card is open); other keys (Overview's `date`) are kept. Its Explorer links use the filter key `test` |
@@ -119,7 +119,8 @@ Source; tag (multi); test (the frozen and price-first tests and the stopped cate
 that test counts); market family and raw market; league; book; status; price range with presets
 (`≤ 1.70`; `1.70–2.00`; `< 2.00`; `≤ 2.00`; `> 2.00, ≤ 2.50`; `≤ 2.50`; `> 2.50, ≤ 4.00`; `≤ 4.00`; `> 4.00`; each
 label is built from its bounds by `priceRangeLabel`, and "a–b" means both ends included) and custom min/max; date range with presets (last
-slate, 7 days, 30 days, this month, since a date) and single slate date; has closing price; has two-sided
+graded slate, pending slate — the newest with pending picks —, 7 days, 30 days, this month — these three with no end
+date, upcoming slates included —, since a date) and single slate date; has closing price; has two-sided
 close; reference (`ref feed`, books, one book); sample (10+, 6–9); FUERZA (keeps, rejects); filter
 reason (for `filtro` rows); EV range; model probability range; free-text search (match, league, notes).
 The sheet has no slate *run* date, so "slate date" is the match date.
@@ -133,6 +134,10 @@ The sheet has no slate *run* date, so "slate date" is the match date.
 - Numbers: `format.js` only. Prices 2 decimals (3 when the sheet has 3), units with sign and 2 decimals,
   percentages 1 decimal, dates `15 nov 2026`. Money appears only when a bankroll is set in Settings and
   is labelled as the user's own setting.
+- Two measures against the close, never one label for both: "Precio vs cierre" (`fairCloseEv`) and "EV
+  justo (revisión)" (`openingFairEv`); DATA_CONTRACT section 4.
+- A button or chip that disables itself while focused stays focusable and `aria-disabled` until focus
+  moves on (`useFocusSafeDisabled`, `src/lib/ui/controls.js`), so focus never drops to the page body.
 - Accessibility: semantic HTML, focus states, 44 px touch targets, contrast AA in both themes, charts
   have a text alternative (the summary sentence and a table toggle), colour is never the only signal
   (won/lost also differ by icon or sign).

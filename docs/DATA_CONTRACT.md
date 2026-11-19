@@ -251,6 +251,9 @@ Fields added with the line filter (`src/data/lines.js`, called from `normalize.j
 - `side` is unchanged: review.py's `side()` on the selection (over / under / ''), which the frozen tests
   use. On every total it agrees with the kind in `lineKey`; a handicap has side '' and kind `ah`. Known
   quirk kept for review.py parity: `X con más córners` (Grok, `Córners 1X2`) has side `over`.
+  The Over / Under filter (`sides`, URL `side`) therefore reads `lineSide(p)` (`filters.js`): the side
+  only on picks that have a `lineKey`, '' otherwise, so its chips never select a three-way market or any
+  other pick without a line (round 2; on 18 Nov 2026 nine Grok rows had side `over` and no line).
 - Labels are built with `t()` (`lineLabel(key)` → "Under 4.5", "Hándicap +0.25"; `{ scope: true }` →
   "Tarjetas: Under 4.5").
 
@@ -260,6 +263,14 @@ a line; every shape has a synthetic copy in `tests/unit/lines.test.mjs`.
 
 Definitions that follow review.py rather than the first draft of this contract:
 
+- **Two measures, two names (round 2).** `fairCloseEv` is shown as **"Precio vs cierre" / "Price vs
+  close"** (glossary `price-vs-close`): the Overview, Explorer, Simulator, Analysis and the frozen tests.
+  `openingFairEv` is shown as **"EV justo (revisión)" / "Fair-close EV (review)"** (glossary
+  `fair-ev-review`): the headline of the Sombra reviews (milestone-reviewer's "fair-close EV") and the
+  measure of VALOR and VALOR CASI; the Overview shows it for Sombra beside price vs close
+  (`reviewFairEv`, `shadowTagReviewEv` in `overview.js`). VALOR PROP uses a third one, "EV vs bet365
+  (power)" (`propCloseEv`). No label may call either of the first two "EV vs cierre". The old glossary
+  slug `fair-close-ev` opens `price-vs-close` (`GLOSSARY_ALIASES`).
 - `fairCloseEv` is review.py's *price-vs-close EV* (`pvc`): `price × p − 1` with p the proportionally
   de-vigged close at the row's own book when the notes have a two-sided clv-logger close there, otherwise
   the two-sided bet365 feed close. This is the measure of the frozen tests.
@@ -375,7 +386,9 @@ with both sides, exactly as `milestone-reviewer` describes. A row without both s
   (rows with the same date + match form one cluster, milestone-reviewer's formula), ±2 SE and z. The flat
   yield's SE is the plain SD of per-pick profit / √n (review.py's plain_se).
 - CLV = `price / closePrice − 1`. Fair-close EV as above. Means are reported with `n` and ± 2 standard errors.
-- Drawdown: peak-to-trough of the cumulative curve, in units and as % of the bankroll in Settings.
+- Drawdown: peak-to-trough of the cumulative curve, in units and as % of the bankroll in Settings. The
+  Overview's real-bets card measures it (worst drop and below the peak) on the same daily series as its
+  chart, the running total at the end of each day (`realBetsExtras`, round 2), and says "por día".
 - Real bets (`Apuestas`): profit is the sheet's `Ganancia (u)` (it knows about free bets and odd
   settlements); the app only recomputes it in the Simulator.
 - Never show a rate over fewer than 5 graded picks without its `n` next to it.
@@ -416,3 +429,20 @@ with both sides, exactly as `milestone-reviewer` describes. A row without both s
   aliases (whole terms first, then "Term (other name)" parts and aliases; first entry in the file wins);
   capitalised sheet words (DNB, VALOR CASI) match as written, the rest without case or accents; common
   words are skipped (`TERM_SKIP`); the first occurrence per paragraph is linked. Tokens only.
+
+## 9. Dates, slates and links (round 2)
+
+- **Date presets** (`filters.js` `DATE_PRESETS`, `resolveDates`): `last_slate` is the last slate with a
+  graded countable pick (`lastSlate`, the same as the Overview's `lastGradedSlate`); `pending_slate` is
+  the newest slate that still has countable pending picks (`pendingSlate`); `7d`, `30d` and
+  `this_month` bound only the start (`[start, null]`), so picks logged for upcoming slates are in;
+  `since` as before. Old URLs keep working (`date=last_slate` now means the last graded slate). The
+  filter panel says the dates of the active preset under its chips (`dateNote`).
+- **Links count what they open.** Every row-to-Explorer link selects exactly the picks the row counts
+  (`exactSlice`; Overview tag, line and market rows, Analysis rows, cells and Grok markets, Simulator
+  rows), or the link says how many picks it opens (Overview source cards, quick link, pending slates:
+  `pendingSlateLink`; Tests cards; glossary tag entries). `tests/e2e/round2.spec.js` follows every kind
+  and compares the count at both ends.
+- **Real bets' hit rate** is not set against a flat break-even when the stakes differ or a free bet is
+  in (`realStakeShape`, `describeRealHitRate`): the sentence says why results and hit rate can disagree.
+

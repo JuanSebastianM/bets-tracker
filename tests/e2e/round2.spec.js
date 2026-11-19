@@ -1,6 +1,7 @@
 // Round 2 (second audit's screen findings): the two measures against the close under their own names,
 // and every kind of link into the Explorer opening exactly the picks its row counts. On the fixture.
 import { test, expect } from 'playwright/test';
+import { readFileSync } from 'node:fs';
 import { openApp, expectNoHorizontalScroll } from './helpers.js';
 
 test.beforeEach(async ({ page }) => {
@@ -165,4 +166,24 @@ test('Decisions: a month header counts the whole month under the filters', async
   await expect(page.getByTestId('decisions-timeline')).toBeVisible();
   const heads = await page.locator('.dmonth-h').evaluateAll((els) => els.map((e) => ({ total: Number(e.getAttribute('data-count')), text: e.textContent })));
   for (const h of heads) expect(h.text).toContain(String(h.total));
+});
+
+test('Settings: one cache note, which also says when to check again when the script version differs', async ({ page }) => {
+  const f = JSON.parse(readFileSync(new URL('../fixtures/feed.json', import.meta.url), 'utf8'));
+  f.meta.scriptVersion = '000000000000';
+  await page.route('**/tests/fixtures/feed.json', (route) => route.fulfill({ contentType: 'application/json', body: JSON.stringify(f) }));
+  await openApp(page, '/settings');
+  await expect(page.getByTestId('feed-script')).toHaveAttribute('data-state', 'different');
+  await expect(page.getByTestId('settings-feed').getByText(/5 minutos/)).toHaveCount(1);
+  await expect(page.getByTestId('feed-cache-note')).toContainText('Después de implementar');
+});
+
+test('Grok pick detail says whose price the quote is and at which book the close was measured', async ({ page }) => {
+  const { errors } = await openApp(page, '/explorer/grok%3A3');
+  const prices = page.getByTestId('pick-prices');
+  await expect(prices).toContainText('Cuota de Grok');
+  await expect(prices).toContainText('2.44: la cuota que dio Grok; coincide con Betsson');
+  await expect(prices).toContainText('Medido en Betsson: su apertura 2.44 contra su cierre 2.22, no la cuota de Grok');
+  await expect(prices).toContainText('2.22 · en Betsson');
+  expect(errors).toEqual([]);
 });
