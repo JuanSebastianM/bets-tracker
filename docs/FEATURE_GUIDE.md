@@ -179,8 +179,11 @@ State fields: `sources, tags, markets, marketsRaw, leagues, books, statuses` (li
 `datePreset` (`last_slate, 7d, 30d, this_month, since`) with `dateFrom/dateTo`, `slate`, `hasClose`,
 `twoSidedClose`, `refs`, `samples`, `fuerza`, `reasons`, `ev {min,max}`, `prob {min,max}`, `q`. Added with the line filter:
 `sides` (`over`, `under`: `Pick.side`; URL `side`), `lines` (lineKeys, `cards:under:4.5`; URL `line`) and
-`passedAll` (`true`/`false`/`null`: `parsed.passedAll`; URL `pass`). Old URLs and saved presets parse as
-before (the new fields stay at their defaults). `PRICE_PRESETS` has one hidden preset, `lt170` (< 1.70),
+`passedAll` (`true`/`false`/`null`: `parsed.passedAll`; URL `pass`). Added with the fixes pass: `tests`
+(ids of `TEST_FILTERS` in `tests-config.js`: the frozen tests, the price-first tests and the stopped
+categories; URL `test`, comma-joined like every list; a pick passes when it belongs to any of them, by the
+test's own membership function, so `test=team_corners` is exactly the rows the CÓRNERS EQUIPO card counts,
+pending included). Old URLs and saved presets parse as before (the new fields stay at their defaults). `PRICE_PRESETS` has one hidden preset, `lt170` (< 1.70),
 not offered as a chip: it exists so the `lt170` price band can be linked. The same
 query string works on `#/explorer` and `#/simulator`, and saved presets (`savePreset(name, query)` in
 `settings.js`) store it.
@@ -192,7 +195,14 @@ import { TAGS, tagLabel, classifyShadow, MARKET_FAMILIES, FILTER_REASONS, BOOKS 
 import { FROZEN_TESTS, FROZEN_RULE, frozenProgress, nextShadowReview, SHADOW_REVIEW } from '../../data/tests-config.js';
 const p = frozenProgress(FROZEN_TESTS[0], data.picks); // { graded, withClose, ev, state: 'collecting'|'pass'|'stop', summary, … }
 const r = nextShadowReview(data.decisions, data.picks, todayIn(APP_TIMEZONE)); // { dueDate, dueRows, daysLeft, rowsLeft, due }
+import { TEST_FILTERS, TEST_IDS, testIdsOf, testLabel, priceFirstMember } from '../../data/tests-config.js';
+explorerHref(FROZEN_TESTS[0].explorer);                 // every test's `explorer` is { tests: [id] }: exact by construction
+testIdsOf(pick);                                       // ['team_corners'] (memoised per pick)
 ```
+
+`TEST_FILTERS` (`{ id, kind: 'frozen' | 'price_first' | 'stopped', sheetLabel, member }`) is the one list of
+memberships; `frozenProgress`, `priceFirstProgress` and `stoppedSummary` count the same rows (countable,
+pending included). `filters.js` imports `tests-config.js` (never the other way at run time).
 
 Show the sheet's own label (`tagLabel(tag)` → "VALOR CASI"), never the id.
 
@@ -265,7 +275,8 @@ html`<${FilterButton} count=${countActive(f)} onClick=${() => setOpen(true)} />
 
 - `FilterPanel` props: `picks` (all picks: options and the last slate come from them), `filters`,
   `onChange(next)`, `hide` (section ids from `FILTER_SECTIONS`: `q, source, tag, price, date, market,
-  status, league, book, close, ref, sample, fuerza, reason, numbers`), `today` (defaults to Bogotá today).
+  status, league, book, close, ref, sample, fuerza, reason, numbers`, plus `test` right after `tag`),
+  `today` (defaults to Bogotá today).
   It shows a live count (`filter-live-count`) and, on every option, how many picks it would give with the
   other filters as they are (`facetCounts`); options at 0 are disabled, or hidden in the long lists
   (leagues, raw markets). Chip test ids: `fchip-<field>-<value>`, `fchip-price-<preset>`, `fchip-date-<preset>`.
@@ -280,6 +291,10 @@ html`<${FilterButton} count=${countActive(f)} onClick=${() => setOpen(true)} />
   Chip test ids: `fchip-sides-under`, `fchip-lines-cards:under:4.5`; the section is `fp-lines`. "Pasó
   todos los filtros" (yes / no / any) sits in the Reason section. Built-in presets `cards_under_45`,
   `cards_under_55`, `corners_under_95` (a preset may carry `labelKey`).
+- The "Prueba" section (`test`, collapsed by default, right after Tag; `fp-tests`) lists the tests in
+  three groups (frozen, price-first, stopped) with their counts under the other filters; chip test ids
+  `fchip-tests-<id>`; the active chip reads "Prueba: CÓRNERS EQUIPO (pasó todos los filtros)". It hides
+  itself when no pick is in any test.
 - Data helpers added with it: `facetCounts`, `activeEntries`, `removeEntry`, `fromQueryString`,
   `BUILTIN_PRESETS`, `builtinPreset` (`filters.js`); `TAG_GROUPS`, `tagSlug` (`tags.js`); `sortPicks`,
   `SORT_KEYS`, `pinnacleFor`, `neighbours` (`explore.js`).

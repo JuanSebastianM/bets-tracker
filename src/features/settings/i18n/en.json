@@ -49,5 +49,16 @@
   "schema": "Data format",
   "feedUrl": "Sheet script",
   "feedUrlSet": "Configured",
-  "feedUrlUnset": "Not configured"
+  "feedUrlUnset": "Not configured",
+  "scriptVersion": "Feed script version",
+  "scriptDeployed": "Version in the sheet",
+  "scriptExpected": "Version the app expects",
+  "scriptNone": "no version (older script)",
+  "scriptCurrent": "Up to date: the sheet runs the script version the app expects.",
+  "scriptDifferent": "The sheet is running a different version of the feed script.",
+  "scriptMissing": "The sheet is running a different version of the feed script: one from before the script reported its version.",
+  "scriptStillValid": "The data still shows normally: an older script also serves a valid feed with no money in it.",
+  "scriptWhatToDo": "What to do: copy Feed.gs from the repository over the Feed file of the sheet's Apps Script project, run btFeedSelfTest and deploy a new version of the existing deployment (Deploy › Manage deployments › edit › New version). The /exec URL stays the same.",
+  "scriptCacheNote": "After deploying, the script can keep serving its cached copy for up to {minutes} minutes. Refresh the data after that and check here again.",
+  "scriptDocs": "Steps in the README (section 5)"
 }

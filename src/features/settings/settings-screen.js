@@ -2,13 +2,14 @@
 // (this device only), default stake, saved filter presets, feed status, about.
 import { html } from '../../../vendor/preact.js';
 import { t, setLocale, useLocale, formatDateTime } from '../../lib/i18n.js';
-import { Card, SegmentedControl, NumberField, TextField, Button, Banner, Chip } from '../../lib/ui/index.js';
+import { Card, SegmentedControl, NumberField, TextField, Button, Banner, Chip, Icon } from '../../lib/ui/index.js';
 import { formatAgo, formatAmount, formatCount, formatUnits } from '../../lib/format.js';
 import { useSettings, updateSettings, clearMoney, bankrollUnits, deletePreset } from '../../data/settings.js';
 import { useFeed, refreshFeed, clearFeedCache } from '../../data/store.js';
 import { toast } from '../../lib/toast.js';
 import { href } from '../../lib/router.js';
-import { APP_TIMEZONE, FEED_SCHEMA, FEED_URL } from '../../config.js';
+import { APP_TIMEZONE, FEED_SCHEMA, FEED_URL, FEED_SCRIPT_DOCS_URL } from '../../config.js';
+import { scriptVersionStatus } from '../../data/feed.js';
 import { APP_VERSION } from '../../version.js';
 import { updateStore, applyUpdate, isServiceWorkerDisabled, isStandalone } from '../../lib/pwa.js';
 import { useStore } from '../../lib/store.js';
@@ -85,6 +86,35 @@ function Presets() {
   </${Card}>`;
 }
 
+/**
+ * Whether the sheet runs the feed script this app expects (meta.scriptVersion), and what to do when not.
+ * @param {{ meta: any }} props
+ */
+function ScriptVersion({ meta }) {
+  const v = scriptVersionStatus(meta);
+  const minutes = Math.round((meta.cacheTtlSeconds || 300) / 60);
+  const ok = v.state === 'current';
+  return html`<div class=${`settings-script${ok ? ' is-current' : ''}`} data-testid="feed-script" data-state=${v.state}>
+    <h3 class="settings-script-title">${t('settings.scriptVersion')}</h3>
+    <dl class="kv">
+      <dt>${t('settings.scriptDeployed')}</dt>
+      <dd class="num" data-testid="feed-script-deployed">${v.deployed ? html`<code>${v.deployed}</code>` : t('settings.scriptNone')}</dd>
+      <dt>${t('settings.scriptExpected')}</dt>
+      <dd class="num" data-testid="feed-script-expected"><code>${v.expected}</code></dd>
+    </dl>
+    <p class="settings-script-state" data-testid="feed-script-state">
+      <${Icon} name=${ok ? 'check' : 'info'} size=${18} />
+      <span>${ok ? t('settings.scriptCurrent') : v.state === 'missing' ? t('settings.scriptMissing') : t('settings.scriptDifferent')}</span>
+    </p>
+    ${ok
+      ? null
+      : html`<p class="small">${t('settings.scriptStillValid')}</p>
+          <p class="small" data-testid="feed-script-todo">${t('settings.scriptWhatToDo')}</p>
+          <p class="small muted">${t('settings.scriptCacheNote', { minutes })}</p>
+          <p class="small"><a href=${FEED_SCRIPT_DOCS_URL} target="_blank" rel="noopener noreferrer" data-testid="feed-script-docs">${t('settings.scriptDocs')}</a></p>`}
+  </div>`;
+}
+
 function FeedStatus() {
   const f = useFeed();
   useLocale();
@@ -105,6 +135,7 @@ function FeedStatus() {
       <dt>${t('settings.missingHeaders')}</dt>
       <dd data-testid="feed-missing">${meta ? (missing.length ? html`<span class="row-wrap kv-chips">${missing.map((m) => html`<${Chip} tone="pending">${m}</${Chip}>`)}</span>` : t('settings.none')) : '–'}</dd>
     </dl>
+    ${meta ? html`<${ScriptVersion} meta=${meta} />` : null}
     ${meta && meta.cacheTtlSeconds ? html`<p class="small muted">${t('settings.cacheNote', { minutes: Math.round(meta.cacheTtlSeconds / 60) })}</p>` : null}
     ${meta && meta.redactions ? html`<${Banner} tone="warning">${t('settings.redactionsNote', { count: meta.redactions, n: meta.redactions })}</${Banner}>` : null}
     ${f.error ? html`<${Banner} tone="warning" title=${t('settings.lastError')}>${t(`feed.error.${f.error.code}`, { detail: f.error.detail })}</${Banner}>` : null}

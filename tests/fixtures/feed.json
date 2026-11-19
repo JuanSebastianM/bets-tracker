@@ -16,7 +16,8 @@
    "Grok!Cuota mín. Grok"
   ],
   "cached": false,
-  "cacheTtlSeconds": 300
+  "cacheTtlSeconds": 300,
+  "scriptVersion": "9d17005378a3"
  },
  "tabs": {
   "bets": {

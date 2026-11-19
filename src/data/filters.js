@@ -3,6 +3,7 @@
 
 import { MARKET_FAMILIES, TAGS } from './tags.js';
 import { compareLineKeys, isLineKey, LINE_SIDES } from './lines.js';
+import { TEST_IDS, testIdsOf } from './tests-config.js';
 
 /** @typedef {import('./types').Pick} Pick */
 
@@ -39,6 +40,8 @@ import { compareLineKeys, isLineKey, LINE_SIDES } from './lines.js';
  * @property {string[]} sides         'over' | 'under' (review.py's side of the selection, Pick.side)
  * @property {string[]} lines         lineKey ('cards:under:4.5', 'ah:+0.25'; src/data/lines.js)
  * @property {boolean | null} passedAll  model picks that passed every filter (parsed.passedAll)
+ * @property {string[]} tests         ids of tests-config.js TEST_FILTERS (frozen and price-first tests,
+ *   stopped categories): the rows the test counts, by its own membership function (URL `test`)
  */
 
 /** @returns {FilterState} */
@@ -69,6 +72,7 @@ export function defaultFilters() {
     sides: [],
     lines: [],
     passedAll: null,
+    tests: [],
   };
 }
 
@@ -201,6 +205,7 @@ export function applyFilters(picks, f, ctx) {
     if (f.sides && f.sides.length && !f.sides.includes(p.side)) return false;
     if (f.lines && f.lines.length && !f.lines.includes(/** @type {string} */ (p.lineKey))) return false;
     if (f.passedAll != null && Boolean(p.parsed.passedAll) !== f.passedAll) return false;
+    if (f.tests && f.tests.length && !testIdsOf(p).some((id) => f.tests.includes(id))) return false;
     if (words.length) {
       const hay = fold(`${p.match} ${p.league} ${p.selection} ${p.marketRaw} ${p.tagRaw} ${p.notes}`);
       if (!words.every((w) => hay.includes(w))) return false;
@@ -232,6 +237,7 @@ const LIST_KEYS = /** @type {const} */ ({
   sources: 'src', tags: 'tag', markets: 'mkt', marketsRaw: 'mraw', leagues: 'lg', books: 'book', statuses: 'st',
   refs: 'ref', samples: 'sample', fuerza: 'fz', reasons: 'why',
   sides: 'side', lines: 'line',
+  tests: 'test',
 });
 const RANGE_KEYS = /** @type {const} */ ({ price: ['pmin', 'pmax'], ev: ['evmin', 'evmax'], prob: ['prmin', 'prmax'] });
 
@@ -288,6 +294,7 @@ export function fromQuery(q = {}) {
   f.sides = f.sides.filter((v) => /** @type {readonly string[]} */ (LINE_SIDES).includes(v));
   f.lines = f.lines.filter(isLineKey);
   if (q.pass === '1' || q.pass === '0') f.passedAll = q.pass === '1';
+  f.tests = f.tests.filter((id) => TEST_IDS.includes(id));
   return f;
 }
 
@@ -337,6 +344,7 @@ export function filterOptions(picks) {
     add('slates', p.date);
     add('sides', p.side);
     add('lines', p.lineKey);
+    for (const id of testIdsOf(p)) add('tests', id);
   }
   const tagOrder = TAGS.map((t) => t.id);
   const order = /** @type {Record<string, string[]>} */ ({
@@ -348,10 +356,11 @@ export function filterOptions(picks) {
     samples: ['10+', '6-9'],
     fuerza: ['keeps', 'rejects', 'na'],
     sides: [...LINE_SIDES],
+    tests: TEST_IDS,
   });
   /** @type {Record<string, Array<{ value: string, count: number }>>} */
   const out = {};
-  for (const field of ['sources', 'tags', 'markets', 'marketsRaw', 'leagues', 'books', 'statuses', 'refs', 'samples', 'fuerza', 'reasons', 'slates', 'sides', 'lines']) {
+  for (const field of ['sources', 'tags', 'markets', 'marketsRaw', 'leagues', 'books', 'statuses', 'refs', 'samples', 'fuerza', 'reasons', 'slates', 'sides', 'lines', 'tests']) {
     const m = maps[field] || new Map();
     const list = [...m.entries()].map(([value, count]) => ({ value, count }));
     const ord = order[field];
@@ -381,6 +390,7 @@ const FACET_VALUES = /** @type {Record<string, (p: Pick) => Array<string | null>
   reasons: (p) => p.parsed.filters,
   sides: (p) => [p.side],
   lines: (p) => [p.lineKey],
+  tests: (p) => testIdsOf(p),
 });
 
 /** The list fields that facetCounts counts. */
@@ -455,6 +465,7 @@ export function activeEntries(f) {
   };
   list('sources');
   list('tags');
+  list('tests');
   if (f.pricePreset) out.push({ field: 'pricePreset', value: f.pricePreset });
   if (f.price.min != null || f.price.max != null) out.push({ field: 'price' });
   if (f.slate) out.push({ field: 'slate', value: f.slate });

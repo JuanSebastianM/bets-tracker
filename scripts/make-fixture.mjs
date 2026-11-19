@@ -6,6 +6,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import vm from 'node:vm';
+import { FEED_SCRIPT_VERSION } from '../src/feed-version.js';
 
 const root = resolve(import.meta.dirname, '..');
 
@@ -514,7 +515,9 @@ const feed = {
   schema: 1,
   generatedAt: '2026-11-15T16:00:00Z',
   timeZone: 'America/Los_Angeles',
-  meta: { rows: {}, redactions: 0, missingHeaders: ['Grok!Cuota mín. Grok'], cached: false, cacheTtlSeconds: 300 },
+  // scriptVersion: the version the app expects (src/feed-version.js), so the fixture never shows the
+  // "different feed script" banner; e2e tests that want it change the value in a route.
+  meta: { rows: {}, redactions: 0, missingHeaders: ['Grok!Cuota mín. Grok'], cached: false, cacheTtlSeconds: 300, scriptVersion: FEED_SCRIPT_VERSION },
   tabs: {
     bets: tab('bets', betRows),
     shadow: tab('shadow', shadowRows),

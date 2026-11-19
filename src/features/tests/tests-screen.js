@@ -116,6 +116,17 @@ function NextReview({ data, today }) {
   </${Card}>`;
 }
 
+// ---------------------------------------------------------------- the link to the Explorer
+
+/**
+ * "Ver las 34 filas en el Explorador": the test's own filter (`test=<id>`), so the Explorer shows exactly
+ * the rows the card counts, pending included, and the count on the link is the Explorer's count.
+ * @param {{ filter: any, rows: number, small?: boolean, testId: string }} props
+ */
+function ExplorerLink({ filter, rows, small = false, testId }) {
+  return html`<a class=${small ? 'link-btn tests-link-sm' : 'btn btn-secondary tests-link'} href=${explorerHref(filter)} data-testid=${testId} data-rows=${rows}>${t('tests.frozen.explorerN', { count: rows, n: rows })}</a>`;
+}
+
 // ---------------------------------------------------------------- frozen tests
 
 /** The expanded content of a frozen test. @param {{ p: FrozenProgress, today: string }} props */
@@ -163,10 +174,9 @@ function FrozenDetail({ p, today }) {
       ? html` <span class="tests-muted num">(${t('tests.frozen.projectionPace', { graded: formatNumber(proj.graded.perDay, { maximumFractionDigits: 1 }, 'en'), close: formatNumber(proj.withClose.perDay, { maximumFractionDigits: 1 }, 'en') })})</span>`
       : null}</p>
     <div class="tests-links">
-      <a class="btn btn-secondary tests-link" href=${explorerHref(test.explorer || {})} data-testid=${`explorer-${test.id}`}>${t('tests.frozen.explorer')}</a>
+      <${ExplorerLink} filter=${test.explorer} rows=${p.rows.length} testId=${`explorer-${test.id}`} />
     </div>
     ${test.decisionRow ? html`<ul class="dlink-list"><li><${DecisionLink} row=${test.decisionRow} class="tests-link-sm" /></li></ul>` : null}
-    ${test.explorer && test.explorerExact === false ? html`<p class="tests-muted tests-small" data-testid=${`explorer-approx-${test.id}`}>${t('tests.frozen.explorerApprox')}</p>` : null}
   </div>`;
 }
 
@@ -241,7 +251,7 @@ function PriceFirstDetail({ p }) {
         </${Disclosure}>`
       : null}
     <div class="tests-links">
-      <a class="btn btn-secondary tests-link" href=${explorerHref(test.explorer)} data-testid=${`explorer-${test.id}`}>${t('tests.frozen.explorer')}</a>
+      <${ExplorerLink} filter=${test.explorer} rows=${p.rows.length} testId=${`explorer-${test.id}`} />
       <a class="link-btn tests-link-sm" href=${tagHref(test.tag)} data-testid=${`glossary-${test.id}`}>${t('tests.list.glossary', { label: test.sheetLabel })}</a>
     </div>
     <div class="tests-decision-links"><span class="tests-muted tests-small">${t('tests.frozen.decisions')}</span>
@@ -272,8 +282,7 @@ function StoppedSection({ data }) {
               <p>${t(`tests.stopped.why.${c.id}`)}</p>
               ${rows.length ? html`<p class="tests-muted tests-small">${t('tests.stopped.span', { first: formatDate(first), last: formatDate(last) })}</p>` : null}
               <div class="tests-links">
-                ${rows.length ? html`<a class="link-btn tests-link-sm" href=${explorerHref(c.explorer)}>${t('tests.frozen.explorer')}</a>` : null}
-                ${rows.length && c.explorerExact === false ? html`<span class="tests-muted tests-small">${t('tests.frozen.explorerApprox')}</span>` : null}
+                ${rows.length ? html`<${ExplorerLink} filter=${c.explorer} rows=${rows.length} small testId=${`explorer-${c.id}`} />` : null}
               </div>
               <ul class="dlink-list"><li><${DecisionLink} row=${c.decisionRow} class="tests-link-sm" /></li></ul>
             </div>

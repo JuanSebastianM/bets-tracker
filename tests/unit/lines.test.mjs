@@ -308,20 +308,13 @@ test('Tests links: an exact Explorer filter selects the same picks as the member
   ];
   const picks = [...data.picks, ...extra];
   const all = [...FROZEN_TESTS, ...STOPPED_CATEGORIES];
-  let exact = 0;
+  // Every link is the test's own filter (`test=<id>`, fixes): exact for all of them. The membership
+  // counts countable rows only (no PUBLICADA Y APOSTADA, no unknown status), as the cards do.
   for (const tt of all) {
-    assert.equal(typeof tt.explorerExact, 'boolean', `${tt.id} says whether its link is exact`);
     const linked = applyFilters(picks, { ...defaultFilters(), ...tt.explorer }, ctx).map((p) => p.uid).sort();
-    const members = picks.filter(tt.match).map((p) => p.uid).sort();
-    if (tt.explorerExact) {
-      exact++;
-      assert.deepEqual(linked, members, tt.id);
-    } else {
-      // An approximation is a superset: it never hides a member.
-      for (const u of members) assert.ok(linked.includes(u), `${tt.id} keeps ${u}`);
-    }
+    const members = picks.filter((p) => isCountable(p) && tt.match(p)).map((p) => p.uid).sort();
+    assert.deepEqual(linked, members, tt.id);
   }
-  assert.ok(exact >= all.length - 1);
   assert.ok(MODEL_SHADOW_TAGS.every((tag) => !['value', 'near_value', 'prop_value', 'prop_near_value', 'ai_watch', 'published', 'published_bet'].includes(tag)));
 });
 

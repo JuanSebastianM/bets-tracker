@@ -2,3 +2,12 @@
 .settings .settings-presets { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-1); }
 .settings .settings-presets li { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
 .settings .kv-chips { justify-content: flex-end; }
+/* feed script version (fixes) */
+.settings .settings-script { display: grid; gap: var(--sp-2); padding-top: var(--sp-3); border-top: 1px solid var(--c-line); }
+.settings .settings-script-title { font-size: var(--fs-sm); font-weight: 600; margin: 0; }
+.settings .settings-script code { font-family: var(--font-num); font-size: var(--fs-sm); overflow-wrap: anywhere; }
+.settings .settings-script-state { display: flex; gap: var(--sp-2); align-items: flex-start; margin: 0; padding: var(--sp-2) var(--sp-3); border-radius: var(--r-card); background: var(--c-info-soft); }
+.settings .settings-script-state > .icon { flex: none; margin-top: 1px; color: var(--c-info); }
+.settings .settings-script.is-current .settings-script-state { background: var(--c-surface-2); }
+.settings .settings-script.is-current .settings-script-state > .icon { color: var(--c-accent); }
+.settings .settings-script p { margin: 0; }

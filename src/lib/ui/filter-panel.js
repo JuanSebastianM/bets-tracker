@@ -22,6 +22,7 @@ import {
 } from '../../data/filters.js';
 import { TAG_GROUPS, tagLabel } from '../../data/tags.js';
 import { LINE_SCOPES, lineLabel, lineScopeLabel, parseLineKey } from '../../data/lines.js';
+import { TEST_FILTERS, testLabel } from '../../data/tests-config.js';
 import { useSettings, savePreset, deletePreset } from '../../data/settings.js';
 import { Icon } from './icons.js';
 import { Button, IconButton, FilterChip, SegmentedControl, RangeInput, SearchInput, TextField } from './controls.js';
@@ -31,7 +32,7 @@ import { Button, IconButton, FilterChip, SegmentedControl, RangeInput, SearchInp
 /** @typedef {import('../../data/types').Pick} Pick */
 
 /** Section ids in display order (the most used first). Pass some in `hide` to leave them out. */
-export const FILTER_SECTIONS = ['q', 'source', 'tag', 'price', 'date', 'market', 'line', 'status', 'league', 'book', 'close', 'ref', 'sample', 'fuerza', 'reason', 'numbers'];
+export const FILTER_SECTIONS = ['q', 'source', 'tag', 'test', 'price', 'date', 'market', 'line', 'status', 'league', 'book', 'close', 'ref', 'sample', 'fuerza', 'reason', 'numbers'];
 const OPEN_BY_DEFAULT = ['q', 'source', 'tag', 'price', 'date', 'line'];
 /** Long lists show this many options until "show all". */
 const SHORT_LIST = 12;
@@ -87,6 +88,8 @@ export function optionLabel(field, v) {
       return t(`lines.side.${v}`);
     case 'lines':
       return lineLabel(v);
+    case 'tests':
+      return testLabel(v);
     default:
       return v;
   }
@@ -134,6 +137,8 @@ export function entryLabel(e, f) {
     }
     case 'passedAll':
       return t('lines.filter.entryPassedAll', { v: t(`filters.${v}`) });
+    case 'tests':
+      return t('filters.entry.test', { label: testLabel(v) });
     default:
       return optionLabel(e.field, v);
   }
@@ -291,6 +296,11 @@ export function FilterPanel({ picks, filters: f, onChange, hide = [], today, tes
       )}
     </div>`)}
 
+    ${options.tests.length || f.tests.length
+      ? sec('test', t('filters.test'), f.tests.length, html`<${TestSection} options=${options.tests} counts=${counts.tests} selected=${f.tests}
+          onToggle=${(/** @type {string} */ v) => toggleIn('tests', v)} />`)
+      : null}
+
     ${sec('price', t('filters.price'), priceActive, html`
       <div class="fp-chips" role="group" aria-label=${t('filters.price')}>
         ${PRICE_PRESETS.filter((p) => !p.hidden || f.pricePreset === p.id).map((p) => {
@@ -384,6 +394,31 @@ export function FilterPanel({ picks, filters: f, onChange, hide = [], today, tes
     ${sec('numbers', t('filters.numbers'), rangeOn(f.ev) + rangeOn(f.prob), html`
       <${PercentRange} label=${t('filters.ev')} value=${f.ev} onValue=${(/** @type {any} */ ev) => set({ ev })} />
       <${PercentRange} label=${t('filters.prob')} value=${f.prob} onValue=${(/** @type {any} */ prob) => set({ prob })} />`)}
+  </div>`;
+}
+
+/** Test kinds in the "Prueba" section, in display order (tests-config.js TEST_FILTERS kinds). */
+const TEST_KINDS = /** @type {const} */ (['frozen', 'price_first', 'stopped']);
+
+/**
+ * The "Prueba" section: the frozen tests, the price-first tests and the stopped categories, each with
+ * how many picks it would give under the other filters (a pick can be in several tests).
+ * @param {{ options: Array<{ value: string, count: number }>, counts: Record<string, number>, selected: string[], onToggle: (v: string) => void }} props
+ */
+function TestSection({ options, counts, selected, onToggle }) {
+  const kindOf = (/** @type {string} */ id) => (TEST_FILTERS.find((x) => x.id === id) || { kind: 'stopped' }).kind;
+  // A selected test with no rows in this dataset still shows, so its chip can be turned off.
+  const all = [...options, ...selected.filter((id) => !options.some((o) => o.value === id)).map((value) => ({ value, count: 0 }))];
+  return html`<div class="fp-groups" data-testid="fp-tests">
+    ${TEST_KINDS.map((kind) => {
+      const list = all.filter((o) => kindOf(o.value) === kind);
+      return list.length
+        ? html`<div class="fp-group">
+            <h4 class="fp-group-title">${t(`filters.testGroup.${kind}`)}</h4>
+            <${ChipGroup} field="tests" label=${t(`filters.testGroup.${kind}`)} options=${list} selected=${selected} counts=${counts} onToggle=${onToggle} />
+          </div>`
+        : null;
+    })}
   </div>`;
 }
 

@@ -28,10 +28,8 @@ export const FROZEN_RULE = {
  * @property {string} since       the Decisiones row or rule that set it up
  * @property {(p: Pick) => boolean} match membership (shadow picks only)
  * @property {number} [decisionRow] the Decisiones row that defines the test (all are decided by row 111)
- * @property {Partial<import('./filters.js').FilterState>} [explorer] closest Explorer filter (a superset
- *   when the membership has conditions the filters cannot express)
- * @property {boolean} [explorerExact] true when `explorer` selects exactly the rows `match` accepts
- *   (unit-tested); false means the link is an approximation and the screen says so
+ * @property {Partial<import('./filters.js').FilterState>} explorer the Explorer filter of the link: the
+ *   test itself (`{ tests: [id] }`, URL `test=<id>`), so it selects exactly the rows the test counts
  */
 
 /** Tolerance for "z of 2 or more": a mean exactly 2 SE above zero passes despite floating-point error. */
@@ -47,13 +45,6 @@ const inBand = (/** @type {Pick} */ p) => p.price != null && p.price >= 1.7 && p
  * @type {import('./types').TagId[]}
  */
 export const MODEL_SHADOW_TAGS = ['cards_under', 'team_corners', 'corner_rejects', 'model_only_shots', 'shadow_rule30', 'shadow', 'low_edge', 'filter_reject'];
-const MODEL_NO_SOLO = MODEL_SHADOW_TAGS.filter((x) => x !== 'model_only_shots');
-// review.py's classes as market families. Exact for every raw market Sombra has used (15 Nov 2026);
-// 'Córners 1X2' (class corners) and 'Más tarjetas' (family cards_team, class result) appear only in Grok.
-const CORNERS_CLASS = ['corners_total'];
-const CARDS_CLASS = ['cards_total', 'cards_team'];
-const MATCH_SHOTS_RAW = ['Tiros (total)', 'Tiros totales', 'Tiros al arco (total)', 'Tiros al arco totales'];
-const TEAM_SHOTS_RAW = ['Tiros (equipo)', 'Tiros equipo', 'Tiros al arco (equipo)', 'Tiros al arco equipo'];
 
 /** @type {FrozenTest[]} */
 export const FROZEN_TESTS = [
@@ -63,8 +54,7 @@ export const FROZEN_TESTS = [
     startDate: '2026-10-13',
     since: 'Decisiones 70',
     decisionRow: 70,
-    explorer: { sources: ['shadow'], tags: MODEL_SHADOW_TAGS, markets: [...CORNERS_CLASS, ...CARDS_CLASS], dateFrom: '2026-10-13', passedAll: true },
-    explorerExact: true,
+    explorer: { tests: ['rule30_pass_all'] },
     match: (p) => shadowModel(p) && (p.reviewClass === 'corners' || p.reviewClass === 'cards') && p.date >= '2026-10-13' && p.parsed.passedAll,
   },
   {
@@ -73,8 +63,7 @@ export const FROZEN_TESTS = [
     startDate: '2026-11-01',
     since: 'Decisiones 84',
     decisionRow: 84,
-    explorer: { sources: ['shadow'], tags: MODEL_SHADOW_TAGS, markets: CARDS_CLASS, sides: ['under'], dateFrom: '2026-11-01', price: { min: 1.7, max: 4 } },
-    explorerExact: true,
+    explorer: { tests: ['cards_under'] },
     match: (p) => shadowModel(p) && p.reviewClass === 'cards' && p.side === 'under' && p.date >= '2026-11-01' && inBand(p),
   },
   {
@@ -83,11 +72,7 @@ export const FROZEN_TESTS = [
     startDate: '2026-11-01',
     since: 'Decisiones 84',
     decisionRow: 85,
-    explorer: {
-      sources: ['shadow'], tags: MODEL_SHADOW_TAGS, markets: CARDS_CLASS, sides: ['under'], lines: ['cards:under:4.5', 'cards_team:under:4.5'],
-      dateFrom: '2026-11-01', price: { min: 1.7, max: 4 },
-    },
-    explorerExact: true,
+    explorer: { tests: ['under45_control'] },
     match: (p) =>
       shadowModel(p) && p.reviewClass === 'cards' && p.side === 'under' && p.date >= '2026-11-01' && inBand(p) && /under\s*4[.,]5/i.test(p.selection),
   },
@@ -97,8 +82,7 @@ export const FROZEN_TESTS = [
     startDate: '2026-11-09',
     since: 'Decisiones 106',
     decisionRow: 106,
-    explorer: { sources: ['shadow'], tags: ['corner_rejects'], dateFrom: '2026-11-09' },
-    explorerExact: true,
+    explorer: { tests: ['corner_rejects'] },
     match: (p) => p.source === 'shadow' && p.tag === 'corner_rejects' && p.date >= '2026-11-09',
   },
   {
@@ -107,9 +91,7 @@ export const FROZEN_TESTS = [
     startDate: null,
     since: 'Regla 32, Decisiones 88',
     decisionRow: 88,
-    // "passed every filter OR dated 3 Nov or later" is an OR the filters cannot express: a superset.
-    explorer: { sources: ['shadow'], tags: MODEL_SHADOW_TAGS, markets: ['corners_team'] },
-    explorerExact: false,
+    explorer: { tests: ['team_corners'] },
     match: (p) => shadowModel(p) && p.reviewClass === 'team_corners' && (p.parsed.passedAll || p.date >= '2026-11-03'),
   },
   {
@@ -118,8 +100,7 @@ export const FROZEN_TESTS = [
     startDate: null,
     since: 'Decisiones 66, 91',
     decisionRow: 91,
-    explorer: { sources: ['shadow'], tags: ['model_only_shots'], price: { min: 1.7, max: 4 } },
-    explorerExact: true,
+    explorer: { tests: ['model_only_shots'] },
     match: (p) => p.source === 'shadow' && p.tag === 'model_only_shots' && inBand(p),
   },
   {
@@ -128,8 +109,7 @@ export const FROZEN_TESTS = [
     startDate: null,
     since: 'Regla 25',
     decisionRow: 64,
-    explorer: { sources: ['shadow'], tags: MODEL_NO_SOLO, markets: ['shots'], marketsRaw: MATCH_SHOTS_RAW },
-    explorerExact: true,
+    explorer: { tests: ['match_total_shots'] },
     match: (p) => shadowModel(p) && p.reviewClass === 'shots' && !isTeamShots(p.marketRaw) && p.tag !== 'model_only_shots',
   },
   {
@@ -138,8 +118,7 @@ export const FROZEN_TESTS = [
     startDate: null,
     since: 'Regla 18',
     decisionRow: 5,
-    explorer: { sources: ['shadow'], tags: MODEL_SHADOW_TAGS, markets: CORNERS_CLASS, reasons: ['rule18'] },
-    explorerExact: true,
+    explorer: { tests: ['relaxed_sample_corners'] },
     match: (p) => shadowModel(p) && p.reviewClass === 'corners' && p.parsed.filters.includes('rule18'),
   },
 ];
@@ -351,10 +330,10 @@ export function propCloseEv(p) {
 
 /** @type {PriceFirstTest[]} */
 export const PRICE_FIRST_TESTS = [
-  { id: 'value', tag: 'value', sheetLabel: 'VALOR', decisionRows: [79, 80, 108], rule: 'value', startDate: null, explorer: { sources: ['shadow'], tags: ['value'] } },
-  { id: 'near_value', tag: 'near_value', sheetLabel: 'VALOR CASI', decisionRows: [58, 80], rule: 'context', startDate: null, explorer: { sources: ['shadow'], tags: ['near_value'] } },
-  { id: 'prop_value', tag: 'prop_value', sheetLabel: 'VALOR PROP', decisionRows: [97], rule: 'prop', startDate: null, explorer: { sources: ['shadow'], tags: ['prop_value'] } },
-  { id: 'prop_near_value', tag: 'prop_near_value', sheetLabel: 'VALOR PROP CASI', decisionRows: [97], rule: 'context', startDate: null, explorer: { sources: ['shadow'], tags: ['prop_near_value'] } },
+  { id: 'value', tag: 'value', sheetLabel: 'VALOR', decisionRows: [79, 80, 108], rule: 'value', startDate: null, explorer: { tests: ['value'] } },
+  { id: 'near_value', tag: 'near_value', sheetLabel: 'VALOR CASI', decisionRows: [58, 80], rule: 'context', startDate: null, explorer: { tests: ['near_value'] } },
+  { id: 'prop_value', tag: 'prop_value', sheetLabel: 'VALOR PROP', decisionRows: [97], rule: 'prop', startDate: null, explorer: { tests: ['prop_value'] } },
+  { id: 'prop_near_value', tag: 'prop_near_value', sheetLabel: 'VALOR PROP CASI', decisionRows: [97], rule: 'context', startDate: null, explorer: { tests: ['prop_near_value'] } },
 ];
 
 /**
@@ -397,11 +376,18 @@ function line(rows, get) {
 const clearsValueGate = (l) => l.ev.n >= VALUE_RULE.minWithEv && l.ev.mean > 0 && l.summary.yield != null && l.summary.yield > 0;
 
 /**
+ * The rows a price-first test counts: its Sombra tag, from its start date, countable rows only.
+ * @param {PriceFirstTest} test
+ * @returns {(p: Pick) => boolean}
+ */
+export const priceFirstMember = (test) => (p) => p.source === 'shadow' && isCountable(p) && p.tag === test.tag && (!test.startDate || p.date >= test.startDate);
+
+/**
  * Progress of a price-first test, with its own rule.
  * @param {PriceFirstTest} test @param {Pick[]} picks
  */
 export function priceFirstProgress(test, picks) {
-  const rows = picks.filter((p) => p.source === 'shadow' && isCountable(p) && p.tag === test.tag && (!test.startDate || p.date >= test.startDate));
+  const rows = picks.filter(priceFirstMember(test));
   const pending = rows.filter((p) => p.status === 'pending').length;
   const slates = new Set(rows.map((p) => p.date)).size;
   const base = { test, rows, pending, slates, perSlate: slates ? rows.length / slates : null };
@@ -457,8 +443,7 @@ export function priceFirstProgress(test, picks) {
  * @property {string} stoppedOn YYYY-MM-DD
  * @property {number} decisionRow
  * @property {(p: Pick) => boolean} match
- * @property {Partial<import('./filters.js').FilterState>} explorer
- * @property {boolean} [explorerExact] as in FrozenTest
+ * @property {Partial<import('./filters.js').FilterState>} explorer as in FrozenTest
  */
 
 /** @type {StoppedCategory[]} */
@@ -466,44 +451,37 @@ export const STOPPED_CATEGORIES = [
   {
     id: 'ai_watch_corners', sheetLabel: 'IA-WATCH (córners)', stoppedOn: '2026-10-29', decisionRow: 76,
     match: (p) => p.source === 'shadow' && p.tag === 'ai_watch' && p.reviewClass === 'corners',
-    explorer: { sources: ['shadow'], tags: ['ai_watch'], markets: CORNERS_CLASS },
-    explorerExact: true,
+    explorer: { tests: ['ai_watch_corners'] },
   },
   {
     id: 'ai_watch_cards', sheetLabel: 'IA-WATCH (tarjetas)', stoppedOn: '2026-11-02', decisionRow: 88,
     match: (p) => p.source === 'shadow' && p.tag === 'ai_watch' && p.reviewClass === 'cards',
-    explorer: { sources: ['shadow'], tags: ['ai_watch'], markets: CARDS_CLASS },
-    explorerExact: true,
+    explorer: { tests: ['ai_watch_cards'] },
   },
   {
     id: 'team_corner_rejects', sheetLabel: 'CÓRNERS EQUIPO (rechazos)', stoppedOn: '2026-11-02', decisionRow: 88,
     match: (p) => shadowModel(p) && p.reviewClass === 'team_corners' && !p.parsed.passedAll && p.date < '2026-11-03',
-    explorer: { sources: ['shadow'], tags: MODEL_SHADOW_TAGS, markets: ['corners_team'], dateTo: '2026-11-02', passedAll: false },
-    explorerExact: true,
+    explorer: { tests: ['team_corner_rejects'] },
   },
   {
     id: 'team_shots', sheetLabel: 'Tiros y tiros al arco de equipo', stoppedOn: '2026-11-02', decisionRow: 88,
     match: (p) => shadowModel(p) && p.reviewClass === 'shots' && isTeamShots(p.marketRaw) && p.tag !== 'model_only_shots',
-    explorer: { sources: ['shadow'], tags: MODEL_NO_SOLO, markets: ['shots'], marketsRaw: TEAM_SHOTS_RAW },
-    explorerExact: true,
+    explorer: { tests: ['team_shots'] },
   },
   {
     id: 'corner_card_fillers', sheetLabel: 'Rellenos de córners y tarjetas (rechazos)', stoppedOn: '2026-11-08', decisionRow: 103,
     match: (p) => p.source === 'shadow' && p.tag === 'filter_reject' && (p.reviewClass === 'corners' || p.reviewClass === 'cards') && p.date <= '2026-11-08',
-    explorer: { sources: ['shadow'], tags: ['filter_reject'], markets: [...CORNERS_CLASS, ...CARDS_CLASS], dateTo: '2026-11-08' },
-    explorerExact: true,
+    explorer: { tests: ['corner_card_fillers'] },
   },
   {
     id: 'shots_fillers', sheetLabel: 'Rellenos de tiros (rechazos)', stoppedOn: '2026-10-24', decisionRow: 64,
     match: (p) => p.source === 'shadow' && p.tag === 'filter_reject' && p.reviewClass === 'shots' && p.date <= '2026-10-24',
-    explorer: { sources: ['shadow'], tags: ['filter_reject'], markets: ['shots'], dateTo: '2026-10-24' },
-    explorerExact: true,
+    explorer: { tests: ['shots_fillers'] },
   },
   {
     id: 'model_only_shots_low', sheetLabel: 'MODELO SOLO bajo 1.70', stoppedOn: '2026-11-03', decisionRow: 91,
     match: (p) => p.source === 'shadow' && p.tag === 'model_only_shots' && p.price != null && p.price < 1.7,
-    explorer: { sources: ['shadow'], tags: ['model_only_shots'], pricePreset: 'lt170' },
-    explorerExact: true,
+    explorer: { tests: ['model_only_shots_low'] },
   },
 ];
 
@@ -521,3 +499,52 @@ export function stoppedSummary(cat, picks) {
   }
   return { category: cat, rows, summary: summarize(rows), first, last };
 }
+
+// ---------------------------------------------------------------- the filter by test (URL key `test`)
+// filters.js imports this block (one way only: nothing here imports filters.js at run time).
+
+/**
+ * One entry per test the Tests screen shows: the frozen tests, the price-first tests and the stopped
+ * categories, in that order. `member` is exactly the rows the test counts on its card: frozenProgress,
+ * priceFirstProgress and stoppedSummary filter with the same predicates (countable rows, pending
+ * included), so a link with `{ tests: [id] }` shows in the Explorer the card's own row count.
+ * @typedef {object} TestFilterEntry
+ * @property {string} id
+ * @property {'frozen' | 'price_first' | 'stopped'} kind
+ * @property {string} sheetLabel
+ * @property {(p: Pick) => boolean} member
+ */
+
+/** @type {TestFilterEntry[]} */
+export const TEST_FILTERS = [
+  ...FROZEN_TESTS.map((x) => ({ id: x.id, kind: /** @type {const} */ ('frozen'), sheetLabel: x.sheetLabel, member: (/** @type {Pick} */ p) => isCountable(p) && x.match(p) })),
+  ...PRICE_FIRST_TESTS.map((x) => ({ id: x.id, kind: /** @type {const} */ ('price_first'), sheetLabel: x.sheetLabel, member: priceFirstMember(x) })),
+  ...STOPPED_CATEGORIES.map((x) => ({ id: x.id, kind: /** @type {const} */ ('stopped'), sheetLabel: x.sheetLabel, member: (/** @type {Pick} */ p) => isCountable(p) && x.match(p) })),
+];
+
+/** Every test id, in display order (unique across the three kinds; unit-tested). */
+export const TEST_IDS = TEST_FILTERS.map((x) => x.id);
+
+/** The entry of a test id, or null. @param {string} id */
+export const testFilterEntry = (id) => TEST_FILTERS.find((x) => x.id === id) || null;
+
+/** The sheet's own label of a test ("CÓRNERS EQUIPO (pasó todos los filtros)"); the id when unknown. @param {string} id */
+export const testLabel = (id) => (testFilterEntry(id) || { sheetLabel: id }).sheetLabel;
+
+/** @type {WeakMap<Pick, string[]>} */
+const membership = new WeakMap();
+
+/**
+ * The ids of the tests a pick belongs to (memoised per pick: a dataset's picks never change).
+ * @param {Pick} p
+ * @returns {string[]}
+ */
+export function testIdsOf(p) {
+  let ids = membership.get(p);
+  if (!ids) {
+    ids = TEST_FILTERS.filter((x) => x.member(p)).map((x) => x.id);
+    membership.set(p, ids);
+  }
+  return ids;
+}
+

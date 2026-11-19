@@ -33,6 +33,7 @@ src/
   main.js, app.js       boot, router (hash routes), layout, nav
   config.js             FEED_URL, schema version
   version.js            stamped by the deploy
+  feed-version.js       the Feed.gs version the app expects (stamped by scripts/stamp-feed.mjs)
   data/                 feed.js, normalize.js, tags.js, notes.js, filters.js, stats.js, simulate.js,
                         summaries.js, store.js (signals/state), settings.js (localStorage),
                         tests-config.js (frozen tests, review schedule), types.d.ts
@@ -46,7 +47,8 @@ src/
   content/              glossary.es.json, glossary.en.json, rules.es.json, rules.en.json
   styles/               tokens.css (light + dark), base.css, components.css
 scripts/                bin.mjs, serve.mjs, build-site.mjs, check-i18n.mjs, make-icons.mjs, vendor-build.mjs,
-                        make-fixture.mjs (regenerates tests/fixtures/feed.json, deterministic)
+                        make-fixture.mjs (regenerates tests/fixtures/feed.json, deterministic),
+                        stamp-feed.mjs (npm run feed:stamp: the feed script version)
 tests/
   fixtures/             synthetic feed JSON (never real sheet data)
   unit/                 *.test.mjs
@@ -94,23 +96,27 @@ column is painted on `.app`, so it runs the full height of long pages). Detail r
 | Overview | `date` (`30d`, `7d`, `last_slate`; the filters' own date key) |
 | Explorer | the filter keys (below) + `sort`, `dir`, `page` |
 | Simulator | the filter keys + `mode`, `stake`, `pct`, `bank`, `kf`, `kcap`; scenario B in `b` (its own query string) |
-| Tests | `open` (the test whose card is open); other keys (Overview's `date`) are kept |
+| Tests | `open` (the test whose card is open); other keys (Overview's `date`) are kept. Its Explorer links use the filter key `test` |
 | Analysis | the filter keys + `dim`, `dim2`, `sort`, `dir`, `measure`, `minn`, `small`, `series` (the part is in the path) |
 | Decisions | `q`, `st`, `th`, `from`, `to`, `view` (`now`), `page` |
 | Glossary | `tab` (`rules`), `q`, `cat`, `state` |
 
 Filter keys (`src/data/filters.js` toQuery): `src, tag, mkt, mraw, lg, book, st, ref, sample, fz, why, side,
-line` (lists), `price` (preset) or `pmin/pmax`, `date` (preset), `from`, `to`, `slate`, `close`, `close2`,
+line, test` (lists; `test` holds ids of the Tests section's tests and stopped categories), `price` (preset) or `pmin/pmax`, `date` (preset), `from`, `to`, `slate`, `close`, `close2`,
 `evmin/evmax`, `prmin/prmax`, `pass`, `q`.
 
 ### Banners
 
 The fixture banner and the offline / stale banner show on every page; the "missing columns" banner only
-on the Overview and Settings (Settings lists the columns).
+on the Overview and Settings (Settings lists the columns), and so does the "different feed script" banner
+(`meta.scriptVersion` is not the version in `src/feed-version.js`, or is missing; dismissible for the
+session; Settings shows both versions and what to do).
 
 ### Filters (shared by Explorer and Simulator)
 
-Source; tag (multi); market family and raw market; league; book; status; price range with presets
+Source; tag (multi); test (the frozen and price-first tests and the stopped categories of
+`src/data/tests-config.js`, by their own membership functions: `test=team_corners` shows exactly the rows
+that test counts); market family and raw market; league; book; status; price range with presets
 (`≤ 1.70`; `1.70–2.00`; `< 2.00`; `≤ 2.00`; `> 2.00, ≤ 2.50`; `≤ 2.50`; `> 2.50, ≤ 4.00`; `≤ 4.00`; `> 4.00`; each
 label is built from its bounds by `priceRangeLabel`, and "a–b" means both ends included) and custom min/max; date range with presets (last
 slate, 7 days, 30 days, this month, since a date) and single slate date; has closing price; has two-sided
@@ -154,5 +160,7 @@ orchestrator after review.
 ## Changing the feed
 
 `apps-script/Feed.gs` is copied by hand into the sheet's Apps Script project and redeployed (README has
-the steps). Bump `schema` when the shape changes; the app refuses a newer schema with a clear message
+the steps). After editing it run `npm run feed:stamp` (the script version, DATA_CONTRACT "Script
+version"; `npm run check` fails until you do); after redeploying, Settings shows whether the sheet runs
+that version. Bump `schema` when the shape changes; the app refuses a newer schema with a clear message
 instead of misreading it.

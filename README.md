@@ -80,7 +80,8 @@ list. Keys: the filter keys plus `sort`, `dir`, `page`.
 
 **The filter panel** (`src/lib/ui/filter-panel.js`, a bottom sheet on phones, a side column from
 1200 px): source; tag (grouped: price-first tests, model tests, published, rejects and watch, real bets,
-Grok); market family and raw market; **line and side** (Over / Under chips and the lines that exist under
+Grok); market family and raw market; **test** (each frozen and price-first test and each stopped category,
+by its own membership: the Tests links use it, so they are exact); **line and side** (Over / Under chips and the lines that exist under
 the other filters, "Under 4.5 · 11", grouped by kind of market when they mix: TARJETAS UNDER + Under 4.5
 is two taps); league (searchable); book; status; price presets (`≤ 1.70`, `1.70–2.00`, `< 2.00`, `≤ 2.00`,
 `> 2.00, ≤ 2.50`, `≤ 2.50`, `> 2.50, ≤ 4.00`, `≤ 4.00`, `> 4.00`, each label built from its bounds) or a
@@ -106,8 +107,9 @@ last "Revisión Sombra" decision) with two meters and past reviews, then one com
 expands in place: the frozen model tests (graded out of 100, two-sided closes out of 50, mean price
 against the close with ±2 SE drawn against zero, the state and the rule in words, flat results marked
 "context, decides nothing", a projected decision date) and the price-first tests (VALOR, VALOR CASI,
-VALOR PROP, VALOR PROP CASI) with their own rules. Stopped categories sit in one disclosure. Key: `open`
-(the expanded test).
+VALOR PROP, VALOR PROP CASI) with their own rules. Stopped categories sit in one disclosure. Every card
+links to exactly its rows in the Explorer ("Ver las 34 filas en el Explorador", filter key `test`, pending
+rows included, the same count the Explorer shows). Key: `open` (the expanded test).
 
 **Analysis** (`#/analysis/:part`, parts `breakdown`, `calibration`, `close`, `grok`). Breakdown by 16
 dimensions (tag, market, raw market, league, book, price band, month, weekday, model-probability band,
@@ -138,7 +140,8 @@ inline elsewhere in the app. Content in `src/content/{glossary,rules}.{es,en}.js
 
 **Settings** (`#/settings`, also reachable from "Más" on phones). Language, theme (auto, light, dark),
 bankroll, unit value and currency label (on this device only), default simulator stake, saved filters,
-feed status (source, last sync, "sheet read at", rows per tab, redactions, missing columns), app status
+feed status (source, last sync, "sheet read at", rows per tab, redactions, missing columns, and whether
+the sheet runs the feed script version this app expects, with what to do when not), app status
 and update button, version and schema.
 
 ## 3. Architecture
@@ -233,7 +236,7 @@ Screens format numbers (`src/lib/format.js`) and never compute them. The deliber
 
 Hash routes (`#/explorer/shadow:412?tag=value`). The filter state is one plain object
 (`src/data/filters.js`) serialised to the query: `src, tag, mkt, mraw, lg, book, st, ref, sample, fz,
-why, side, line` (lists), `price` (preset) or `pmin`/`pmax`, `date`, `from`, `to`, `slate`, `close`,
+why, side, line, test` (lists), `price` (preset) or `pmin`/`pmax`, `date`, `from`, `to`, `slate`, `close`,
 `close2`, `evmin`/`evmax`, `prmin`/`prmax`, `pass`, `q`. Settings and saved filters are in `localStorage`
 (`bt.*`); the feed copy in IndexedDB. Derived stats are memoised on the dataset version and the query.
 A 5,000-pick test (`tests/unit/polish-perf.test.mjs`) holds normalize, a filter change with every facet
@@ -348,14 +351,24 @@ Pinnacle script; an annotation in a new file narrows the scopes of the whole pro
 stopped the Pinnacle trigger until someone re-authorised it. The feed needs nothing beyond what was
 already granted. The next trigger run after the install completed normally.
 
-**Self-test.** In the editor, choose `btFeedSelfTest` and run it. The log shows rows per tab,
-`meta.redactions`, `meta.missingHeaders` (should be `[]`), the JSON size, and "money marker left: no".
-Run it before every deploy.
+**Self-test.** In the editor, choose `btFeedSelfTest` and run it. The log shows the script version,
+rows per tab, `meta.redactions`, `meta.missingHeaders` (should be `[]`), the JSON size, and "money marker
+left: no". Run it before every deploy.
+
+**Script version.** `BT_FEED_SCRIPT_VERSION` is derived from the file's own content (the first 12 hex
+characters of its SHA-256 with that value blanked). After any edit to `Feed.gs`, run `npm run feed:stamp`:
+it writes the new value into `Feed.gs`, `src/feed-version.js` (the version the app expects) and the
+fixture; `npm run check` fails until you do. The feed returns it as `meta.scriptVersion`, and the cache keys
+carry it. Settings → "Datos de la hoja" shows the version in the sheet, the version the app expects and
+whether they match; when they do not (or the sheet's script is older than the field), a calm banner on the
+Overview and Settings says so. The data keeps showing either way.
 
 **Redeploy after a change.** Paste the new file over `Feed.gs`, run `btFeedSelfTest`, then Implementar →
 Gestionar implementaciones → the existing deployment → edit → Versión: "Nueva versión" → Implementar.
 The `/exec` URL stays the same. Bump `BT_FEED_SCHEMA` (and the app's `FEED_SCHEMA`) only when the JSON
-shape changes. Run `btFeedClearCache` to drop the 5-minute cache at once.
+shape changes. Run `btFeedClearCache` to drop the 5-minute cache at once. Then check Settings → "Datos de
+la hoja": after a refresh the script version should say it is up to date (without `btFeedClearCache` the
+old cached response can take up to 5 minutes to turn over).
 
 **Rotate the URL (kill switch).** Implementar → Gestionar implementaciones → archive the deployment (the
 URL stops working at once) → Nueva implementación with the same settings → put the new `/exec` URL in
@@ -567,20 +580,16 @@ See section 8.
 
 - Scrubbing is best effort (section 4). Units, notes and team names are public through the feed.
 - The sheet has no slate *run* date, so "slate date" is the match date.
-- One Tests link (CÓRNERS EQUIPO: "passed every filter" or a date) stays approximate; the weekday
-  breakdown has no Explorer link (there is no weekday filter).
+- The weekday breakdown has no Explorer link (there is no weekday filter).
 - VALOR PROP's decision row mentions a bootstrap by match; neither `review.py` nor the app runs one.
 - The Grok part of Analysis ignores the source and tag filters (a banner says so).
 - Decision themes are derived from the topic text by patterns; a new kind of topic can land in a
   debatable theme.
-- After any change to `Feed.gs`, the deployed script must be redeployed by hand; nothing checks that the
-  deployed version matches the repository. A "script version" field in `meta` would make that visible
-  in Settings.
 - Real-volume speed is tested on 5,000 synthetic picks; the time budgets can fail on a heavily loaded
   machine (seen once while several agents ran at once).
 - Not tried with a real screen reader.
-- Ideas: a weekday filter; a per-tag "what changed since the last review" view; showing the deployed
-  feed script version; exporting a filtered view as CSV (units only).
+- Ideas: a weekday filter; a per-tag "what changed since the last review" view; exporting a filtered
+  view as CSV (units only).
 
 ## 9. Resumen en español
 

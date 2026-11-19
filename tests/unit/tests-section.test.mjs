@@ -132,7 +132,7 @@ test('frozen tests carry a decision row and an Explorer filter', () => {
   for (const t of FROZEN_TESTS) {
     assert.ok(Number.isInteger(t.decisionRow), t.id);
     const qs = toQueryString({ ...defaultFilters(), ...t.explorer });
-    assert.match(qs, /src=shadow/, t.id);
+    assert.equal(qs, `test=${t.id}`, t.id);
   }
   assert.equal(FROZEN_RULE.decisionRow, 111);
 });

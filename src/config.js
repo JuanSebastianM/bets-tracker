@@ -27,3 +27,6 @@ export const STORAGE_PREFIX = 'bt.';
 
 /** Rows per page in lists. */
 export const PAGE_SIZE = 50;
+
+/** README section with the feed script's redeploy steps (linked from Settings when the versions differ). */
+export const FEED_SCRIPT_DOCS_URL = 'https://github.com/JuanSebastianM/bets-tracker#5-the-feed-script';

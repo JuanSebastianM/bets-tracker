@@ -124,6 +124,8 @@
     "noMatches": "sin picks",
     "showAll": "Ver todas ({n})",
     "showLess": "Ver menos",
+    "test": "Prueba",
+    "testGroup": { "frozen": "Pruebas congeladas", "price_first": "Pruebas de precio (VALOR)", "stopped": "Categorías detenidas" },
     "tagGroup": { "price_first": "Pruebas de precio (VALOR)", "model_tests": "Pruebas del modelo", "published": "Publicadas", "rejects": "Rechazos y vigilancia", "bets": "Apuestas reales", "grok": "Grok" },
     "saved": "Filtros guardados",
     "savedEmpty": "Todavía no guardas ninguno. Arma un filtro y guárdalo con un nombre.",
@@ -137,7 +139,7 @@
     "starting": "Para empezar",
     "startingHint": "Llenan el panel; puedes ajustar después.",
     "builtin": { "value_le200": "VALOR ≤ 2.00", "near_value_le200": "VALOR CASI ≤ 2.00", "cards_under": "Tarjetas under", "team_corners_10": "Córners equipo, muestra 10+", "prop_value": "VALOR PROP y PROP CASI", "real_bets": "Solo apuestas reales", "two_sided_close": "Sombra con cierre de dos lados" },
-    "entry": { "price": "Cuota {range}", "date": "Fecha: {range}", "ev": "EV {range}", "prob": "Prob. {range}", "q": "«{q}»", "slate": "Slate {date}", "hasClose": "Cierre: {v}", "twoSidedClose": "Cierre 2 lados: {v}", "sample": "Muestra {v}", "fuerza": "FUERZA {v}" },
+    "entry": { "price": "Cuota {range}", "date": "Fecha: {range}", "ev": "EV {range}", "prob": "Prob. {range}", "q": "«{q}»", "slate": "Slate {date}", "hasClose": "Cierre: {v}", "twoSidedClose": "Cierre 2 lados: {v}", "sample": "Muestra {v}", "fuerza": "FUERZA {v}", "test": "Prueba: {label}" },
     "rangeMin": "≥ {min}",
     "rangeMax": "≤ {max}",
     "rangeBoth": "{min}–{max}"
@@ -156,6 +158,12 @@
     "unconfiguredBody": "La dirección del script de la hoja (FEED_URL en src/config.js) todavía está vacía. Mientras tanto puedes ver la app con datos de ejemplo.",
     "openFixture": "Ver con datos de ejemplo",
     "errorTitle": "No se pudieron cargar los datos",
+    "scriptVersion": {
+      "bannerTitle": "La hoja corre otra versión del script del feed",
+      "bannerBody": "Los datos se siguen viendo normal. Para ponerla al día hay que volver a implementar Feed.gs en la hoja; en Ajustes está cómo.",
+      "bannerOpen": "Ver en Ajustes",
+      "bannerDismiss": "Ocultar por ahora"
+    },
     "error": {
       "offline": "No hay conexión y todavía no hay una copia guardada.",
       "http": "El script de la hoja respondió con un error ({detail}).",
