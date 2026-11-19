@@ -17,3 +17,12 @@ test('the 1X2 three-way shape keeps working', () => {
   const fd = parseFeed('cierre: Sofascore/bet365 2.40 (1 2.40 / X 3.30 / 2 3.00)', 2);
   assert.deepEqual(fd.feedOthers, [3.3, 3]);
 });
+
+test('audit 3: three-way corner and card markets have no line even when the selection has a number', async () => {
+  const { parseLine } = await import('../../src/data/lines.js');
+  for (const [m, fam] of [['Córners 1X2', 'corners_team'], ['Más córners (equipo)', 'corners_team'], ['Tarjetas 1X2', 'cards_team'], ['Más tarjetas (3 vías)', 'cards_team']]) {
+    assert.deepEqual(parseLine(m, 'Uno Over 3.5', fam), { line: null, lineKey: null }, m);
+  }
+  assert.equal(parseLine('Córners equipo', 'Uno córners Over 3.5', 'corners_team').lineKey, 'corners_team:over:3.5');
+  assert.equal(parseLine('Tarjetas totales', 'Under 4.5', 'cards_total').lineKey, 'cards:under:4.5');
+});

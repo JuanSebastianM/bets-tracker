@@ -2,7 +2,7 @@
 // (docs/DATA_CONTRACT.md section 4); everything else derives from it with pure functions.
 
 import { classifyGrok, classifyShadow, marketFamily, reviewClass, sideOf, booksInReason, BOOKS } from './tags.js';
-import { grokSameBook, measure, parseNotes } from './notes.js';
+import { grokPriceBooks, grokSameBook, measure, parseNotes } from './notes.js';
 import { parseLine } from './lines.js';
 
 /** @typedef {import('./types').Pick} Pick */
@@ -136,7 +136,11 @@ function fromGrok(r) {
   const base = { notes, reason: '', market: str(r.market), selection: str(r.selection), price, tag: classifyGrok(verdict) };
   const parsed = parseNotes(base);
   const m = measure(base, parsed);
-  const src = parsed.priceSource;
+  // The book Grok's price came from: only a book whose own noted price equals G (audit 3: the CLV book
+  // was used as a fallback, so the pick sheet said G "coincide con Betano" when it was Kambi's price).
+  const priceBooks = grokPriceBooks(notes, verdict, price);
+  const src = priceBooks.includes(/** @type {any} */ (parsed.priceSource)) ? parsed.priceSource : priceBooks[0] || null;
+  parsed.priceSource = src;
   const own = src && parsed.bookCloses[src] ? parsed.bookCloses[src].close : null;
   // Grok's G is Grok's quote, not necessarily a price at the book whose close is noted: the measures
   // against the close use that book's own opening (review.py's load_grok; rule 34), and no bet365 feed

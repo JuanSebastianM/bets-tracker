@@ -73,6 +73,9 @@ const TOTAL_RE = /(?:^|[^a-záéíóúñ])(over|under|m[áa]s de|menos de)\s*(\d
 const AH_RE = /(?:^|\s)([+\-−–])\s?(\d+(?:[.,]\d+)?)(?!.*[+\-−–]\s?\d)/;
 const AH_ZERO_RE = /(?:^|\s)0(?:[.,]0+)?(?:\s|$)/;
 
+/** Three-way corner and card markets: no line. */
+const THREE_WAY_NO_LINE = /^(?:c[oó]rners 1x2|tarjetas 1x2|m[aá]s c[oó]rners|m[aá]s tarjetas)/i;
+
 /**
  * Line of a selection.
  * @param {string} marketRaw @param {string} selection @param {MarketFamily} family
@@ -82,6 +85,9 @@ export function parseLine(marketRaw, selection, family) {
   const none = { line: null, lineKey: null };
   const sel = String(selection || '').trim();
   if (!sel || family === 'combo' || COMBO_SELECTION.test(sel)) return none;
+  // Three-way corner and card markets ('Córners 1X2', 'Más córners (equipo)', 'Tarjetas 1X2', 'Más
+  // tarjetas (3 vías)') have no line (DATA_CONTRACT section 4), even when the selection carries a number.
+  if (THREE_WAY_NO_LINE.test(String(marketRaw || '').trim())) return none;
   const scope = lineScope(marketRaw, family);
   if (!scope) return none;
   if (scope === 'ah') {

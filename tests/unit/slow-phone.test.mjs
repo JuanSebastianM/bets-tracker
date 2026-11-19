@@ -31,8 +31,11 @@ const STATES = [
  * Round 2 (19 Nov 2026) changed what three filters mean, on purpose: `last_slate` is the last graded
  * slate, the rolling presets have no end date, a `pending_slate` preset exists (one more facet count),
  * and the Over / Under filter skips picks without a line. Recomputed then, with two more states.
+ * Audit 3 (19 Nov 2026): three-way corner and card markets get no line (DATA_CONTRACT section 4), which
+ * removes the fixture's synthetic 'Córners 1X2 | Over 3.5'-shaped rows from line and side results. The
+ * old code gives the previous digest (ad2f6996…) on the same states; only that parse changed.
  */
-const DIGEST_BEFORE = 'ad2f699631f8db5f8ac9404fed63ad2d7060f435560e5bc72b0dcaf32023fc59';
+const DIGEST_BEFORE = '0818b1de3a139861cb60eb650f0522b31af0ffe002f557b93007a331c81991ea';
 
 test('5,000 picks: filters and facet counts give exactly what they gave before the speed-ups', () => {
   const data = normalizeFeed(bigFeed(5000));
