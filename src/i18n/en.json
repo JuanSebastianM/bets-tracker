@@ -124,6 +124,8 @@
     "noMatches": "no picks",
     "showAll": "Show all ({n})",
     "showLess": "Show less",
+    "test": "Test",
+    "testGroup": { "frozen": "Frozen tests", "price_first": "Price-first tests (VALOR)", "stopped": "Stopped categories" },
     "tagGroup": { "price_first": "Price tests (VALOR)", "model_tests": "Model tests", "published": "Published", "rejects": "Rejects and watch", "bets": "Real bets", "grok": "Grok" },
     "saved": "Saved filters",
     "savedEmpty": "Nothing saved yet. Build a filter and save it with a name.",
@@ -137,7 +139,7 @@
     "starting": "Starting points",
     "startingHint": "They fill the panel; adjust from there.",
     "builtin": { "value_le200": "VALOR ≤ 2.00", "near_value_le200": "VALOR CASI ≤ 2.00", "cards_under": "Cards under", "team_corners_10": "Team corners, sample 10+", "prop_value": "VALOR PROP and PROP CASI", "real_bets": "Real bets only", "two_sided_close": "Sombra with a two-sided close" },
-    "entry": { "price": "Price {range}", "date": "Date: {range}", "ev": "EV {range}", "prob": "Prob. {range}", "q": "“{q}”", "slate": "Slate {date}", "hasClose": "Close: {v}", "twoSidedClose": "Two-sided close: {v}", "sample": "Sample {v}", "fuerza": "FUERZA {v}" },
+    "entry": { "price": "Price {range}", "date": "Date: {range}", "ev": "EV {range}", "prob": "Prob. {range}", "q": "“{q}”", "slate": "Slate {date}", "hasClose": "Close: {v}", "twoSidedClose": "Two-sided close: {v}", "sample": "Sample {v}", "fuerza": "FUERZA {v}", "test": "Test: {label}" },
     "rangeMin": "≥ {min}",
     "rangeMax": "≤ {max}",
     "rangeBoth": "{min}–{max}"

@@ -101,7 +101,7 @@ test('links: explorer filter, decisions, glossary, stopped categories', async ({
   await expectNoHorizontalScroll(page);
 
   await d.getByTestId('explorer-corner_rejects').click();
-  await expect(page).toHaveURL(/#\/explorer\?src=shadow&tag=corner_rejects&from=2026-11-09$/);
+  await expect(page).toHaveURL(/#\/explorer\?test=corner_rejects$/);
   await expect(page.getByTestId('explorer-count')).toBeVisible();
 
   await openApp(page, '/tests?open=value');

@@ -80,7 +80,8 @@ list. Keys: the filter keys plus `sort`, `dir`, `page`.
 
 **The filter panel** (`src/lib/ui/filter-panel.js`, a bottom sheet on phones, a side column from
 1200 px): source; tag (grouped: price-first tests, model tests, published, rejects and watch, real bets,
-Grok); market family and raw market; **line and side** (Over / Under chips and the lines that exist under
+Grok); market family and raw market; **test** (each frozen and price-first test and each stopped category,
+by its own membership: the Tests links use it, so they are exact); **line and side** (Over / Under chips and the lines that exist under
 the other filters, "Under 4.5 · 11", grouped by kind of market when they mix: TARJETAS UNDER + Under 4.5
 is two taps); league (searchable); book; status; price presets (`≤ 1.70`, `1.70–2.00`, `< 2.00`, `≤ 2.00`,
 `> 2.00, ≤ 2.50`, `≤ 2.50`, `> 2.50, ≤ 4.00`, `≤ 4.00`, `> 4.00`, each label built from its bounds) or a
@@ -106,8 +107,9 @@ last "Revisión Sombra" decision) with two meters and past reviews, then one com
 expands in place: the frozen model tests (graded out of 100, two-sided closes out of 50, mean price
 against the close with ±2 SE drawn against zero, the state and the rule in words, flat results marked
 "context, decides nothing", a projected decision date) and the price-first tests (VALOR, VALOR CASI,
-VALOR PROP, VALOR PROP CASI) with their own rules. Stopped categories sit in one disclosure. Key: `open`
-(the expanded test).
+VALOR PROP, VALOR PROP CASI) with their own rules. Stopped categories sit in one disclosure. Every card
+links to exactly its rows in the Explorer ("Ver las 34 filas en el Explorador", filter key `test`, pending
+rows included, the same count the Explorer shows). Key: `open` (the expanded test).
 
 **Analysis** (`#/analysis/:part`, parts `breakdown`, `calibration`, `close`, `grok`). Breakdown by 16
 dimensions (tag, market, raw market, league, book, price band, month, weekday, model-probability band,
@@ -234,7 +236,7 @@ Screens format numbers (`src/lib/format.js`) and never compute them. The deliber
 
 Hash routes (`#/explorer/shadow:412?tag=value`). The filter state is one plain object
 (`src/data/filters.js`) serialised to the query: `src, tag, mkt, mraw, lg, book, st, ref, sample, fz,
-why, side, line` (lists), `price` (preset) or `pmin`/`pmax`, `date`, `from`, `to`, `slate`, `close`,
+why, side, line, test` (lists), `price` (preset) or `pmin`/`pmax`, `date`, `from`, `to`, `slate`, `close`,
 `close2`, `evmin`/`evmax`, `prmin`/`prmax`, `pass`, `q`. Settings and saved filters are in `localStorage`
 (`bt.*`); the feed copy in IndexedDB. Derived stats are memoised on the dataset version and the query.
 A 5,000-pick test (`tests/unit/polish-perf.test.mjs`) holds normalize, a filter change with every facet
@@ -578,8 +580,7 @@ See section 8.
 
 - Scrubbing is best effort (section 4). Units, notes and team names are public through the feed.
 - The sheet has no slate *run* date, so "slate date" is the match date.
-- One Tests link (CÓRNERS EQUIPO: "passed every filter" or a date) stays approximate; the weekday
-  breakdown has no Explorer link (there is no weekday filter).
+- The weekday breakdown has no Explorer link (there is no weekday filter).
 - VALOR PROP's decision row mentions a bootstrap by match; neither `review.py` nor the app runs one.
 - The Grok part of Analysis ignores the source and tag filters (a banner says so).
 - Decision themes are derived from the topic text by patterns; a new kind of topic can land in a
