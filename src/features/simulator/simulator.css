@@ -121,3 +121,7 @@
 .simulator .sim-quick .fchip { min-width: var(--tap); justify-content: center; }
 /* Reflow at large text: the staking modes wrap inside their segment. */
 .simulator .sim-staking .seg { white-space: normal; }
+
+/* Reflow guard: the headline wraps and the picks header gives way before the page scrolls sideways. */
+.simulator .sim-picks-head { flex-wrap: wrap; min-width: 0; }
+.simulator .sim-lead, .simulator .sim-big, .simulator .sim-count { overflow-wrap: anywhere; min-width: 0; }

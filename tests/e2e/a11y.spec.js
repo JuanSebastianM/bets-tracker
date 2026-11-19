@@ -221,6 +221,8 @@ test.describe('keyboard', () => {
   // the first Tab. A fresh load has no previous focus, so every walk starts at the document's start.
   for (const r of ROUTES) {
     test(`every Tab stop is visible and in a sensible place, never the page body: ${r.path}`, async ({ page }) => {
+      // One route takes 5 to 8 seconds alone and passed the default 20 s when other agents loaded the machine.
+      test.setTimeout(90_000);
       await fresh(page, r.path);
       await expect(page.getByTestId(r.ready).first()).toBeVisible();
       const seen = [];
@@ -425,6 +427,28 @@ test('reflow: every route at 320 px and at 200% text has no sideways scroll', as
   for (const r of ROUTES) {
     await fresh(page, r.path);
     await page.addStyleTag({ content: 'html { font-size: 200% !important; }' });
+    await expect(page.getByTestId(r.ready).first()).toBeVisible();
+    await expectNoHorizontalScroll(page);
+  }
+});
+
+// The same two conditions with a wider font than the app's own. The CI runner has no UI font and falls
+// back to a wider one; twice a layout that held here scrolled sideways there and the deploy was skipped.
+// A phone without the font behaves like the runner, so this is a real case, not a test artefact.
+const WIDE_FONT = '* { font-family: "DejaVu Sans", Verdana, sans-serif !important; letter-spacing: 0.5px !important; }';
+test('reflow with a wider fallback font: 320 px and 200% text still have no sideways scroll', async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 320, height: 640 });
+  for (const r of ROUTES) {
+    await fresh(page, r.path);
+    await page.addStyleTag({ content: WIDE_FONT });
+    await expect(page.getByTestId(r.ready).first()).toBeVisible();
+    await expectNoHorizontalScroll(page);
+  }
+  await page.setViewportSize(PHONE);
+  for (const r of ROUTES) {
+    await fresh(page, r.path);
+    await page.addStyleTag({ content: 'html { font-size: 200% !important; } ' + WIDE_FONT });
     await expect(page.getByTestId(r.ready).first()).toBeVisible();
     await expectNoHorizontalScroll(page);
   }

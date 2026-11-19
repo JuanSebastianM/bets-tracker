@@ -95,7 +95,7 @@ async function follow(page, kind, links) {
 }
 
 test('every kind of link into the Explorer opens exactly what its row counts', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(300_000); // about 40 s alone; it timed out at 120 s on a machine loaded by other agents
   await page.setViewportSize({ width: 1280, height: 900 });
   // Overview, all time and the last slate: tag, line and market rows, source cards, pending, quick links.
   for (const period of ['', '?date=last_slate', '?date=30d']) {

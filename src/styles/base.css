@@ -136,3 +136,9 @@ img, svg { display: block; }
 .app-title { min-width: min(20%, 6em); }
 .sync-stamp { min-width: 0; }
 .sync-stamp .stamp-lines { min-width: 0; overflow-wrap: anywhere; }
+
+/* Reflow guard: the five tabs share the bar whatever the font; a label that does not fit is cut, not widened. */
+.tabbar ul { min-width: 0; }
+.tabbar li, .tab { min-width: 0; }
+.tab span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; overflow-wrap: normal; }
+main, .page, .content { min-width: 0; }

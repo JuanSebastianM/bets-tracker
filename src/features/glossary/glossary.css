@@ -107,3 +107,12 @@
 .glossary .gl-decisions a { display: inline-block; }
 .glossary .gl-decisions a::after { content: ''; position: absolute; inset: -12px 0; }
 .glossary .gl-entry-head a.chip::after { content: ''; position: absolute; inset: -12px -2px; }
+
+/* Reflow guard: groups and entries never set the page width. */
+.glossary .gl-group, .glossary .gl-items, .glossary .gl-item { min-width: 0; max-width: 100%; }
+.glossary .gl-items { grid-template-columns: minmax(0, 1fr); }
+.glossary .gl-group-sum { flex-wrap: wrap; }
+.glossary .gl-item-head { flex-wrap: wrap; }
+.glossary .gl-item-short, .glossary .gl-group-sum > * { overflow-wrap: anywhere; min-width: 0; }
+.glossary .gl-pager { flex-wrap: wrap; }
+.glossary .gl-pager > * { min-width: 0; }

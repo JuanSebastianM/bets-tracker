@@ -364,3 +364,20 @@ mark.hl { background: var(--c-accent-soft); color: inherit; border-radius: 3px; 
 /* Round 2: half results are written in words ("+3 medias"), longer than "+3½": the figures may wrap. */
 .score-figures { flex-wrap: wrap; row-gap: 4px; }
 .score-half { white-space: nowrap; }
+
+/* Reflow guard (CI run 19, 19 Nov): with a wider fallback font and text at 200%, the pick card's
+   one-line rows set the width of the whole list and the page scrolled sideways. Every grid here has one
+   shrinkable column, rows wrap, and long words break instead of pushing their container wider. */
+.pick-list, .stack, .stack-sm, .card, .grid { grid-template-columns: minmax(0, 1fr); }
+.pick-list { min-width: 0; }
+.pick-card { min-width: 0; max-width: 100%; }
+.pc-top { flex-wrap: wrap; row-gap: 2px; min-width: 0; }
+.pc-top > *, .pc-main > * { min-width: 0; }
+.pc-main > :first-child { flex: 1 1 0; overflow-wrap: anywhere; }
+.pc-price { flex: 0 1 auto; }
+.pc-date, .card-title, .card-sub, .page-title, .stat-label, .stat-value { overflow-wrap: anywhere; }
+.btn { max-width: 100%; }
+a.btn, button.btn { white-space: normal; }
+.pick-card { grid-template-columns: minmax(0, 1fr); }
+.pc-main { flex-wrap: wrap; }
+.pc-what { flex: 1 1 8rem; }
